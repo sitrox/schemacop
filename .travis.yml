@@ -5,4 +5,4 @@ rvm:
  - 2.3.0
 script:
  - bundle exec rake test
- - RAILS_ENV=development bundle exec rubocop
+ - bundle exec rubocop
