@@ -1,7 +1,12 @@
 # Schemacop
 
+<<<<<<< HEAD
 Schemacop validates ruby structures consisting of nested hashes and arrays
 against simple schema definitions.
+=======
+Schemacop allows to validate ruby structures consisting of nested hashes and
+arrays against a simple schema definition.
+>>>>>>> Update README.md
 
 Example:
 
