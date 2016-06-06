@@ -1,0 +1,1 @@
+--markup=markdown --readme=README.md --no-private lib/**/*.rb
