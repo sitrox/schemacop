@@ -1,3 +1,5 @@
+# Schemacop
+
 Schemacop allows to validate ruby structures consisting of nested hashes and
 arrays against a simple schema definition.
 
@@ -338,4 +340,4 @@ Schemacop's changelog is available [here](CHANGELOG.md).
 
 ## Copyright
 
-Copyright (c) 2016 Sitrox. See [LICENSE.txt](LICENSE.txt) for further details.
+Copyright (c) 2016 Sitrox. See [LICENSE](LICENSE) for further details.
