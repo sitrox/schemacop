@@ -19,6 +19,7 @@ task :gemspec do
     spec.add_development_dependency 'activesupport'
     spec.add_development_dependency 'haml'
     spec.add_development_dependency 'yard'
+    spec.add_development_dependency 'rubocop'
     spec.add_development_dependency 'redcarpet'
   end
 
