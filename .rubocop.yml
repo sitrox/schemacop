@@ -3,6 +3,7 @@ AllCops:
     - 'local/**/*'
     - 'vendor/**/*'
     - 'tmp/**/*'
+    - '*.gemspec'
 
   DisplayCopNames: true
 
