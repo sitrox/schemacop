@@ -3,7 +3,10 @@ task :gemspec do
     spec.name          = 'schemacop'
     spec.version       = IO.read('VERSION').chomp
     spec.authors       = ['Sitrox']
-    spec.summary       = 'Validation of ruby structures against a schema definition.'
+    spec.summary       = %(
+      Schemacop allows to validate ruby structures consisting of nested hashes and
+      arrays against a simple schema definition.
+    )
     spec.files         = `git ls-files`.split($INPUT_RECORD_SEPARATOR)
     spec.executables   = []
     spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
@@ -11,9 +14,8 @@ task :gemspec do
 
     spec.add_development_dependency 'bundler', '~> 1.3'
     spec.add_development_dependency 'rake'
-    spec.add_development_dependency 'rspec'
     spec.add_development_dependency 'ci_reporter', '~> 2.0'
-    spec.add_development_dependency 'ci_reporter_rspec'
+    spec.add_development_dependency 'ci_reporter_minitest'
     spec.add_development_dependency 'activerecord'
     spec.add_development_dependency 'haml'
     spec.add_development_dependency 'yard'
@@ -24,12 +26,13 @@ task :gemspec do
 end
 
 # rubocop: disable Lint/HandleExceptions
-
 begin
-  require 'rspec/core/rake_task'
-  require 'ci/reporter/rake/rspec'
-  RSpec::Core::RakeTask.new(:spec)
-  task spec: 'ci:setup:rspec'
-  task test: :spec
+  require 'rake/testtask'
+  require 'ci/reporter/rake/minitest'
+  Rake::TestTask.new do |t|
+    t.pattern = 'test/*_test.rb'
+    t.verbose = false
+    t.libs << 'test'
+  end
 rescue LoadError
 end
