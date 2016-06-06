@@ -4,5 +4,6 @@ rvm:
  - 2.2
  - 2.3.0
 script:
+ - bundle install
  - bundle exec rake test
  - bundle exec rubocop
