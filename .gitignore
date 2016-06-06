@@ -1,0 +1,14 @@
+/.bundle
+.DS_Store
+*.tmproj
+tmtags
+/Gemfile.lock
+*~
+\#*
+.\#*
+*.swp
+/vendor/gems/*
+/vendor/bundle/*
+/spec/reports
+/.yardoc
+.idea
