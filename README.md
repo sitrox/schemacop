@@ -19,7 +19,7 @@ data = {
   last_name: 'Doe'
 }
 
-Schemacop.validate(schema, data)
+Schemacop.validate!(schema, data)
 ```
 
 ## Installation
@@ -42,7 +42,7 @@ gem 'schemacop'
 Schemacop's interface is very simple:
 
 ```ruby
-Schemacop.validate(schema, data)
+Schemacop.validate!(schema, data)
 ```
 
 It will throw an exception if either the schema is wrong or the given data does
