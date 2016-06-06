@@ -16,7 +16,7 @@ task :gemspec do
     spec.add_development_dependency 'rake'
     spec.add_development_dependency 'ci_reporter', '~> 2.0'
     spec.add_development_dependency 'ci_reporter_minitest'
-    spec.add_development_dependency 'activerecord'
+    spec.add_development_dependency 'activesupport'
     spec.add_development_dependency 'haml'
     spec.add_development_dependency 'yard'
     spec.add_development_dependency 'redcarpet'
