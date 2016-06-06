@@ -338,10 +338,6 @@ Schemacop will throw one of the following checked exceptions:
 Thanks to [Rubocop](https://github.com/bbatsov/rubocop) for great inspiration
 concerning their name and the structure of their README file.
 
-## Changelog
-
-Schemacop's changelog is available [here](CHANGELOG.md).
-
 ## Copyright
 
-Copyright (c) 2016 Sitrox. See [LICENSE](LICENSE) for further details.
+Copyright (c) 2016 Sitrox. See `LICENSE` for further details.
