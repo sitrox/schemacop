@@ -1,0 +1,405 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>
+  File: README
+  
+    &mdash; Documentation by YARD 0.8.7.6
+  
+</title>
+
+  <link rel="stylesheet" href="css/style.css" type="text/css" charset="utf-8" />
+
+  <link rel="stylesheet" href="css/common.css" type="text/css" charset="utf-8" />
+
+<script type="text/javascript" charset="utf-8">
+  hasFrames = window.top.frames.main ? true : false;
+  relpath = '';
+  framesUrl = "frames.html#!file.README.html";
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div id="header">
+      <div id="menu">
+  
+    <a href="_index.html">Index</a> &raquo; 
+    <span class="title">File: README</span>
+  
+
+  <div class="noframes"><span class="title">(</span><a href="." target="_top">no frames</a><span class="title">)</span></div>
+</div>
+
+      <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="class_list.html">
+      Class List
+    </a>
+  
+    <a class="full_list_link" id="method_list_link"
+        href="method_list.html">
+      Method List
+    </a>
+  
+    <a class="full_list_link" id="file_list_link"
+        href="file_list.html">
+      File List
+    </a>
+  
+</div>
+      <div class="clear"></div>
+    </div>
+
+    <iframe id="search_frame"></iframe>
+
+    <div id="content"><div id='filecontents'><p><a href="https://travis-ci.org/sitrox/schemacop"><img src="https://travis-ci.org/sitrox/schemacop.svg?branch=master" alt="Build Status"></a></p>
+
+<h1>Schemacop</h1>
+
+<p>Schemacop validates ruby structures consisting of nested hashes and arrays
+against simple schema definitions.</p>
+
+<p>Example:</p>
+
+<pre class="code ruby"><code class="ruby"><span class='id identifier rubyid_schema'>schema</span> <span class='op'>=</span> <span class='lbrace'>{</span>
+  <span class='label'>type:</span> <span class='symbol'>:hash</span><span class='comma'>,</span>
+  <span class='label'>hash:</span> <span class='lbrace'>{</span>
+    <span class='label'>first_name:</span> <span class='symbol'>:string</span><span class='comma'>,</span>
+    <span class='label'>last_name:</span> <span class='symbol'>:string</span>
+  <span class='rbrace'>}</span>
+<span class='rbrace'>}</span>
+
+<span class='id identifier rubyid_data'>data</span> <span class='op'>=</span> <span class='lbrace'>{</span>
+  <span class='label'>first_name:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>John</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+  <span class='label'>last_name:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Doe</span><span class='tstring_end'>&#39;</span></span>
+<span class='rbrace'>}</span>
+
+<span class='const'>Schemacop</span><span class='period'>.</span><span class='id identifier rubyid_validate!'>validate!</span><span class='lparen'>(</span><span class='id identifier rubyid_schema'>schema</span><span class='comma'>,</span> <span class='id identifier rubyid_data'>data</span><span class='rparen'>)</span>
+</code></pre>
+
+<h2>Installation</h2>
+
+<p>To install the <strong>Schemacop</strong> gem:</p>
+
+<pre class="code sh"><code class="sh">$ gem install schemacop
+</code></pre>
+
+<p>To install it using <code>bundler</code> (recommended for any application), add it
+to your <code>Gemfile</code>:</p>
+
+<pre class="code ruby"><code class="ruby"><span class='id identifier rubyid_gem'>gem</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>schemacop</span><span class='tstring_end'>&#39;</span></span>
+</code></pre>
+
+<h2>Basic usage</h2>
+
+<p>Schemacop&#39;s interface is very simple:</p>
+
+<pre class="code ruby"><code class="ruby"><span class='const'>Schemacop</span><span class='period'>.</span><span class='id identifier rubyid_validate!'>validate!</span><span class='lparen'>(</span><span class='id identifier rubyid_schema'>schema</span><span class='comma'>,</span> <span class='id identifier rubyid_data'>data</span><span class='rparen'>)</span>
+</code></pre>
+
+<p>It will throw an exception if either the schema is wrong or the given data does
+not comply with the schema. See section <em>Exceptions</em> for more information.</p>
+
+<h2>Defining schemas</h2>
+
+<p>Schemacop can validate recursive structures of arrays nested into hashes and
+vice-versa. &#39;Leaf-nodes&#39; can be of any data type, but their internal structure
+is not validated.</p>
+
+<p>Schema definitions are always a hash, even if they specify an array. Each level
+of a definition hash has to define a type.</p>
+
+<p>You can specify any type, but only the types <code>:hash</code> and <code>:array</code> allow you to
+specify a sub structure.</p>
+
+<h3>Defining hashes</h3>
+
+<p>Once a level is defined as a hash (<code>type: :hash</code>), you can provide the key
+<code>hash</code> which in turn specifies the keys contained in that hash:</p>
+
+<pre class="code ruby"><code class="ruby"><span class='lbrace'>{</span>
+  <span class='label'>type:</span> <span class='symbol'>:hash</span><span class='comma'>,</span>
+  <span class='label'>hash:</span> <span class='lbrace'>{</span>
+    <span class='label'>first_name:</span> <span class='lbrace'>{</span> <span class='label'>type:</span> <span class='symbol'>:string</span> <span class='rbrace'>}</span><span class='comma'>,</span>
+    <span class='label'>last_name:</span> <span class='lbrace'>{</span> <span class='label'>type:</span> <span class='symbol'>:string</span> <span class='rbrace'>}</span>
+  <span class='rbrace'>}</span>
+<span class='rbrace'>}</span>
+</code></pre>
+
+<p>If you don&#39;t provide the <code>:hash</code> key, the hash won&#39;t be validated (other than
+the verification that it really is a hash):</p>
+
+<pre class="code ruby"><code class="ruby"><span class='lbrace'>{</span> <span class='label'>type:</span> <span class='symbol'>:hash</span> <span class='rbrace'>}</span>
+</code></pre>
+
+<p>Hash definitions can be nested deeply:</p>
+
+<pre class="code ruby"><code class="ruby"><span class='lbrace'>{</span>
+  <span class='label'>type:</span> <span class='symbol'>:hash</span><span class='comma'>,</span>
+  <span class='label'>hash:</span> <span class='lbrace'>{</span>
+    <span class='label'>name:</span> <span class='lbrace'>{</span>
+      <span class='label'>type:</span> <span class='symbol'>:hash</span><span class='comma'>,</span>
+      <span class='label'>hash:</span> <span class='lbrace'>{</span>
+        <span class='label'>first_name:</span> <span class='lbrace'>{</span> <span class='label'>type:</span> <span class='symbol'>:string</span> <span class='rbrace'>}</span><span class='comma'>,</span>
+        <span class='label'>last_name:</span> <span class='lbrace'>{</span> <span class='label'>type:</span> <span class='symbol'>:string</span> <span class='rbrace'>}</span>
+      <span class='rbrace'>}</span>
+    <span class='rbrace'>}</span>
+  <span class='rbrace'>}</span>
+<span class='rbrace'>}</span>
+</code></pre>
+
+<h3>Defining arrays</h3>
+
+<p>When you define a level as an array (<code>type: :array</code>), you can provide further
+specification of the array&#39;s contents uby supplying the key <code>:array</code>:</p>
+
+<pre class="code ruby"><code class="ruby"><span class='lbrace'>{</span>
+  <span class='label'>type:</span> <span class='symbol'>:array</span><span class='comma'>,</span>
+  <span class='label'>array:</span> <span class='lbrace'>{</span>
+    <span class='label'>type:</span> <span class='symbol'>:string</span>
+  <span class='rbrace'>}</span>
+<span class='rbrace'>}</span>
+</code></pre>
+
+<p>This example would define an array of strings.</p>
+
+<p>Arrays can nest hashes and vice-versa:</p>
+
+<pre class="code ruby"><code class="ruby"><span class='lbrace'>{</span>
+  <span class='label'>type:</span> <span class='symbol'>:array</span><span class='comma'>,</span>
+  <span class='label'>array:</span> <span class='lbrace'>{</span>
+    <span class='label'>type:</span> <span class='symbol'>:string</span>
+  <span class='rbrace'>}</span>
+<span class='rbrace'>}</span>
+</code></pre>
+
+<p>If you don&#39;t provide the <code>:array</code> key, the array contents won&#39;t be validated:</p>
+
+<pre class="code ruby"><code class="ruby"><span class='lbrace'>{</span> <span class='label'>type:</span> <span class='symbol'>:array</span> <span class='rbrace'>}</span>
+</code></pre>
+
+<h2>Types</h2>
+
+<p>For each level in your schema, you can specify the type in one of the following
+manors:</p>
+
+<ul>
+<li>A ruby class:</li>
+</ul>
+
+<pre class="code ruby"><code class="ruby">  <span class='lbrace'>{</span> <span class='label'>type:</span> <span class='const'>String</span> <span class='rbrace'>}</span>
+</code></pre>
+
+<ul>
+<li>A type alias (see <span class='object_link'><a href="Schemacop/Validator.html#TYPE_ALIASES-constant" title="Schemacop::Validator::TYPE_ALIASES (constant)">Schemacop::Validator::TYPE_ALIASES</a></span> for a full list of
+available type aliasses):</li>
+</ul>
+
+<pre class="code ruby"><code class="ruby">  <span class='lbrace'>{</span> <span class='label'>type:</span> <span class='symbol'>:boolean</span> <span class='rbrace'>}</span>
+</code></pre>
+
+<ul>
+<li>A list of ruby classes or type aliases:</li>
+</ul>
+
+<pre class="code ruby"><code class="ruby">  <span class='lbrace'>{</span> <span class='label'>type:</span> <span class='lbracket'>[</span><span class='const'>String</span><span class='comma'>,</span> <span class='symbol'>:integer</span><span class='rbracket'>]</span> <span class='rbrace'>}</span>
+</code></pre>
+
+<p>When specifying more than one type, it is validated that the given data
+  structure matches <em>one</em> of the given types.</p>
+
+<p>If you specify both <code>:array</code> and <code>:hash</code> in such a type array, you can provide
+  a specification for both <code>array</code> and <code>hash</code> types:</p>
+
+<pre class="code ruby"><code class="ruby">  <span class='lbrace'>{</span>
+    <span class='label'>type:</span> <span class='lbracket'>[</span><span class='symbol'>:array</span><span class='comma'>,</span> <span class='symbol'>:hash</span><span class='rbracket'>]</span><span class='comma'>,</span>
+    <span class='label'>array:</span> <span class='lbrace'>{</span>
+      <span class='label'>type:</span> <span class='symbol'>:string</span>
+    <span class='rbrace'>}</span><span class='comma'>,</span>
+    <span class='label'>hash:</span> <span class='lbrace'>{</span>
+      <span class='label'>first_name:</span> <span class='symbol'>:string</span>
+    <span class='rbrace'>}</span>
+  <span class='rbrace'>}</span>
+</code></pre>
+
+<p>It will then determine which specification to use based on the actual data.</p>
+
+<h2>Null and required</h2>
+
+<p>Using the optional parameters <code>required</code> and <code>null</code>, you can control whether a
+specific substructure must be provided (<code>required</code>) and if it can be <code>nil</code>
+(<code>null</code>).</p>
+
+<p>These two parameters can be combined in any way.</p>
+
+<h3>Required validation</h3>
+
+<p>When validating with <code>required = false</code>, it means that the whole key can be
+omitted. As an example:</p>
+
+<pre class="code ruby"><code class="ruby"><span class='comment'># Successfully validates data hash: {}
+</span><span class='lbrace'>{</span>
+  <span class='label'>type:</span> <span class='symbol'>:hash</span><span class='comma'>,</span>
+  <span class='label'>hash:</span> <span class='lbrace'>{</span>
+    <span class='label'>first_name:</span> <span class='lbrace'>{</span> <span class='label'>type:</span> <span class='symbol'>:string</span><span class='comma'>,</span> <span class='label'>required:</span> <span class='kw'>false</span> <span class='rbrace'>}</span>
+  <span class='rbrace'>}</span>
+<span class='rbrace'>}</span>
+</code></pre>
+
+<h3>Null validation</h3>
+
+<p>When validating with <code>null = true</code>, the key must still be present, but it can
+also be <code>nil</code>.</p>
+
+<pre class="code ruby"><code class="ruby"><span class='comment'># Successfully validates data hash: { first_name: nil }
+</span><span class='lbrace'>{</span>
+  <span class='label'>type:</span> <span class='symbol'>:hash</span><span class='comma'>,</span>
+  <span class='label'>hash:</span> <span class='lbrace'>{</span>
+    <span class='label'>first_name:</span> <span class='lbrace'>{</span> <span class='label'>type:</span> <span class='symbol'>:string</span><span class='comma'>,</span> <span class='label'>null:</span> <span class='kw'>false</span> <span class='rbrace'>}</span>
+  <span class='rbrace'>}</span>
+<span class='rbrace'>}</span>
+</code></pre>
+
+<h2>Allowed values</h2>
+
+<p>For any level, you can optionally specify an array of values that are allowed.</p>
+
+<p>For example:</p>
+
+<pre class="code ruby"><code class="ruby"><span class='lbrace'>{</span>
+  <span class='label'>type:</span> <span class='symbol'>:hash</span><span class='comma'>,</span>
+  <span class='label'>hash:</span> <span class='lbrace'>{</span>
+    <span class='label'>category:</span> <span class='lbrace'>{</span> <span class='label'>type:</span> <span class='symbol'>:integer</span><span class='comma'>,</span> <span class='label'>allowed_values:</span> <span class='lbracket'>[</span><span class='int'>1</span><span class='comma'>,</span> <span class='int'>2</span><span class='comma'>,</span> <span class='int'>3</span><span class='rbracket'>]</span> <span class='rbrace'>}</span>
+  <span class='rbrace'>}</span>
+<span class='rbrace'>}</span>
+</code></pre>
+
+<h2>Shortcuts</h2>
+
+<h3>Type shortcut</h3>
+
+<p>If you&#39;d just like to define a type for a level but don&#39;t need to supply any
+additional information, you can just skip passing an extra hash and just pass
+the type instead.</p>
+
+<p>For example, the following</p>
+
+<pre class="code ruby"><code class="ruby"><span class='lbrace'>{</span>
+  <span class='label'>type:</span> <span class='symbol'>:array</span><span class='comma'>,</span>
+  <span class='label'>array:</span> <span class='lbrace'>{</span>
+    <span class='label'>type:</span> <span class='symbol'>:string</span>
+  <span class='rbrace'>}</span>
+<span class='rbrace'>}</span>
+</code></pre>
+
+<p>can also be written as:</p>
+
+<pre class="code ruby"><code class="ruby"><span class='lbrace'>{</span>
+  <span class='label'>type:</span> <span class='symbol'>:array</span><span class='comma'>,</span>
+  <span class='label'>array:</span> <span class='symbol'>:string</span>
+<span class='rbrace'>}</span>
+</code></pre>
+
+<h3>Quick hash and array</h3>
+
+<p>When specifying a level as hash or array and you&#39;re further specifying the
+hashe&#39;s fields or the array&#39;s content types, you can omit the <code>type</code> key.</p>
+
+<p>For example, the following</p>
+
+<pre class="code ruby"><code class="ruby"><span class='lbrace'>{</span>
+  <span class='label'>type:</span> <span class='symbol'>:array</span><span class='comma'>,</span>
+  <span class='label'>array:</span> <span class='lbrace'>{</span>
+    <span class='label'>type:</span> <span class='symbol'>:string</span>
+  <span class='rbrace'>}</span>
+<span class='rbrace'>}</span>
+</code></pre>
+
+<p>can also be written as:</p>
+
+<pre class="code ruby"><code class="ruby"><span class='lbrace'>{</span>
+  <span class='label'>array:</span> <span class='symbol'>:string</span>
+<span class='rbrace'>}</span>
+</code></pre>
+
+<h2>Example schema</h2>
+
+<pre class="code ruby"><code class="ruby"><span class='lbrace'>{</span>
+  <span class='label'>hash:</span> <span class='lbrace'>{</span>
+    <span class='label'>id:</span> <span class='lbracket'>[</span><span class='const'>Integer</span><span class='comma'>,</span> <span class='const'>String</span><span class='rbracket'>]</span><span class='comma'>,</span>
+    <span class='label'>name:</span> <span class='symbol'>:string</span><span class='comma'>,</span>
+    <span class='label'>meta:</span> <span class='lbrace'>{</span>
+      <span class='label'>hash:</span> <span class='lbrace'>{</span>
+        <span class='label'>groups:</span> <span class='lbrace'>{</span> <span class='label'>array:</span> <span class='symbol'>:integer</span> <span class='rbrace'>}</span><span class='comma'>,</span>
+        <span class='label'>birthday:</span> <span class='const'>Date</span><span class='comma'>,</span>
+        <span class='label'>comment:</span> <span class='lbrace'>{</span>
+          <span class='label'>type:</span> <span class='symbol'>:string</span><span class='comma'>,</span>
+          <span class='label'>required:</span> <span class='kw'>false</span><span class='comma'>,</span>
+          <span class='label'>null:</span> <span class='kw'>true</span>
+        <span class='rbrace'>}</span><span class='comma'>,</span>
+        <span class='label'>ar_object:</span> <span class='const'>User</span>
+      <span class='rbrace'>}</span>
+    <span class='rbrace'>}</span>
+  <span class='rbrace'>}</span><span class='comma'>,</span>
+<span class='rbrace'>}</span>
+</code></pre>
+
+<h2>Exceptions</h2>
+
+<p>Schemacop will throw one of the following checked exceptions:</p>
+
+<ul>
+<li><span class='object_link'><a href="Schemacop/Exceptions/InvalidSchema.html" title="Schemacop::Exceptions::InvalidSchema (class)">Schemacop::Exceptions::InvalidSchema</a></span></li>
+</ul>
+
+<p>This exception is thrown when the given schema definition format is invalid.</p>
+
+<ul>
+<li><span class='object_link'><a href="Schemacop/Exceptions/Validation.html" title="Schemacop::Exceptions::Validation (class)">Schemacop::Exceptions::Validation</a></span></li>
+</ul>
+
+<p>This exception is thrown when the given data does not comply with the given
+  schema definition.</p>
+
+<h2>Known limitations</h2>
+
+<ul>
+<li><p>Schemacop does not yet allow cyclic structures with infinite depth.</p></li>
+<li><p>Schemacop aborts when it encounters an error. It is not able to collect a full
+list of multiple errors.</p></li>
+<li><p>Schemacop is not made for validating complex causalities (i.e. field <code>a</code>
+needs to be given only if field <code>b</code> is present).</p></li>
+<li><p>Schemacop does not yet support string regex matching.</p></li>
+</ul>
+
+<h2>Contributors</h2>
+
+<p>Thanks to <a href="https://github.com/bbatsov/rubocop">Rubocop</a> for great inspiration
+concerning their name and the structure of their README file.</p>
+
+<h2>Changelog</h2>
+
+<p>Schemacop&#39;s changelog is available <a href="CHANGELOG.md">here</a>.</p>
+
+<h2>Copyright</h2>
+
+<p>Copyright (c) 2016 Sitrox. See <a href="LICENSE">LICENSE</a> for further details.</p>
+</div></div>
+
+    <div id="footer">
+  Generated on Mon Jun  6 15:58:59 2016 by
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.8.7.6 (ruby-2.0.0).
+</div>
+
+  </body>
+</html>
