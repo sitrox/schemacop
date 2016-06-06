@@ -25,7 +25,7 @@ Gem::Specification.new do |s|
       s.add_development_dependency(%q<activesupport>, [">= 0"])
       s.add_development_dependency(%q<haml>, [">= 0"])
       s.add_development_dependency(%q<yard>, [">= 0"])
-      s.add_development_dependency(%q<rubocop>, ["~> 0.35"])
+      s.add_development_dependency(%q<rubocop>, ["= 0.35.1"])
       s.add_development_dependency(%q<redcarpet>, [">= 0"])
     else
       s.add_dependency(%q<bundler>, ["~> 1.3"])
@@ -35,7 +35,7 @@ Gem::Specification.new do |s|
       s.add_dependency(%q<activesupport>, [">= 0"])
       s.add_dependency(%q<haml>, [">= 0"])
       s.add_dependency(%q<yard>, [">= 0"])
-      s.add_dependency(%q<rubocop>, ["~> 0.35"])
+      s.add_dependency(%q<rubocop>, ["= 0.35.1"])
       s.add_dependency(%q<redcarpet>, [">= 0"])
     end
   else
@@ -46,7 +46,7 @@ Gem::Specification.new do |s|
     s.add_dependency(%q<activesupport>, [">= 0"])
     s.add_dependency(%q<haml>, [">= 0"])
     s.add_dependency(%q<yard>, [">= 0"])
-    s.add_dependency(%q<rubocop>, ["~> 0.35"])
+    s.add_dependency(%q<rubocop>, ["= 0.35.1"])
     s.add_dependency(%q<redcarpet>, [">= 0"])
   end
 end
