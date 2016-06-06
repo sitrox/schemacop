@@ -13,3 +13,4 @@ tmtags
 /spec/reports
 /.yardoc
 .idea
+/*.gem
