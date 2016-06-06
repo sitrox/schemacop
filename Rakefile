@@ -4,8 +4,8 @@ task :gemspec do
     spec.version       = IO.read('VERSION').chomp
     spec.authors       = ['Sitrox']
     spec.summary       = %(
-      Schemacop allows to validate ruby structures consisting of nested hashes and
-      arrays against a simple schema definition.
+      Schemacop validates ruby structures consisting of nested hashes and arrays
+      against simple schema definitions.
     )
     spec.files         = `git ls-files`.split($INPUT_RECORD_SEPARATOR)
     spec.executables   = []
