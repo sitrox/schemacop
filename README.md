@@ -13,7 +13,7 @@ schema = {
   type: :hash,
   hash: {
     first_name: :string,
-    last_name: :string,
+    last_name: :string
   }
 }
 
@@ -227,7 +227,7 @@ For example:
 {
   type: :hash,
   hash: {
-    category: { type: :integer, allowed_values: [1, 2, 3]}
+    category: { type: :integer, allowed_values: [1, 2, 3] }
   }
 }
 ```
