@@ -1,0 +1,41 @@
+AllCops:
+  Exclude:
+    - 'local/**/*'
+    - 'vendor/**/*'
+    - 'tmp/**/*'
+
+  DisplayCopNames: true
+
+Metrics/MethodLength:
+  Enabled: false
+
+Metrics/AbcSize:
+  Enabled: False
+
+Metrics/CyclomaticComplexity:
+  Enabled: False
+
+Metrics/PerceivedComplexity:
+  Enabled: False
+
+Metrics/LineLength:
+  Max: 160
+
+Style/IfUnlessModifier:
+  Enabled: false
+
+Style/Documentation:
+  Enabled: false
+
+Style/RedundantReturn:
+  Enabled: false
+
+Style/GuardClause:
+  Enabled: false
+
+Style/ClassAndModuleChildren:
+  Enabled: false
+  EnforcedStyle: compact
+  SupportedStyles:
+    - nested
+    - compact
