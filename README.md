@@ -1,3 +1,6 @@
+[![Build Status](https://travis-ci.org/sitrox/schemacop.svg?branch=master)](https://travis-ci.org/sitrox/schemacop)
+
+
 # Schemacop
 
 Schemacop validates ruby structures consisting of nested hashes and arrays
