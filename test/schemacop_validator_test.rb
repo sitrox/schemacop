@@ -21,7 +21,7 @@ class SchemacopValidatorTest < Minitest::Test
     assert_schema({ type: [:string, 'integer'] }, 123)
     assert_schema({ type: String }, 'Hello world')
     assert_schema({ type: :string }, 'Hello world')
-    assert_schema({ type: :array, array: :integer }, %w(John Doe))
+    assert_schema({ type: :array, array: :string }, %w(John Doe))
     assert_schema({ type: :hash, hash: { name: :string } }, name: 'John Doe')
     assert_schema({ type: [:array, :hash], array: { type: :string }, hash: { name: :string } }, name: 'John Doe')
     assert_schema({ type: [:array, :hash], array: { type: :string }, hash: { name: :string } }, %w(John Doe))
