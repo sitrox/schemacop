@@ -10,10 +10,13 @@ class SchemacopValidatorTest < Minitest::Test
 
   def test_short_type_schema
     assert_schema({ type: :array, array: :string }, %w(Hello world))
+    assert_schema({ type: [ Array ], array: :string }, %w(Hello world))
     assert_schema({ array: :string }, %w(Hello world))
     assert_schema({ hash: { first_name: :string, last_name: :string } }, first_name: 'John', last_name: 'Doe')
 
-    assert_schema_failure({ type: :array }, %w(Hello world))
+    assert_schema_failure({ type: :array, array: :integer }, %w(Hello world))
+    assert_schema_failure({ type: Array, array: :string }, [1, 2, 3])
+    assert_schema_failure({ type: [ Array ], array: :integer }, %w(Hello world))
   end
 
   def test_many_types_schema
@@ -46,11 +49,31 @@ class SchemacopValidatorTest < Minitest::Test
       }
     }
 
-    assert_schema(schema_rules, id: 123, name: 'John Doe', meta: { groups: [1, 2, 3], birthday: Date.today, comment: 'Hello world' })
-    assert_schema(schema_rules, id: 'XYZ', name: 'John Doe', meta: { groups: [1, 2, 3], birthday: Date.today })
+    assert_schema(schema_rules, { id: 123, name: 'John Doe', meta: { groups: [1, 2, 3], birthday: Date.today, comment: 'Hello world' } })
+    assert_schema(schema_rules, { id: 'XYZ', name: 'John Doe', meta: { groups: [1, 2, 3], birthday: Date.today } })
   end
 
   def test_hash_without_specification
+    schema_rules = {
+      type: :hash
+    }
+
+    assert_schema(schema_rules, { user: 'hello' })
+    assert_schema(schema_rules, { user: :world })
+    assert_schema(schema_rules, { user: 123 })
+  end
+
+  def test_array_without_specification
+    schema_rules = {
+      type: :array
+    }
+
+    assert_schema(schema_rules, [1, 'hello', :world])
+    assert_schema(schema_rules, [])
+  end
+
+
+  def test_hash_attributes_without_specification
     schema_rules = {
       type: :hash,
       hash: {
@@ -58,8 +81,34 @@ class SchemacopValidatorTest < Minitest::Test
       }
     }
 
-    assert_schema(schema_rules, user: { foo: :bar })
-    assert_schema(schema_rules, user: nil)
+    assert_schema(schema_rules, { user: { foo: :bar } })
+    assert_schema(schema_rules, { user: nil })
+  end
+
+  def test_array_in_hash_without_specification
+    schema_rules = {
+      type: Hash,
+      hash: {
+        types: { type: :array, null: true }
+      }
+    }
+
+    assert_schema(schema_rules, { types: ['test', 1, :hello] })
+    assert_schema(schema_rules, { types: [] })
+    assert_schema(schema_rules, { types: nil })
+  end
+
+  def test_array_in_hash_with_multiple_types
+    schema_rules = {
+      type: :hash,
+      hash: {
+        types: { type: Array, array: [Integer, String] }
+      }
+    }
+
+    assert_schema(schema_rules, { types: ['test', 1] })
+    assert_schema(schema_rules, { types: [] })
+    assert_schema_failure(schema_rules, { types: ['test', 1, :hello_world] })
   end
 
   def test_nested_hash_schema
@@ -76,7 +125,7 @@ class SchemacopValidatorTest < Minitest::Test
       }
     }
 
-    assert_schema(schema_rules, name: { first_name: 'John', last_name: 'Doe' })
+    assert_schema(schema_rules, { name: { first_name: 'John', last_name: 'Doe' } })
   end
 
   def test_flat_hash_old_schema
@@ -89,13 +138,13 @@ class SchemacopValidatorTest < Minitest::Test
       }
     }
 
-    assert_schema schema_rules, name: 'John Doe'
-    assert_schema schema_rules, name: ''
-    assert_schema schema_rules, name: nil
+    assert_schema(schema_rules, { name: 'John Doe' })
+    assert_schema(schema_rules, { name: '' })
+    assert_schema(schema_rules, { name: nil })
 
-    assert_schema_failure schema_rules, name: 123
-    assert_schema_failure schema_rules, name: true
-    assert_schema_failure schema_rules, name: []
+    assert_schema_failure(schema_rules, { name: 123 })
+    assert_schema_failure(schema_rules, { name: true })
+    assert_schema_failure(schema_rules, { name: [] })
   end
 
   def test_array_hash_old_schema
@@ -110,13 +159,13 @@ class SchemacopValidatorTest < Minitest::Test
       }
     }
 
-    assert_schema schema_rules, [{ name: 'John', required: true }, { name: 'Alex', required: false }]
+    assert_schema(schema_rules, [{ name: 'John', required: true }, { name: 'Alex', required: false }])
 
-    assert_schema_failure schema_rules, name: 'John Doe'
-    assert_schema_failure schema_rules, [{ name: 'John Doe' }]
-    assert_schema_failure schema_rules, [{ required: true }]
-    assert_schema_failure schema_rules, [{ name: 0, required: true }]
-    assert_schema_failure schema_rules, [{ name: 'John Doe', required: 'string' }]
+    assert_schema_failure(schema_rules, { name: 'John Doe' })
+    assert_schema_failure(schema_rules, [{ name: 'John Doe' }])
+    assert_schema_failure(schema_rules, [{ required: true }])
+    assert_schema_failure(schema_rules, [{ name: 0, required: true }])
+    assert_schema_failure(schema_rules, [{ name: 'John Doe', required: 'string' }])
   end
 
   def test_fields_array_old_schema
@@ -132,12 +181,12 @@ class SchemacopValidatorTest < Minitest::Test
       }
     }
 
-    assert_schema schema_rules, ids: []
-    assert_schema schema_rules, ids: [1, 2, 3]
+    assert_schema(schema_rules, { ids: [] })
+    assert_schema(schema_rules, { ids: [1, 2, 3] })
 
-    assert_schema_failure schema_rules, ids: [1, '2']
-    assert_schema_failure schema_rules, ids: '3'
-    assert_schema_failure schema_rules, ids: nil
+    assert_schema_failure(schema_rules, { ids: [1, '2'] })
+    assert_schema_failure(schema_rules, { ids: '3' })
+    assert_schema_failure(schema_rules, { ids: nil })
   end
 
   def test_validate_fields_old_schema
@@ -152,14 +201,14 @@ class SchemacopValidatorTest < Minitest::Test
       }
     }
 
-    assert_schema schema_rules, name: 'John', id: 2, ids: [1, 2, 3], currency: 'CHF'
-    assert_schema schema_rules, name: nil, id: 2, ids: [1, 2, 3], currency: 'CHF'
-    assert_schema schema_rules, name: nil, age: 2, id: 2, ids: nil, currency: 'CHF'
-    assert_schema schema_rules, name: nil, id: 2, ids: nil, currency: 'CHF'
+    assert_schema(schema_rules, { name: 'John', id: 2, ids: [1, 2, 3], currency: 'CHF' })
+    assert_schema(schema_rules, { name: nil, id: 2, ids: [1, 2, 3], currency: 'CHF' })
+    assert_schema(schema_rules, { name: nil, age: 2, id: 2, ids: nil, currency: 'CHF' })
+    assert_schema(schema_rules, { name: nil, id: 2, ids: nil, currency: 'CHF' })
 
-    assert_schema_failure schema_rules, id: 2, ids: [1, 2, 3], currency: 'CHF'
-    assert_schema_failure schema_rules, name: nil, id: nil, ids: [1, 2, 3], currency: 'CHF'
-    assert_schema_failure schema_rules, name: nil, id: 2, ids: [1, 2, 3], currency: 'JPN'
+    assert_schema_failure(schema_rules, { id: 2, ids: [1, 2, 3], currency: 'CHF' })
+    assert_schema_failure(schema_rules, { name: nil, id: nil, ids: [1, 2, 3], currency: 'CHF' })
+    assert_schema_failure(schema_rules, { name: nil, id: 2, ids: [1, 2, 3], currency: 'JPN' })
   end
 
   def test_nested_old_schema
