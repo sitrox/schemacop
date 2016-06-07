@@ -36,8 +36,8 @@ module Schemacop
 
       schema[:types] = [*schema[:types]]
       schema[:types].map! do |type|
-        alias_type_type = TYPE_ALIASES.select { |alias_type, data_types| data_types.include?(type) }.keys.first
-        type = alias_type_type unless alias_type_type.nil?
+        alias_type = TYPE_ALIASES.select { |_, v| v.include?(type) }.keys.first
+        type = alias_type unless alias_type.nil?
         type
       end
 
@@ -47,7 +47,7 @@ module Schemacop
             schema[:hash] = schema.delete(:fields)
           end
 
-          schema[:hash] = schema[:hash] || Hash.new
+          schema[:hash] = schema[:hash] || {}
           if schema[:hash].is_a?(Hash)
             schema[:hash].each do |key, value|
               schema[:hash][key] = prepare_schema(value)
@@ -55,9 +55,7 @@ module Schemacop
           end
         end
 
-        if type == :array
-          schema[:array] = prepare_schema(schema[:array])
-        end
+        schema[:array] = prepare_schema(schema[:array]) if type == :array
       end
 
       schema
@@ -93,18 +91,15 @@ module Schemacop
         end
       end
 
-      if schema[:types].present?
-        unless supported_types.any? { |t| data.is_a?(t) }
-          fail Exceptions::Validation, "Property at path #{path} must be of type #{supported_types.inspect}."
-        end
+      if schema[:types].present? && !supported_types.any? { |t| data.is_a?(t) }
+        fail Exceptions::Validation, "Property at path #{path} must be of type #{supported_types.inspect}."
       end
 
       # ---------------------------------------------------------------
       # Check for allowed values
       # ---------------------------------------------------------------
       if schema[:allowed_values] && !schema[:allowed_values].include?(data)
-        fail Exceptions::Validation,
-             "Value #{data.inspect} of property at path #{path} is not valid. Valid are: #{schema[:allowed_values].inspect}."
+        fail Exceptions::Validation, "Value #{data.inspect} of property at path #{path} is not valid. Valid are: #{schema[:allowed_values].inspect}."
       end
 
       # ---------------------------------------------------------------
