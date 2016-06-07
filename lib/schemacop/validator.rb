@@ -1,11 +1,11 @@
 module Schemacop
   class Validator
     TYPE_ALIASES = {
-      hash:             [Hash],
-      array:            [Array],
-      string:           [String],
-      integer:          [Integer],
-      boolean:          [TrueClass, FalseClass]
+      hash:    [Hash],
+      array:   [Array],
+      string:  [String],
+      integer: [Integer],
+      boolean: [TrueClass, FalseClass]
     }
 
     # Validates `data` against `schema` and throws an exception on missmatch.
@@ -25,31 +25,38 @@ module Schemacop
     end
 
     def prepare_schema(schema)
-      schema = { types: schema } unless schema.is_a? Hash
+      schema = { types: schema } unless schema.is_a?(Hash)
 
       if schema.include?(:type)
-        schema[:types] = schema.delete :type
+        schema[:types] = schema.delete(:type)
       else
         schema[:types] = :array unless schema[:array].nil?
         schema[:types] = :hash  unless schema[:hash].nil?
       end
 
       schema[:types] = [*schema[:types]]
+      schema[:types].map! do |type|
+        alias_type_type = TYPE_ALIASES.select { |alias_type, data_types| data_types.include?(type) }.keys.first
+        type = alias_type_type unless alias_type_type.nil?
+        type
+      end
+
       schema[:types].each do |type|
         if type == :hash
-          if schema.include? :fields
-            schema[:hash] = schema.delete :fields
+          if schema.include?(:fields)
+            schema[:hash] = schema.delete(:fields)
           end
 
-          if schema[type].is_a? Hash
-            schema[type].each do |key, value|
-              schema[type][key] = prepare_schema value
+          schema[:hash] = schema[:hash] || Hash.new
+          if schema[:hash].is_a?(Hash)
+            schema[:hash].each do |key, value|
+              schema[:hash][key] = prepare_schema(value)
             end
           end
         end
 
         if type == :array
-          schema[:array] = prepare_schema schema[:array]
+          schema[:array] = prepare_schema(schema[:array])
         end
       end
 
@@ -57,10 +64,10 @@ module Schemacop
     end
 
     def assign_data_type(type)
-      if type.is_a? Symbol
+      if type.is_a?(Symbol)
         fail Exceptions::InvalidSchema, "Type alias #{type} is not supported." if TYPE_ALIASES[type].nil?
         TYPE_ALIASES[type]
-      elsif type.is_a? String
+      elsif type.is_a?(String)
         type.to_s.classify.safe_constantize
       else
         type
@@ -86,8 +93,10 @@ module Schemacop
         end
       end
 
-      unless supported_types.any? { |t| data.is_a?(t) }
-        fail Exceptions::Validation, "Property at path #{path} must be of type #{supported_types.inspect}."
+      if schema[:types].present?
+        unless supported_types.any? { |t| data.is_a?(t) }
+          fail Exceptions::Validation, "Property at path #{path} must be of type #{supported_types.inspect}."
+        end
       end
 
       # ---------------------------------------------------------------
@@ -108,11 +117,13 @@ module Schemacop
           fail Exceptions::InvalidSchema, "Missing schema entry :hash at path #{path}."
         end
 
-        data_keys = data.keys.collect(&:to_s)
         schema_keys = schema[:hash].keys.collect(&:to_s)
+        unless schema_keys.empty?
+          data_keys = data.keys.collect(&:to_s)
 
-        unless (obsolete_keys = data_keys - schema_keys).empty?
-          fail Exceptions::Validation, "Obsolete keys at path #{path}: #{obsolete_keys.inspect}."
+          unless (obsolete_keys = data_keys - schema_keys).empty?
+            fail Exceptions::Validation, "Obsolete keys at path #{path}: #{obsolete_keys.inspect}."
+          end
         end
 
         schema[:hash].each do |sub_key, sub_schema|
@@ -125,12 +136,12 @@ module Schemacop
               fail Exceptions::Validation, "Property at path #{path}.#{sub_key} can't be null."
             end
           else
-            validate_branch "#{path}.#{sub_key}", sub_schema, data[sub_key]
+            validate_branch("#{path}.#{sub_key}", sub_schema, data[sub_key])
           end
         end
-      elsif schema[:types].include? :array
+      elsif schema[:types].include?(:array)
         data.each_with_index do |value, index|
-          validate_branch "#{path}[#{index}]", schema[:array], value
+          validate_branch("#{path}[#{index}]", schema[:array], value)
         end
       end
     end
