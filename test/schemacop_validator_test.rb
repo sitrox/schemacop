@@ -50,6 +50,15 @@ class SchemacopValidatorTest < Minitest::Test
     assert_schema(schema_rules, id: 'XYZ', name: 'John Doe', meta: { groups: [1, 2, 3], birthday: Date.today })
   end
 
+  def test_hash_without_specification
+    schema_rules = {
+      user: { type: :hash, null: true }
+    }
+
+    assert_schema(schema_rules, user: { foo: :bar })
+    assert_schema(schema_rules, user: nil)
+  end
+
   def test_nested_hash_schema
     schema_rules = {
       type: :hash,
