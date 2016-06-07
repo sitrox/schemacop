@@ -52,7 +52,10 @@ class SchemacopValidatorTest < Minitest::Test
 
   def test_hash_without_specification
     schema_rules = {
-      user: { type: :hash, null: true }
+      type: :hash,
+      hash: {
+        user: { type: :hash, null: true }
+      }
     }
 
     assert_schema(schema_rules, user: { foo: :bar })
