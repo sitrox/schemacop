@@ -26,6 +26,7 @@ module Schemacop
 
     def prepare_schema(schema)
       schema = { types: schema } unless schema.is_a?(Hash)
+      schema = schema.dup
 
       if schema.include?(:type)
         schema[:types] = schema.delete(:type)
