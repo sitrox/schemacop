@@ -336,7 +336,8 @@ Schemacop will throw one of the following checked exceptions:
 ## Contributors
 
 Thanks to [Rubocop](https://github.com/bbatsov/rubocop) for great inspiration
-concerning their name and the structure of their README file.
+concerning their name and the structure of their README file. And special thanks to
+[SubGit](http://www.subgit.com/) for their great open source licensing.
 
 ## Copyright
 
