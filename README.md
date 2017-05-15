@@ -3,6 +3,9 @@
 
 # Schemacop
 
+This is the README for Schemacop version 2, which **breaks backwards
+compatibility** with version 1.
+
 Schemacop validates ruby structures consisting of nested hashes and arrays
 against schema definitions described by a simple DSL.
 
