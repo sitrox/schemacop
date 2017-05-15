@@ -7,6 +7,8 @@ task :gemspec do
       Schemacop validates ruby structures consisting of nested hashes and arrays
       against simple schema definitions.
     )
+    spec.license       = 'MIT'
+    spec.homepage      = 'https://github.com/sitrox/schemacop'
     spec.files         = `git ls-files`.split($INPUT_RECORD_SEPARATOR)
     spec.executables   = []
     spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})

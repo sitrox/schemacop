@@ -1,14 +1,42 @@
 AllCops:
+  TargetRubyVersion: 2.3
+
   Exclude:
     - 'local/**/*'
     - 'vendor/**/*'
     - 'tmp/**/*'
-    - '*.gemspec'
+    - 'target/**/*'
+    - 'log/**/*'
+    - 'db/schema.rb'
+    - 'locale/translations.rb'
+    - 'lib/scratch.rb'
 
   DisplayCopNames: true
 
+Style/FrozenStringLiteralComment:
+  Enabled: false
+
+Style/SignalException:
+  EnforcedStyle: only_fail
+
+Style/ConditionalAssignment:
+  Enabled: false
+
+Style/IndentArray:
+  EnforcedStyle: consistent
+
 Metrics/MethodLength:
   Enabled: false
+
+Metrics/ClassLength:
+  Enabled: false
+
+Metrics/ModuleLength:
+  Enabled: false
+
+Metrics/ParameterLists:
+  Max: 5
+  CountKeywordArgs: false
 
 Metrics/AbcSize:
   Enabled: False
@@ -22,6 +50,12 @@ Metrics/PerceivedComplexity:
 Metrics/LineLength:
   Max: 160
 
+Metrics/BlockNesting:
+  Enabled: false
+
+Metrics/BlockLength:
+  Enabled: false
+
 Style/IfUnlessModifier:
   Enabled: false
 
@@ -29,6 +63,9 @@ Style/Documentation:
   Enabled: false
 
 Style/RedundantReturn:
+  Enabled: false
+
+Style/AsciiComments:
   Enabled: false
 
 Style/GuardClause:
@@ -40,3 +77,24 @@ Style/ClassAndModuleChildren:
   SupportedStyles:
     - nested
     - compact
+  # Checks the style of children definitions at classes and modules.
+  #
+  # Basically there are two different styles:
+  #
+  # `nested` - have each child on a separate line
+  #   class Foo
+  #     class Bar
+  #     end
+  #   end
+  #
+  # `compact` - combine definitions as much as possible
+  #   class Foo::Bar
+  #   end
+  #
+  # The compact style is only forced, for classes / modules with one child.
+
+Style/NumericPredicate:
+  Enabled: false
+
+Style/FormatString:
+  Enabled: false
