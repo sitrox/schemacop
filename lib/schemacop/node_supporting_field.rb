@@ -23,7 +23,7 @@ module Schemacop
       field(*args, required: true, allow_nil: false, &block)
     end
 
-    alias req req!
+    alias_method :req, :req!
 
     def opt?(*args, &block)
       field(*args, required: false, allow_nil: true, &block)
@@ -33,7 +33,7 @@ module Schemacop
       field(*args, required: false, allow_nil: false, &block)
     end
 
-    alias opt opt?
+    alias_method :opt, :opt?
 
     protected
 
@@ -42,7 +42,6 @@ module Schemacop
       # options = args.last.is_a?(Hash) ? args.pop : {}
       name = args.shift
 
-      # rubocop: disable Style/IfInsideElse
       if @fields[name]
         @fields[name].type(*args, &block)
       else
@@ -54,7 +53,6 @@ module Schemacop
           @fields[name] = FieldNode.new(name, required, &block)
         end
       end
-      # rubocop: enable Style/IfInsideElse
 
       @fields[name].type(:nil) if allow_nil
     end
