@@ -23,7 +23,7 @@ module Schemacop
       field(*args, required: true, allow_nil: false, &block)
     end
 
-    alias_method req, req!
+    alias_method :req, :req!
 
     def opt?(*args, &block)
       field(*args, required: false, allow_nil: true, &block)
@@ -33,7 +33,7 @@ module Schemacop
       field(*args, required: false, allow_nil: false, &block)
     end
 
-    alias_method opt, opt?
+    alias_method :opt, :opt?
 
     protected
 
