@@ -9,6 +9,7 @@ module Schemacop
                             hash: {},
                             integer: -5,
                             number: -3.2,
+                            symbol: :thing,
                             object: self,
                             string: 'miau' }.freeze
     end
