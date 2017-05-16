@@ -275,9 +275,10 @@ there are plenty of short forms available which we will see below.
 
 ## Types
 
-The following types are supported by Schemacop:
-<!-- TODO: Test the following statement: (you can easily extend them by writing
-another `your_validator.rb` class under `validator/`): -->
+Types are defined via their validators, which is a class under `validator/`.
+Each validator is sourced by `schemacop.rb`.
+
+The following types are supported by Schemacop by default:
 
 * `:boolean` accepts a Ruby TrueClass or FalseClass instance.
 
@@ -296,6 +297,8 @@ another `your_validator.rb` class under `validator/`): -->
 * `:string` accepts a Ruby String.
 
   - supported options: `min`, `max` (bounds for string length)
+
+* `:symbol` accepts a Ruby Symbol.
 
 * `:object` accepts an arbitrary Ruby object (any object if no option is given).
 

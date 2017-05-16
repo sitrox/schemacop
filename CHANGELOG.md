@@ -1,14 +1,14 @@
 # Change log
 
-<!--
 ## master (unreleased)
 
 ### New features
 
+* Validator for type Symbol, accessible with the symbol `:symbol`
+
 ### Bug fixes
 
 ### Changes
--->
 
 ## 2.0.0 (2017-05-15)
 

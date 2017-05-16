@@ -21,6 +21,7 @@ require 'schemacop/validator/hash_validator'
 require 'schemacop/validator/number_validator'
 require 'schemacop/validator/integer_validator'
 require 'schemacop/validator/float_validator'
+require 'schemacop/validator/symbol_validator'
 require 'schemacop/validator/string_validator'
 require 'schemacop/validator/nil_validator'
 require 'schemacop/validator/object_validator' # Matches any object, must be last validator
