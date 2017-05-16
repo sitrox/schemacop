@@ -329,10 +329,10 @@ there are plenty of short forms available which we will see below.</p>
 
 <h2>Types</h2>
 
-<p>The following types are supported by Schemacop:</p>
+<p>Types are defined via their validators, which is a class under <code>validator/</code>.
+Each validator is sourced by <code>schemacop.rb</code>.</p>
 
-<!-- TODO: Test the following statement: (you can easily extend them by writing
-another `your_validator.rb` class under `validator/`): -->
+<p>The following types are supported by Schemacop by default:</p>
 
 <ul>
 <li><p><code>:boolean</code> accepts a Ruby TrueClass or FalseClass instance.</p></li>
@@ -356,6 +356,7 @@ another `your_validator.rb` class under `validator/`): -->
 <ul>
 <li>supported options: <code>min</code>, <code>max</code> (bounds for string length)</li>
 </ul></li>
+<li><p><code>:symbol</code> accepts a Ruby Symbol.</p></li>
 <li><p><code>:object</code> accepts an arbitrary Ruby object (any object if no option is given).</p>
 
 <ul>
@@ -589,7 +590,7 @@ to <a href="http://www.subgit.com/">SubGit</a> for their great open source licen
 </div></div>
 
       <div id="footer">
-  Generated on Mon May 15 17:46:05 2017 by
+  Generated on Tue May 16 11:56:24 2017 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.9 (ruby-2.3.1).
 </div>
