@@ -280,8 +280,8 @@ option <code>min</code> is supported by the <code>:string</code> validator (cove
 
 <h3>Field Line</h3>
 
-<p>Inside a Type Line of type <code>:hash</code> or <code>Hash</code>, you may specify an arbitrary
-number of field lines (one for each key-value pair you want to be in the hash).</p>
+<p>Inside a Type Line of type <code>:hash</code>, you may specify an arbitrary number of field
+lines (one for each key-value pair you want to be in the hash).</p>
 
 <p>Field Lines start with one of the following six identifiers: <code>req</code>, <code>req?</code>,
 <code>req!</code>, <code>opt</code>, <code>opt?</code> or <code>opt!</code>:</p>
@@ -326,6 +326,35 @@ non-nil field of type Integer or Date under the key <code>:age</code>.</p>
 
 <p>You might find the notation cumbersome, and you&#39;d be right to say so. Luckily
 there are plenty of short forms available which we will see below.</p>
+
+<h4>Handling hashes with indifferent access</h4>
+
+<p>Schemacop has special handling for objects of the class
+<code>ActiveSupport::HashWithIndifferentAccess</code>: You may specify the keys as symbols
+or strings, and Schemacop will handle the conversion necessary for proper
+validation internally. Note that if you define the same key as string and
+symbol, it will throw a <code>ValidationError</code> <a href="#exceptions">exception</a> when asked to
+validate a hash with indifferent access.</p>
+
+<p>Thus, the following two schema definitions are equivalent when validating a hash
+with indifferent access:</p>
+
+<pre class="code ruby"><code class="ruby"><span class='const'>Schema</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span> <span class='kw'>do</span>
+  <span class='id identifier rubyid_type'>type</span> <span class='symbol'>:hash</span> <span class='kw'>do</span>
+    <span class='id identifier rubyid_req'>req</span> <span class='symbol'>:name</span> <span class='kw'>do</span>
+      <span class='id identifier rubyid_type'>type</span> <span class='symbol'>:string</span>
+    <span class='kw'>end</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span>
+
+<span class='const'>Schema</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span> <span class='kw'>do</span>
+  <span class='id identifier rubyid_type'>type</span> <span class='symbol'>:hash</span> <span class='kw'>do</span>
+    <span class='id identifier rubyid_req'>req</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>name</span><span class='tstring_end'>&#39;</span></span> <span class='kw'>do</span>
+      <span class='id identifier rubyid_type'>type</span> <span class='symbol'>:string</span>
+    <span class='kw'>end</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span>
+</code></pre>
 
 <h2>Types</h2>
 
@@ -374,7 +403,7 @@ own validation (e.g. through the option <code>check</code>).</li>
 <li>TODO no lookahead for different arrays, see
 validator_array_test#test_multiple_arrays</li>
 </ul></li>
-<li><p><code>:hash</code> accepts a Ruby Hash.</p>
+<li><p><code>:hash</code> accepts a Ruby Hash or an <code>ActiveSupport::HashWithIndifferentAccess</code>.</p>
 
 <ul>
 <li>accepts a block with an arbitrary number of Field Lines.</li>
@@ -590,7 +619,7 @@ to <a href="http://www.subgit.com/">SubGit</a> for their great open source licen
 </div></div>
 
       <div id="footer">
-  Generated on Tue May 16 11:56:24 2017 by
+  Generated on Wed May 17 10:53:58 2017 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.9 (ruby-2.3.1).
 </div>
