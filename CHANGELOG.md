@@ -10,7 +10,7 @@
 ### Changes
 -->
 
-## master (unreleased)
+## 2.2.0 (2017-05-17)
 
 ### Changes
 
