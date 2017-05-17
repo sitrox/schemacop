@@ -3,6 +3,7 @@ end
 
 require 'set'
 require 'active_support/core_ext/class/attribute'
+require 'active_support/hash_with_indifferent_access'
 
 require 'schemacop/scoped_env'
 require 'schemacop/exceptions'
