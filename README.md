@@ -226,8 +226,8 @@ option `min` is supported by the `:string` validator (covered later).
 
 ### Field Line
 
-Inside a Type Line of type `:hash` or `Hash`, you may specify an arbitrary
-number of field lines (one for each key-value pair you want to be in the hash).
+Inside a Type Line of type `:hash`, you may specify an arbitrary number of field
+lines (one for each key-value pair you want to be in the hash).
 
 Field Lines start with one of the following six identifiers: `req`, `req?`,
 `req!`, `opt`, `opt?` or `opt!`:
@@ -273,6 +273,36 @@ end
 You might find the notation cumbersome, and you'd be right to say so. Luckily
 there are plenty of short forms available which we will see below.
 
+#### Handling hashes with indifferent access
+
+Schemacop has special handling for objects of the class
+`ActiveSupport::HashWithIndifferentAccess`: You may specify the keys as symbols
+or strings, and Schemacop will handle the conversion necessary for proper
+validation internally. Note that if you define the same key as string and
+symbol, it will throw a `ValidationError` [exception](#exceptions) when asked to
+validate a hash with indifferent access.
+
+Thus, the following two schema definitions are equivalent when validating a hash
+with indifferent access:
+
+```ruby
+Schema.new do
+  type :hash do
+    req :name do
+      type :string
+    end
+  end
+end
+
+Schema.new do
+  type :hash do
+    req 'name' do
+      type :string
+    end
+  end
+end
+```
+
 ## Types
 
 Types are defined via their validators, which is a class under `validator/`.
@@ -317,7 +347,7 @@ The following types are supported by Schemacop by default:
   - TODO no lookahead for different arrays, see
     validator_array_test#test_multiple_arrays
 
-* `:hash` accepts a Ruby Hash.
+* `:hash` accepts a Ruby Hash or an `ActiveSupport::HashWithIndifferentAccess`.
 
   - accepts a block with an arbitrary number of Field Lines.
 

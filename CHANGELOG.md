@@ -10,6 +10,19 @@
 ### Changes
 -->
 
+## master (unreleased)
+
+### Changes
+
+* Handle `ActiveSupport::HashWithIndifferentAccess` objects gracefully when
+  performing the validation. This allows the user to specify the schema using
+  a mixture of symbols and strings, but during the validation of a
+  `HashWithIndifferentAccess` it transparently converts the keys, both in the
+  schema and in the hash, to symbols.
+
+  In the event that a key is defined both in the string and symbol version,
+  Schemacop expects a Ruby hash and will throw a ValidationError otherwise.
+
 ## 2.1.0 (2017-05-16)
 
 ### New features

@@ -18,11 +18,15 @@ task :gemspec do
     spec.add_development_dependency 'rake'
     spec.add_development_dependency 'ci_reporter', '~> 2.0'
     spec.add_development_dependency 'ci_reporter_minitest'
-    spec.add_development_dependency 'activesupport'
     spec.add_development_dependency 'haml'
     spec.add_development_dependency 'yard'
     spec.add_development_dependency 'rubocop', '0.35.1'
     spec.add_development_dependency 'redcarpet'
+
+    # This lower bound for ActiveSupport is not necessarily true. Schemacop
+    # needs access to ActiveSupport::HashWithIndifferentAccess and expects
+    # behavior of that as in version 5 of ActiveSupport.
+    spec.add_dependency 'activesupport', '>= 4.0', '< 6'
   end
 
   File.open('schemacop.gemspec', 'w') { |f| f.write(gemspec.to_ruby.strip) }
