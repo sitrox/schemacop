@@ -142,6 +142,7 @@ module Schemacop
         end
         req :name, :integer, min: 5, max: 7
         req :id, [:integer, :string]
+        req :callback, :symbol
         req :attrs do
           req :color do
             type :integer
@@ -161,6 +162,7 @@ module Schemacop
         foo: { bar: nil },
         attrs: { color: 5 },
         id: 'hallo',
+        callback: :funky_function,
         colors: [5, 'sdf'],
         cars: [
           {
