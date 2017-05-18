@@ -12,6 +12,13 @@
 
 ## master (unreleased)
 
+### New features
+
+* Option `strict` for the Type `:object`
+
+  This option, which defaults to true, ensures that instance classes are checked
+  strictly. If set to false, instances of derived classes are also allowed.
+
 ### Bug fixes
 
 * Remove '/root' from the paths in the error messages
