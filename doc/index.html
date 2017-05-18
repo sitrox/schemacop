@@ -132,7 +132,7 @@ around at runtime. Those two steps look as follows:</p>
 
 <p>At runtime:</p>
 
-<pre class="code ruby"><code class="ruby"><span class='id identifier rubyid_my_shema'>my_shema</span><span class='period'>.</span><span class='id identifier rubyid_validate!'>validate!</span><span class='lparen'>(</span>
+<pre class="code ruby"><code class="ruby"><span class='id identifier rubyid_my_schema'>my_schema</span><span class='period'>.</span><span class='id identifier rubyid_validate!'>validate!</span><span class='lparen'>(</span>
   <span class='comment'># Your data goes here
 </span><span class='rparen'>)</span>
 </code></pre>
@@ -386,31 +386,38 @@ Each validator is sourced by <code>schemacop.rb</code>.</p>
 <li>supported options: <code>min</code>, <code>max</code> (bounds for string length)</li>
 </ul></li>
 <li><p><code>:symbol</code> accepts a Ruby Symbol.</p></li>
-<li><p><code>:object</code> accepts an arbitrary Ruby object (any object if no option is given).</p>
+<li><p><code>:object</code> accepts an arbitrary Ruby object (any object if no option is given).</p></li>
+</ul>
+
+<p>Supported options:</p>
 
 <ul>
-<li>supported option: <code>classes</code>: Ruby class (or an array of them) that will be
-the only recognized filters. Unlike other options, this one affects not the
-validation but the type recognition, meaning that you can have multiple Type
-Lines with different <code>classes</code> option for the same field, each having its
-own validation (e.g. through the option <code>check</code>).</li>
-</ul></li>
-<li><p><code>:array</code> accepts a Ruby Array.</p>
+<li><p><code>classes</code>: Ruby class (or an array of them) that will be the only recognized
+filters. Unlike other options, this one affects not the validation but the
+type recognition, meaning that you can have multiple Type Lines with
+different <code>classes</code> option for the same field, each having its own
+validation (e.g. through the option <code>check</code>).</p></li>
+<li><p><code>strict</code>: Boolean option, defaults to true. If set to false, the validator
+also allows derived classes of those specified with <code>classes</code>.</p>
 
 <ul>
-<li>supported options: <code>min</code>, <code>max</code> (bounds for array size) and <code>nil</code>: TODO</li>
-<li>accepts a block with an arbitrary number of Type Lines.</li>
-<li>TODO no lookahead for different arrays, see
-validator_array_test#test_multiple_arrays</li>
+<li><code>:array</code> accepts a Ruby Array.</li>
 </ul></li>
-<li><p><code>:hash</code> accepts a Ruby Hash or an <code>ActiveSupport::HashWithIndifferentAccess</code>.</p>
+<li><p>supported options: <code>min</code>, <code>max</code> (bounds for array size) and <code>nil</code>: TODO</p></li>
+<li><p>accepts a block with an arbitrary number of Type Lines.</p></li>
+<li><p>TODO no lookahead for different arrays, see
+validator_array_test#test_multiple_arrays</p>
 
 <ul>
-<li>accepts a block with an arbitrary number of Field Lines.</li>
+<li><code>:hash</code> accepts a Ruby Hash or an <code>ActiveSupport::HashWithIndifferentAccess</code>.</li>
 </ul></li>
-<li><p><code>:nil</code>: accepts a Ruby NilClass instance. If you want to allow <code>nil</code> as a
+<li><p>accepts a block with an arbitrary number of Field Lines.</p>
+
+<ul>
+<li><code>:nil</code>: accepts a Ruby NilClass instance. If you want to allow <code>nil</code> as a
 value in a field, see above for the usage of the suffixes <code>-!</code> and <code>-?</code> for
-Field Lines.</p></li>
+Field Lines.</li>
+</ul></li>
 </ul>
 
 <p>All types support the options <code>if</code> and <code>check</code> (see the section about Type Lines
@@ -619,7 +626,7 @@ to <a href="http://www.subgit.com/">SubGit</a> for their great open source licen
 </div></div>
 
       <div id="footer">
-  Generated on Wed May 17 10:53:58 2017 by
+  Generated on Thu May 18 13:17:23 2017 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.9 (ruby-2.3.1).
 </div>
