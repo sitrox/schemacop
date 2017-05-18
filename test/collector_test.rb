@@ -26,7 +26,7 @@ module Schemacop
 
       assert symbol[:path].first =~ %r{^/long_symbol}
       assert string[:path].first =~ %r{^/long_string}
-      assert number[:path].first =~ %r{^/123456}
+      assert number[:path].first =~ %r{^/123}
     end
 
     def test_nested_paths
