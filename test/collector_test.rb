@@ -8,25 +8,25 @@ module Schemacop
       end
 
       col = s.validate(a: 0)
-      assert col.exceptions.first[:path].first !~ %r'^/root', 'Root node is present in the path.'
+      assert col.exceptions.first[:path].first !~ %r{^/root}, 'Root node is present in the path.'
     end
 
     def test_correct_path
       s = Schema.new do
         req :long_symbol, :string
         req 'long_string', :string
-        req 123456, :string
+        req 123, :string
       end
 
-      col = s.validate('long_string' => 0, long_symbol: 0, 123456 => 0)
+      col = s.validate('long_string' => 0, long_symbol: 0, 123 => 0)
 
       symbol = col.exceptions[0]
       string = col.exceptions[1]
       number = col.exceptions[2]
 
-      assert symbol[:path].first =~ %r'^/long_symbol'
-      assert string[:path].first =~ %r'^/long_string'
-      assert number[:path].first =~ %r'^/123456'
+      assert symbol[:path].first =~ %r{^/long_symbol}
+      assert string[:path].first =~ %r{^/long_string}
+      assert number[:path].first =~ %r{^/123456}
     end
 
     def test_nested_paths
