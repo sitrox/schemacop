@@ -38,7 +38,7 @@ module Schemacop
     #   throughout the validation.
     def validate(data)
       collector = Collector.new
-      @root.fields[:root].validate({ root: data }, collector)
+      @root.fields[:root].validate({ root: data }, collector.ignore_next_segment)
       return collector
     end
 

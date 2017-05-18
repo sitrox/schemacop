@@ -38,8 +38,6 @@ module Schemacop
     protected
 
     def field(*args, required:, allow_nil:, &block)
-      # name = args.shift
-      # options = args.last.is_a?(Hash) ? args.pop : {}
       name = args.shift
 
       if @fields[name]
