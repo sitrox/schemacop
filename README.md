@@ -79,7 +79,7 @@ end
 At runtime:
 
 ```ruby
-my_shema.validate!(
+my_schema.validate!(
   # Your data goes here
 )
 ```
