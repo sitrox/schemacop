@@ -332,11 +332,16 @@ The following types are supported by Schemacop by default:
 
 * `:object` accepts an arbitrary Ruby object (any object if no option is given).
 
-  - supported option: `classes`: Ruby class (or an array of them) that will be
-    the only recognized filters. Unlike other options, this one affects not the
-    validation but the type recognition, meaning that you can have multiple Type
-    Lines with different `classes` option for the same field, each having its
-    own validation (e.g. through the option `check`).
+  Supported options:
+
+  - `classes`: Ruby class (or an array of them) that will be the only recognized
+    filters. Unlike other options, this one affects not the validation but the
+    type recognition, meaning that you can have multiple Type Lines with
+    different `classes` option for the same field, each having its own
+    validation (e.g. through the option `check`).
+
+  - `strict`: Boolean option, defaults to true. If set to false, the validator
+    also allows derived classes of those specified with `classes`.
 
 * `:array` accepts a Ruby Array.
 

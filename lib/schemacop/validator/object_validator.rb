@@ -3,13 +3,19 @@ module Schemacop
     register symbols: :object, klasses: Object
 
     option :classes
+    option :strict
 
     def type_label
       "#{super} (#{classes.join(', ')})"
     end
 
     def type_matches?(data)
-      super && (classes.empty? || classes.include?(data.class)) && !data.nil?
+      if option(:strict).is_a?(FalseClass)
+        sub_or_class = classes.map { |klass| data.class <= klass }.include?(true)
+        super && (classes.empty? || sub_or_class) && !data.nil?
+      else
+        super && (classes.empty? || classes.include?(data.class)) && !data.nil?
+      end
     end
 
     private

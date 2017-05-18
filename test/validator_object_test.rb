@@ -83,5 +83,23 @@ module Schemacop
       assert_verr { s.validate!(fld: nil) }
       assert_verr { s.validate!({}) }
     end
+
+    def test_strict_option
+      s = Schema.new do
+        req :o_strict do
+          type :object, classes: User, strict: true
+        end
+        opt :o_ns do
+          type :object, classes: User, strict: false
+        end
+      end
+
+      assert_nil s.validate!(o_strict: User.new, o_ns: User.new)
+      assert_nil s.validate!(o_strict: User.new, o_ns: SubUser.new)
+      assert_nil s.validate!(o_strict: User.new)
+      assert_verr { s.validate!(o_strict: SubUser.new) }
+      assert_verr { s.validate!(o_strict: User.new, o_ns: AdminUser.new) }
+      assert_verr { s.validate!(o_strict: SubUser.new, o_ns: User.new) }
+    end
   end
 end

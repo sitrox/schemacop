@@ -2,6 +2,9 @@ require 'test_helper'
 
 module Schemacop
   class ShortFormsTest < Minitest::Test
+    class User; end
+    class Group; end
+
     def test_constructor_defaults_to_hash
       s = Schema.new do
         req! :r do
@@ -313,6 +316,16 @@ module Schemacop
       assert_nil s.validate!('1234')
       assert_verr { s.validate!('123') }
       assert_verr { s.validate!(string: '1234') }
+    end
+
+    def test_inline_objects
+      s = Schema.new do
+        req :user, User
+        req :group, Group
+      end
+
+      assert_nil s.validate!(user: User.new, group: Group.new)
+      assert_verr { s.validate!(user: Group.new, group: User.new) }
     end
   end
 end
