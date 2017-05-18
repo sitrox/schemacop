@@ -10,6 +10,17 @@
 ### Changes
 -->
 
+## master (unreleased)
+
+### Bug fixes
+
+* Remove '/root' from the paths in the error messages
+
+### Changes
+
+* Add tests for the Collector paths to ensure correct behavior.
+* Add symbol Type to the short forms test
+
 ## 2.2.0 (2017-05-17)
 
 ### Changes
