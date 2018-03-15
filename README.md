@@ -108,7 +108,7 @@ this:
 s = Schema.new do
   type :integer
   type :hash do
-    req 'name' do
+    req 'present' do
       type :boolean
     end
   end
