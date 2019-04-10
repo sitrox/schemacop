@@ -182,7 +182,7 @@ Consider a scenario in which you want to have the following rule set:
 The corresponding schema would look as follows:
 
 ```ruby
-Schma.new do
+Schema.new do
   type :integer, if: proc { |data| data.odd? }, max: 15
   type :integer
 end
