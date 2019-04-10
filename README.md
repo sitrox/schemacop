@@ -108,7 +108,7 @@ this:
 s = Schema.new do
   type :integer
   type :hash do
-    req 'name' do
+    req 'present' do
       type :boolean
     end
   end
@@ -569,4 +569,4 @@ to [SubGit](http://www.subgit.com/) for their great open source licensing.
 
 ## Copyright
 
-Copyright (c) 2018 Sitrox. See `LICENSE` for further details.
+Copyright (c) 2019 Sitrox. See `LICENSE` for further details.
