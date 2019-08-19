@@ -10,6 +10,12 @@
 ### Changes
 -->
 
+## 2.3.1 (2019-08-19)
+
+### Changes
+
+* Make compatible with Rails 6
+
 ## 2.3.0 (2017-05-18)
 
 ### New features

@@ -26,7 +26,7 @@ task :gemspec do
     # This lower bound for ActiveSupport is not necessarily true. Schemacop
     # needs access to ActiveSupport::HashWithIndifferentAccess and expects
     # behavior of that as in version 5 of ActiveSupport.
-    spec.add_dependency 'activesupport', '>= 4.0', '< 6'
+    spec.add_dependency 'activesupport', '>= 4.0'
   end
 
   File.open('schemacop.gemspec', 'w') { |f| f.write(gemspec.to_ruby.strip) }
