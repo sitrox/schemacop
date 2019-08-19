@@ -6,7 +6,7 @@
 <title>
   File: README
   
-    &mdash; Documentation by YARD 0.9.9
+    &mdash; Documentation by YARD 0.9.20
   
 </title>
 
@@ -161,7 +161,7 @@ this:</p>
 <pre class="code ruby"><code class="ruby"><span class='id identifier rubyid_s'>s</span> <span class='op'>=</span> <span class='const'>Schema</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span> <span class='kw'>do</span>
   <span class='id identifier rubyid_type'>type</span> <span class='symbol'>:integer</span>
   <span class='id identifier rubyid_type'>type</span> <span class='symbol'>:hash</span> <span class='kw'>do</span>
-    <span class='id identifier rubyid_req'>req</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>name</span><span class='tstring_end'>&#39;</span></span> <span class='kw'>do</span>
+    <span class='id identifier rubyid_req'>req</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>present</span><span class='tstring_end'>&#39;</span></span> <span class='kw'>do</span>
       <span class='id identifier rubyid_type'>type</span> <span class='symbol'>:boolean</span>
     <span class='kw'>end</span>
   <span class='kw'>end</span>
@@ -235,7 +235,7 @@ proc returns false.&quot;</p>
 
 <p>The corresponding schema would look as follows:</p>
 
-<pre class="code ruby"><code class="ruby"><span class='const'>Schma</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span> <span class='kw'>do</span>
+<pre class="code ruby"><code class="ruby"><span class='const'>Schema</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span> <span class='kw'>do</span>
   <span class='id identifier rubyid_type'>type</span> <span class='symbol'>:integer</span><span class='comma'>,</span> <span class='label'>if:</span> <span class='id identifier rubyid_proc'>proc</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_data'>data</span><span class='op'>|</span> <span class='id identifier rubyid_data'>data</span><span class='period'>.</span><span class='id identifier rubyid_odd?'>odd?</span> <span class='rbrace'>}</span><span class='comma'>,</span> <span class='label'>max:</span> <span class='int'>15</span>
   <span class='id identifier rubyid_type'>type</span> <span class='symbol'>:integer</span>
 <span class='kw'>end</span>
@@ -622,13 +622,13 @@ to <a href="http://www.subgit.com/">SubGit</a> for their great open source licen
 
 <h2>Copyright</h2>
 
-<p>Copyright (c) 2017 Sitrox. See <code>LICENSE</code> for further details.</p>
+<p>Copyright (c) 2019 Sitrox. See <code>LICENSE</code> for further details.</p>
 </div></div>
 
       <div id="footer">
-  Generated on Thu May 18 13:17:23 2017 by
+  Generated on Mon Aug 19 12:55:07 2019 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.9 (ruby-2.3.1).
+  0.9.20 (ruby-2.6.2).
 </div>
 
     </div>
