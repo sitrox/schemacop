@@ -12,7 +12,7 @@ module Schemacop
         type :object, classes: User
       end
 
-      assert_nil s.validate!(User.new)
+      assert_nothing_raised { s.validate!(User.new) }
       assert_verr { s.validate!(SubUser.new) }
       assert_verr { s.validate!(AdminUser.new) }
     end
@@ -23,8 +23,8 @@ module Schemacop
         type :object, classes: AdminUser
       end
 
-      assert_nil s.validate!(User.new)
-      assert_nil s.validate!(AdminUser.new)
+      assert_nothing_raised { s.validate!(User.new) }
+      assert_nothing_raised { s.validate!(AdminUser.new) }
       assert_verr { s.validate!(SubUser.new) }
       assert_verr { s.validate!([User.new, AdminUser.new]) }
     end
@@ -34,8 +34,8 @@ module Schemacop
         type :object, classes: [User, AdminUser]
       end
 
-      assert_nil s.validate!(User.new)
-      assert_nil s.validate!(AdminUser.new)
+      assert_nothing_raised { s.validate!(User.new) }
+      assert_nothing_raised { s.validate!(AdminUser.new) }
       assert_verr { s.validate!(SubUser.new) }
       assert_verr { s.validate!([User.new, AdminUser.new]) }
     end
@@ -50,9 +50,9 @@ module Schemacop
         end
       end
 
-      assert_nil s.validate!(user: User.new)
-      assert_nil s.validate!(user: User.new, multitype: AdminUser.new)
-      assert_nil s.validate!(user: User.new, multitype: User.new)
+      assert_nothing_raised { s.validate!(user: User.new) }
+      assert_nothing_raised { s.validate!(user: User.new, multitype: AdminUser.new) }
+      assert_nothing_raised { s.validate!(user: User.new, multitype: User.new) }
       assert_verr { s.validate!(user: AdminUser.new) }
       assert_verr { s.validate!(user: User.new, multitype: 12) }
       assert_verr { s.validate!(user: User.new, multitype: self) }
@@ -63,11 +63,11 @@ module Schemacop
         type :object
       end
 
-      assert_nil s.validate!(User.new)
-      assert_nil s.validate!(123)
-      assert_nil s.validate!('sali')
-      assert_nil s.validate!(self)
-      assert_nil s.validate!(self.class)
+      assert_nothing_raised { s.validate!(User.new) }
+      assert_nothing_raised { s.validate!(123) }
+      assert_nothing_raised { s.validate!('sali') }
+      assert_nothing_raised { s.validate!(self) }
+      assert_nothing_raised { s.validate!(self.class) }
       assert_verr { s.validate!(nil) }
     end
 
@@ -78,8 +78,8 @@ module Schemacop
         end
       end
 
-      assert_nil s.validate!(fld: User.new)
-      assert_nil s.validate!(fld: self)
+      assert_nothing_raised { s.validate!(fld: User.new) }
+      assert_nothing_raised { s.validate!(fld: self) }
       assert_verr { s.validate!(fld: nil) }
       assert_verr { s.validate!({}) }
     end
@@ -94,9 +94,9 @@ module Schemacop
         end
       end
 
-      assert_nil s.validate!(o_strict: User.new, o_ns: User.new)
-      assert_nil s.validate!(o_strict: User.new, o_ns: SubUser.new)
-      assert_nil s.validate!(o_strict: User.new)
+      assert_nothing_raised { s.validate!(o_strict: User.new, o_ns: User.new) }
+      assert_nothing_raised { s.validate!(o_strict: User.new, o_ns: SubUser.new) }
+      assert_nothing_raised { s.validate!(o_strict: User.new) }
       assert_verr { s.validate!(o_strict: SubUser.new) }
       assert_verr { s.validate!(o_strict: User.new, o_ns: AdminUser.new) }
       assert_verr { s.validate!(o_strict: SubUser.new, o_ns: User.new) }

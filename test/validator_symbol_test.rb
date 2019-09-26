@@ -7,8 +7,8 @@ module Schemacop
         type :symbol
       end
 
-      assert_nil s.validate!(:good)
-      assert_nil s.validate!('-+/'.to_sym)
+      assert_nothing_raised { s.validate!(:good) }
+      assert_nothing_raised { s.validate!('-+/'.to_sym) }
       assert_verr { s.validate!('bad') }
       assert_verr { s.validate!(456) }
     end

@@ -6,10 +6,10 @@ module Schemacop
       s = Schema.new do
         type :string
       end
-      assert_nil s.validate! ''
-      assert_nil s.validate! 'abc'
-      assert_nil s.validate! 123.to_s
-      assert_nil s.validate! inspect
+      assert_nothing_raised { s.validate! '' }
+      assert_nothing_raised { s.validate! 'abc' }
+      assert_nothing_raised { s.validate! 123.to_s }
+      assert_nothing_raised { s.validate! inspect }
     end
 
     def test_option_min
@@ -17,8 +17,8 @@ module Schemacop
         type :string, min: 3
       end
 
-      assert_nil s.validate!('abc')
-      assert_nil s.validate!('abcd')
+      assert_nothing_raised { s.validate!('abc') }
+      assert_nothing_raised { s.validate!('abcd') }
       assert_verr { s.validate!('ab') }
       assert_verr { s.validate!('') }
     end
@@ -28,9 +28,9 @@ module Schemacop
         type :string, max: 5
       end
 
-      assert_nil s.validate!('')
-      assert_nil s.validate!('abcd')
-      assert_nil s.validate!('abcde')
+      assert_nothing_raised { s.validate!('') }
+      assert_nothing_raised { s.validate!('abcd') }
+      assert_nothing_raised { s.validate!('abcde') }
       assert_verr { s.validate!('abcdef') }
     end
 
@@ -39,9 +39,9 @@ module Schemacop
         type :string, min: 3, max: 5
       end
 
-      assert_nil s.validate!('abc')
-      assert_nil s.validate!('abcd')
-      assert_nil s.validate!('abcde')
+      assert_nothing_raised { s.validate!('abc') }
+      assert_nothing_raised { s.validate!('abcd') }
+      assert_nothing_raised { s.validate!('abcde') }
       assert_verr { s.validate!('ab') }
       assert_verr { s.validate!('abcdef') }
       assert_verr { s.validate!('') }

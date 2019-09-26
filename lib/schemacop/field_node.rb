@@ -18,7 +18,7 @@ module Schemacop
         collector.error "Missing key #{name.inspect}." if @required
         return
       end
-      collector.path "/#{name}" do
+      collector.path "/#{name}", name do
         super(data[name], collector)
       end
     end

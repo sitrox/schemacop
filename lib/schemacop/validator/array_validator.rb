@@ -21,7 +21,7 @@ module Schemacop
         collector.error "Array must have less (<=) than #{option(:max)} elements."
       end
       data.each_with_index do |entry, index|
-        collector.path("[#{index}]") do
+        collector.path("[#{index}]", index) do
           validate_types(entry, collector)
         end
       end

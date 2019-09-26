@@ -40,9 +40,9 @@ module Schemacop
         type :integer, min: 5
       end
 
-      assert_nil s.validate! true
-      assert_nil s.validate! false
-      assert_nil s.validate! 5
+      assert_nothing_raised { s.validate! true }
+      assert_nothing_raised { s.validate! false }
+      assert_nothing_raised { s.validate! 5 }
 
       assert_verr { s.validate! 'sali' }
       assert_verr { s.validate! 4 }
@@ -55,7 +55,7 @@ module Schemacop
           type :integer
         end
       end
-      assert_nil s.validate! [5]
+      assert_nothing_raised { s.validate! [5] }
       assert_verr { s.validate! [nil] }
       assert_verr { s.validate! ['a'] }
       assert_verr { s.validate! [5, 'a'] }
@@ -74,7 +74,7 @@ module Schemacop
            (type == :number && allowed_types.include?(:float)) ||
            allowed_types.include?(:object)
 
-          assert_nil schema.validate! data
+          assert_nothing_raised { schema.validate! data }
         else
           assert_verr { schema.validate! data }
         end

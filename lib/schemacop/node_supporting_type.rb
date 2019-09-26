@@ -93,13 +93,33 @@ module Schemacop
 
     def validate(data, collector)
       super
-
       validate_types(data, collector)
     end
 
     protected
 
+    def cast!(data, collector)
+      @types.each do |type|
+        if type.option?(:cast) && !type.type_matches?(data) && type.type_filter_matches?(data)
+          caster = Caster.new(type.option(:cast), data, type.class.klasses.first)
+
+          if caster.castable?
+            begin
+              data = caster.cast
+              collector.override_value(data)
+              return data
+            rescue Exceptions::InvalidSchemaError => e
+              collector.error e.message
+            end
+          end
+        end
+      end
+
+      return data
+    end
+
     def validate_types(data, collector)
+      data = cast!(data, collector)
       unless (match = @types.find { |t| t.type_matches?(data) })
         allowed_types = @types.map(&:type_label)
 

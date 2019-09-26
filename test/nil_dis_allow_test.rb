@@ -14,8 +14,8 @@ module Schemacop
           type :boolean
         end
       end
-      assert_nil s.validate!(o: nil, r: false)
-      assert_nil s.validate!(o: false, r: false)
+      assert_nothing_raised { s.validate!(o: nil, r: false) }
+      assert_nothing_raised { s.validate!(o: false, r: false) }
       assert_verr { s.validate!(o: true, r: nil) }
       assert_verr { s.validate!(o: nil, r: nil) }
       assert_verr { s.validate!(r: true) }
@@ -30,10 +30,10 @@ module Schemacop
           type :boolean
         end
       end
-      assert_nil s.validate!(o: nil, r: false)
-      assert_nil s.validate!(o: false, r: false)
-      assert_nil s.validate!(r: true)
-      assert_nil s.validate!({})
+      assert_nothing_raised { s.validate!(o: nil, r: false) }
+      assert_nothing_raised { s.validate!(o: false, r: false) }
+      assert_nothing_raised { s.validate!(r: true) }
+      assert_nothing_raised { s.validate!({}) }
       assert_verr { s.validate!(o: true, r: nil) }
       assert_verr { s.validate!(o: nil, r: nil) }
     end

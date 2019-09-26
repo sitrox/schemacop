@@ -15,8 +15,8 @@ module Schemacop
         end
       end
 
-      assert_nil s.validate!(r: 3)
-      assert_nil s.validate!(r: 3, o: 1)
+      assert_nothing_raised { s.validate!(r: 3) }
+      assert_nothing_raised { s.validate!(r: 3, o: 1) }
       assert_verr { s.validate!(o: 1) }
       assert_verr { s.validate!(1) }
       assert_verr { s.validate!(r: 3, n: 5) }
@@ -30,8 +30,8 @@ module Schemacop
         end
       end
 
-      assert_nil s.validate!(r: 3)
-      assert_nil s.validate!(r: 'asd', o: self)
+      assert_nothing_raised { s.validate!(r: 3) }
+      assert_nothing_raised { s.validate!(r: 'asd', o: self) }
       assert_verr { s.validate!(o: -5.3) }
       assert_verr { s.validate!(Class) }
       assert_verr { s.validate!(r: s, n: true) }
@@ -45,8 +45,8 @@ module Schemacop
         end
       end
 
-      assert_nil s.validate!(i: 5)
-      assert_nil s.validate!(i: 5, f: 2.3)
+      assert_nothing_raised { s.validate!(i: 5) }
+      assert_nothing_raised { s.validate!(i: 5, f: 2.3) }
       assert_verr { s.validate!(i: 4, f: 2.3) }
       assert_verr { s.validate!(i: 5, f: 2.2) }
       assert_verr { s.validate!(i: 5, f: 3.4) }
@@ -57,7 +57,7 @@ module Schemacop
 
     def test_inline_type_in_constructor
       s = Schema.new :integer, min: 2, max: 4
-      assert_nil s.validate!(3)
+      assert_nothing_raised { s.validate!(3) }
       assert_verr { s.validate!(5) }
       assert_verr { s.validate!(1) }
     end
@@ -69,9 +69,9 @@ module Schemacop
         opt! :optint, :integer, min: 2, max: 3
       end
 
-      assert_nil s.validate!(nilbool: nil, nilint: nil)
-      assert_nil s.validate!(nilbool: false, nilint: 2)
-      assert_nil s.validate!(nilbool: false, nilint: 3, optint: 2)
+      assert_nothing_raised { s.validate!(nilbool: nil, nilint: nil) }
+      assert_nothing_raised { s.validate!(nilbool: false, nilint: 2) }
+      assert_nothing_raised { s.validate!(nilbool: false, nilint: 3, optint: 2) }
       assert_verr { s.validate!(nilbool: false, nilint: 2, optint: nil) }
       assert_verr { s.validate!(nilbool: false, nilint: 2, optint: 4) }
       assert_verr { s.validate!(nilbool: false, nilint: -5, optint: 2) }
@@ -81,7 +81,7 @@ module Schemacop
       s = Schema.new do
         type(:array, :string)
       end
-      assert_nil s.validate!(%w(a b))
+      assert_nothing_raised { s.validate!(%w(a b)) }
     end
 
     # TODO: Get the exception message into the assertion
@@ -97,10 +97,10 @@ module Schemacop
       s = Schema.new do
         type(:array, [:array, :integer])
       end
-      assert_nil s.validate! [[], 3]
-      assert_nil s.validate! [[:a, 9], 3]
-      assert_nil s.validate! [[]]
-      assert_nil s.validate! [3]
+      assert_nothing_raised { s.validate! [[], 3] }
+      assert_nothing_raised { s.validate! [[:a, 9], 3] }
+      assert_nothing_raised { s.validate! [[]] }
+      assert_nothing_raised { s.validate! [3] }
       assert_verr { s.validate! [[], 'string'] }
       assert_verr { s.validate! [3, 'string'] }
       assert_verr { s.validate! ['string'] }
@@ -119,7 +119,7 @@ module Schemacop
       s = Schema.new do
         type :array, :integer
       end
-      assert_nil s.validate! [5]
+      assert_nothing_raised { s.validate! [5] }
       assert_verr { s.validate! [nil] }
       assert_verr { s.validate! ['a'] }
       assert_verr { s.validate! [5, 'a'] }
@@ -130,7 +130,7 @@ module Schemacop
       s = Schema.new do
         type :array, :array, :integer
       end
-      assert_nil s.validate! [[5]]
+      assert_nothing_raised { s.validate! [[5]] }
       assert_verr { s.validate! [5] }
       assert_verr { s.validate! [[nil]] }
       assert_verr { s.validate! [['a']] }
@@ -160,22 +160,24 @@ module Schemacop
         end
       end
 
-      assert_nil s.validate!(
-        name: 6,
-        foo: { bar: nil },
-        attrs: { color: 5 },
-        id: 'hallo',
-        callback: :funky_function,
-        colors: [5, 'sdf'],
-        cars: [
-          {
-            make: 'Tesla',
-            ps: 5,
-            electric: nil,
-            years: [1993, 1990]
-          }
-        ]
-      )
+      assert_nothing_raised do
+        s.validate!(
+          name: 6,
+          foo: { bar: nil },
+          attrs: { color: 5 },
+          id: 'hallo',
+          callback: :funky_function,
+          colors: [5, 'sdf'],
+          cars: [
+            {
+              make: 'Tesla',
+              ps: 5,
+              electric: nil,
+              years: [1993, 1990]
+            }
+          ]
+        )
+      end
     end
 
     def test_super_deep_wild_should_pass
@@ -210,25 +212,27 @@ module Schemacop
         type :integer, min: 3
       end
 
-      assert_nil s.validate!(
-        id: 'meine ID',
-        friends: [
-          'Rodney',
-          true,
-          false,
-          {
-            rod: {
-              fritz:
-              [
-                [1],
-                [3]
-              ]
+      assert_nothing_raised do
+        s.validate!(
+          id: 'meine ID',
+          friends: [
+            'Rodney',
+            true,
+            false,
+            {
+              rod: {
+                fritz:
+                [
+                  [1],
+                  [3]
+                ]
+              }
             }
-          }
-        ]
-      )
-      assert_nil s.validate!(id: 'my ID', friends: nil)
-      assert_nil s.validate!(3)
+          ]
+        )
+      end
+      assert_nothing_raised { s.validate!(id: 'my ID', friends: nil) }
+      assert_nothing_raised { s.validate!(3) }
     end
 
     def test_example_from_readme
@@ -244,12 +248,14 @@ module Schemacop
         end
       end
 
-      assert_nil schema.validate!(
-        naming: { first_name: 'John',
-                  last_name: 'Doe' },
-        age: 34,
-        password: 'my*pass'
-      )
+      assert_nothing_raised do
+        schema.validate!(
+          naming: { first_name: 'John',
+                    last_name: 'Doe' },
+          age: 34,
+          password: 'my*pass'
+        )
+      end
 
       assert_verr do
         schema.validate!(
@@ -259,6 +265,7 @@ module Schemacop
           password: 'my*pass'
         )
       end
+
       assert_verr do
         schema.validate!(
           naming: { first_name: 'John',
@@ -277,8 +284,8 @@ module Schemacop
         req :description, :string, min: 35
       end
 
-      assert_nil schema2.validate!(description: 'Abstract: a short description')
-      assert_nil schema2.validate!(description: 'Since this is no abstract, we expect it to be longer.')
+      assert_nothing_raised { schema2.validate!(description: 'Abstract: a short description') }
+      assert_nothing_raised { schema2.validate!(description: 'Since this is no abstract, we expect it to be longer.') }
       assert_verr { schema2.validate!(description: 'Abstract: A short description.') }
       assert_verr { schema2.validate!(description: 'Abstract: This is gonna be way way too long for an abstract.') }
       assert_verr { schema2.validate!(description: 'This is too short.') }
@@ -288,16 +295,16 @@ module Schemacop
       s = Schema.new do
         type :array, :integer, min: 3
       end
-      assert_nil s.validate!([3])
-      assert_nil s.validate!([3, 4, 5])
+      assert_nothing_raised { s.validate!([3]) }
+      assert_nothing_raised { s.validate!([3, 4, 5]) }
       assert_verr { s.validate!([3, 2]) }
       assert_verr { s.validate!([5, 'string']) }
     end
 
     def test_one_line_array_schema
       s = Schema.new :array, :integer, min: 3
-      assert_nil s.validate!([3])
-      assert_nil s.validate!([3, 4, 5])
+      assert_nothing_raised { s.validate!([3]) }
+      assert_nothing_raised { s.validate!([3, 4, 5]) }
       assert_verr { s.validate!([3, 2]) }
       assert_verr { s.validate!([5, 'string']) }
     end
@@ -306,14 +313,14 @@ module Schemacop
       s = Schema.new do
         req :bar
       end
-      assert_nil s.validate!(bar: 2)
+      assert_nothing_raised { s.validate!(bar: 2) }
       assert_verr { s.validate!(foo: 2) }
       assert_verr { s.validate!([2]) }
     end
 
     def test_one_line_string_schema
       s = Schema.new :string, min: 4
-      assert_nil s.validate!('1234')
+      assert_nothing_raised { s.validate!('1234') }
       assert_verr { s.validate!('123') }
       assert_verr { s.validate!(string: '1234') }
     end
@@ -324,7 +331,7 @@ module Schemacop
         req :group, Group
       end
 
-      assert_nil s.validate!(user: User.new, group: Group.new)
+      assert_nothing_raised { s.validate!(user: User.new, group: Group.new) }
       assert_verr { s.validate!(user: Group.new, group: User.new) }
     end
   end

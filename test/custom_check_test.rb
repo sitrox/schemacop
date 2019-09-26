@@ -4,9 +4,9 @@ module Schemacop
   class CustomCheckTest < Minitest::Test
     def test_integer_check_short_form
       s = Schema.new :integer, check: proc { |i| i.even? }
-      assert_nil s.validate!(2)
-      assert_nil s.validate!(-8)
-      assert_nil s.validate!(0)
+      assert_nothing_raised { s.validate!(2) }
+      assert_nothing_raised { s.validate!(-8) }
+      assert_nothing_raised { s.validate!(0) }
       assert_verr { s.validate!(1) }
       assert_verr { s.validate!(-7) }
       assert_verr { s.validate!(2.1) }
@@ -14,7 +14,7 @@ module Schemacop
 
     def test_custom_error_message
       s = Schema.new :integer, check: proc { |i| i.even? ? true : 'Custom error' }
-      assert_nil s.validate!(2)
+      assert_nothing_raised { s.validate!(2) }
       exception = assert_verr { s.validate!(3) }
       assert_match(/Custom :check failed: Custom error\./, exception.message)
     end
@@ -24,9 +24,9 @@ module Schemacop
         type :integer, check: ->(i) { i.even? }
       end
 
-      assert_nil s.validate!(2)
-      assert_nil s.validate!(-8)
-      assert_nil s.validate!(0)
+      assert_nothing_raised { s.validate!(2) }
+      assert_nothing_raised { s.validate!(-8) }
+      assert_nothing_raised { s.validate!(0) }
       assert_verr { s.validate!(1) }
       assert_verr { s.validate!(-7) }
       assert_verr { s.validate!(2.1) }
@@ -36,7 +36,7 @@ module Schemacop
       s = Schema.new do
         type :number, check: proc { |x| x == 42 }
       end
-      assert_nil s.validate!(42)
+      assert_nothing_raised { s.validate!(42) }
       assert_verr { s.validate!(42.1) }
       assert_verr { s.validate!(0) }
     end
@@ -47,7 +47,7 @@ module Schemacop
           type :integer
         end
       end
-      assert_nil s.validate!([1, 2, 3])
+      assert_nothing_raised { s.validate!([1, 2, 3]) }
       assert_verr { s.validate!([2, 3, 4]) }
     end
 
@@ -58,7 +58,7 @@ module Schemacop
         end
       end
 
-      assert_nil s.validate!([4, 3, 2])
+      assert_nothing_raised { s.validate!([4, 3, 2]) }
       assert_verr { s.validate!([3, 2]) }
       assert_verr { s.validate!([4, 1]) }
     end
@@ -68,7 +68,7 @@ module Schemacop
         opt 1, :integer
         opt 'two', :string
       end
-      assert_nil s.validate!(1 => 1, 'two' => 'two')
+      assert_nothing_raised { s.validate!(1 => 1, 'two' => 'two') }
       assert_verr { s.validate!(1 => 2, 'two' => 'two') }
       assert_verr { s.validate!(1 => 1, 'two' => 'one') }
     end
@@ -82,9 +82,9 @@ module Schemacop
         req :first_name, :string, min: 3
       end
 
-      assert_nil s.validate!(first_name: 'Bob')
-      assert_nil s.validate!(first_name: 'Sandy')
-      assert_nil s.validate!(first_name: 'Sansibar')
+      assert_nothing_raised { s.validate!(first_name: 'Bob') }
+      assert_nothing_raised { s.validate!(first_name: 'Sandy') }
+      assert_nothing_raised { s.validate!(first_name: 'Sansibar') }
 
       assert_verr { s.validate!(first_name: 'Sandkasten') }
       assert_verr { s.validate!(first_name: 'a') }

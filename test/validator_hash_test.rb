@@ -13,7 +13,7 @@ module Schemacop
           end
         end
       end
-      assert_nil s.validate!(one: 3, two: true)
+      assert_nothing_raised { s.validate!(one: 3, two: true) }
       assert_verr { s.validate!(one: 3) }
       assert_verr { s.validate!(two: true) }
       assert_verr { s.validate!({}) }
@@ -59,10 +59,10 @@ module Schemacop
         end
       end
 
-      assert_nil s.validate!(r: true, r_nil: false)
-      assert_nil s.validate!(r: true, r_nil: nil)
-      assert_nil s.validate!(r: true, r_nil: false, o: false)
-      assert_nil s.validate!(r: true, r_nil: false, o: nil)
+      assert_nothing_raised { s.validate!(r: true, r_nil: false) }
+      assert_nothing_raised { s.validate!(r: true, r_nil: nil) }
+      assert_nothing_raised { s.validate!(r: true, r_nil: false, o: false) }
+      assert_nothing_raised { s.validate!(r: true, r_nil: false, o: nil) }
       assert_verr { s.validate!(r: true, r_nil: false, o_nonnil: nil) }
       assert_verr { s.validate!(o: true) }
       assert_verr { s.validate!(r: nil, r_nil: false, o: true) }

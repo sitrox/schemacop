@@ -7,7 +7,7 @@ module Schemacop
         type :integer, if: proc { |data| data.odd? }
       end
 
-      assert_nil s.validate! 5
+      assert_nothing_raised { s.validate! 5 }
       assert_verr { s.validate! nil }
       assert_verr { s.validate! 4 }
     end
@@ -18,8 +18,8 @@ module Schemacop
         type :string
       end
 
-      assert_nil s.validate!(5)
-      assert_nil s.validate!('abc')
+      assert_nothing_raised { s.validate!(5) }
+      assert_nothing_raised { s.validate!('abc') }
       assert_verr { s.validate!(4) }
     end
 
@@ -29,8 +29,8 @@ module Schemacop
         req :foo, :string, min: 5
       end
 
-      assert_nil s.validate!(foo: 'abc')
-      assert_nil s.validate!(foo: 'bcdef')
+      assert_nothing_raised { s.validate!(foo: 'abc') }
+      assert_nothing_raised { s.validate!(foo: 'bcdef') }
       assert_verr { s.validate!(foo: 'a') }
       assert_verr { s.validate!(foo: 'bcde') }
     end
@@ -41,8 +41,8 @@ module Schemacop
         req :foo, :integer
       end
 
-      assert_nil s.validate!(foo: 3)
-      assert_nil s.validate!(foo: 'abc')
+      assert_nothing_raised { s.validate!(foo: 3) }
+      assert_nothing_raised { s.validate!(foo: 'abc') }
       assert_verr { s.validate!(foo: 'bcd') }
       assert_verr { s.validate!(foo: true) }
     end
@@ -61,8 +61,8 @@ module Schemacop
         end
       end
 
-      assert_nil s.validate!(user: [{ admin: true, admin_only: 'foo' }, { admin: false, non_admin_only: 'foo' }])
-      assert_nil s.validate!(user: [{ admin: true, admin_only: 'foo' }, { non_admin_only: 'foo' }])
+      assert_nothing_raised { s.validate!(user: [{ admin: true, admin_only: 'foo' }, { admin: false, non_admin_only: 'foo' }]) }
+      assert_nothing_raised { s.validate!(user: [{ admin: true, admin_only: 'foo' }, { non_admin_only: 'foo' }]) }
       assert_verr { s.validate!(user: [{ admin: false, admin_only: 'foo' }]) }
       assert_verr { s.validate!(user: [{ admin: true, non_admin_only: 'foo' }]) }
     end
@@ -75,8 +75,8 @@ module Schemacop
         req :bar, :integer
       end
 
-      assert_nil s.validate!(foo: 5, bar: 5)
-      assert_nil s.validate!(foo: 5, bar: 4)
+      assert_nothing_raised { s.validate!(foo: 5, bar: 5) }
+      assert_nothing_raised { s.validate!(foo: 5, bar: 4) }
       assert_verr { s.validate!(foo: 4, bar: 5) }
       assert_verr { s.validate!(foo: 4, bar: 4) }
     end
@@ -87,7 +87,7 @@ module Schemacop
         opt :foo, :integer
       end
 
-      assert_nil s.validate!(foo: 4)
+      assert_nothing_raised { s.validate!(foo: 4) }
       assert_verr { s.validate!({}) }
       assert_verr { s.validate!('something') }
     end

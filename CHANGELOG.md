@@ -14,6 +14,8 @@
 
 ### New features
 
+* Add support for type casting
+
 ### Bug fixes
 
 * Change order of built-in validators so that `Integer` and `String` come

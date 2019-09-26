@@ -17,6 +17,7 @@ module Schemacop
 
     option :if
     option :check
+    option :cast
 
     def type_label
       str = (symbols.first || 'unknown').to_s
@@ -79,6 +80,12 @@ module Schemacop
       if (obsolete_opts = @options.keys - self.class.allowed_options.keys).any?
         fail Exceptions::InvalidSchemaError,
              "Unrecognized option(s) #{obsolete_opts.inspect} for #{self.class.inspect}, allowed options: #{self.class.allowed_options.keys.inspect}."
+      end
+
+      if option?(:cast) && self.class.klasses.size > 1
+        fail Exceptions::InvalidSchemaError,
+             "Casting is only allowed for single-value datatypes, but type #{self.class.inspect} has classes "\
+             "#{self.class.klasses.map(&:inspect)}."
       end
     end
 

@@ -37,7 +37,7 @@ module Schemacop
     # @return [Schemacop::Collector] The object that collected errors
     #   throughout the validation.
     def validate(data)
-      collector = Collector.new
+      collector = Collector.new(data.deep_dup)
       @root.fields[:root].validate({ root: data }, collector.ignore_next_segment)
       return collector
     end
@@ -55,7 +55,7 @@ module Schemacop
         fail Exceptions::ValidationError, collector.exception_message
       end
 
-      return nil
+      return collector.data
     end
   end
 end

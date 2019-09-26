@@ -8,9 +8,9 @@ module Schemacop
           type :integer
         end
       end
-      assert_nil s.validate!([])
-      assert_nil s.validate!([0])
-      assert_nil s.validate!([0, 1])
+      assert_nothing_raised { s.validate!([]) }
+      assert_nothing_raised { s.validate!([0]) }
+      assert_nothing_raised { s.validate!([0, 1]) }
       assert_verr { s.validate!(['string']) }
     end
 
@@ -19,8 +19,8 @@ module Schemacop
         type :array, min: 2
       end
 
-      assert_nil s.validate!([0, 1])
-      assert_nil s.validate!([0, 1, 2])
+      assert_nothing_raised { s.validate!([0, 1]) }
+      assert_nothing_raised { s.validate!([0, 1, 2]) }
       assert_verr { s.validate!([]) }
       assert_verr { s.validate!([0]) }
     end
@@ -30,9 +30,9 @@ module Schemacop
         type :array, max: 2
       end
 
-      assert_nil s.validate!([])
-      assert_nil s.validate!([0])
-      assert_nil s.validate!([0, 1])
+      assert_nothing_raised { s.validate!([]) }
+      assert_nothing_raised { s.validate!([0]) }
+      assert_nothing_raised { s.validate!([0, 1]) }
       assert_verr { s.validate!([0, 1, 2]) }
     end
 
@@ -43,8 +43,8 @@ module Schemacop
         end
       end
 
-      assert_nil s.validate!([1, 2])
-      assert_nil s.validate!([1, 2, 3])
+      assert_nothing_raised { s.validate!([1, 2]) }
+      assert_nothing_raised { s.validate!([1, 2, 3]) }
       assert_verr { s.validate!([]) }
       assert_verr { s.validate!([1]) }
       assert_verr { s.validate!([1, 2, 3, 4]) }
@@ -57,7 +57,7 @@ module Schemacop
         end
       end
 
-      assert_nil s.validate!([1, nil, 2])
+      assert_nothing_raised { s.validate!([1, nil, 2]) }
       assert_verr { s.validate!([1, nil, 'nope']) }
     end
 
@@ -71,8 +71,8 @@ module Schemacop
         end
       end
 
-      assert_nil s.validate!([1, 2, 3])
-      assert_nil s.validate!(%w(one two three))
+      assert_nothing_raised { s.validate!([1, 2, 3]) }
+      assert_nothing_raised { s.validate!(%w(one two three)) }
       assert_verr { s.validate!([1, 'mix']) }
       assert_verr { s.validate!([]) }
     end
@@ -88,9 +88,9 @@ module Schemacop
         type :array
       end
 
-      assert_nil s.validate!([])
-      assert_nil s.validate!([1, 2, 3])
-      assert_nil s.validate!(%w(one two three))
+      assert_nothing_raised { s.validate!([]) }
+      assert_nothing_raised { s.validate!([1, 2, 3]) }
+      assert_nothing_raised { s.validate!(%w(one two three)) }
       assert_verr { s.validate!([1, 'mix']) }
     end
   end

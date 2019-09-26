@@ -6,9 +6,9 @@ module Schemacop
       s = Schema.new do
         type :integer
       end
-      assert_nil s.validate!(-3)
-      assert_nil s.validate!(0)
-      assert_nil s.validate!(15)
+      assert_nothing_raised { s.validate!(-3) }
+      assert_nothing_raised { s.validate!(0) }
+      assert_nothing_raised { s.validate!(15) }
       assert_verr { s.validate!(0.0) }
     end
 
@@ -17,8 +17,8 @@ module Schemacop
         type :integer, min: 6
       end
 
-      assert_nil s.validate!(6)
-      assert_nil s.validate!(7)
+      assert_nothing_raised { s.validate!(6) }
+      assert_nothing_raised { s.validate!(7) }
       assert_verr { s.validate!(5) }
     end
 
@@ -27,8 +27,8 @@ module Schemacop
         type :integer, max: 7
       end
 
-      assert_nil s.validate!(6)
-      assert_nil s.validate!(7)
+      assert_nothing_raised { s.validate!(6) }
+      assert_nothing_raised { s.validate!(7) }
       assert_verr { s.validate!(8) }
     end
 
@@ -37,8 +37,8 @@ module Schemacop
         type :integer, min: 6, max: 7
       end
 
-      assert_nil s.validate!(6)
-      assert_nil s.validate!(7)
+      assert_nothing_raised { s.validate!(6) }
+      assert_nothing_raised { s.validate!(7) }
       assert_verr { s.validate!(5) }
       assert_verr { s.validate!(8) }
     end

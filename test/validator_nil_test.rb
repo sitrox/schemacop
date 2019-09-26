@@ -6,7 +6,7 @@ module Schemacop
       s = Schema.new do
         type :nil
       end
-      assert_nil s.validate! nil
+      assert_nothing_raised { s.validate! nil }
       assert_verr { s.validate! false }
     end
   end
