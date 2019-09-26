@@ -40,8 +40,8 @@ module Schemacop
       self.klasses = [].freeze
     end
 
-    def self.register(symbols: [], klasses: [], clear: true)
-      NodeResolver.register(self)
+    def self.register(symbols: [], klasses: [], clear: true, before: nil)
+      NodeResolver.register(self, before: before)
       symbols = [*symbols]
       klasses = [*klasses]
       if clear
