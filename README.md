@@ -572,6 +572,19 @@ Schemacop will throw one of the following checked exceptions:
 
 * Schemacop does not yet support string regex matching.
 
+## Development
+
+To run tests:
+
+* Check out the source
+
+* Run `bundle install`
+
+* Run `bundle exec rake test` to run all tests
+
+* Run `bundle exec rake test TEST=test/unit/some/file.rb` to run a single test
+  file
+
 ## Contributors
 
 Thanks to [Rubocop](https://github.com/bbatsov/rubocop) for great inspiration
