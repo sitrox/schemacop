@@ -10,6 +10,17 @@
 ### Changes
 -->
 
+## 2.4.0 (unreleased)
+
+### New features
+
+### Bug fixes
+
+* Change order of built-in validators so that `Integer` and `String` come
+  *before* `Number` which matches both.
+
+### Changes
+
 ## 2.3.2 (2019-09-26)
 
 ### New features
