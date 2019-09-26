@@ -203,8 +203,8 @@ the type checking, meaning that it only gets executed if the data has the right
 type and the proc in `if` (if any) has returned true.
 
 The proc passed to the `check` option is given the data being analyzed. It is to
-return true if the data passes the custom check. If it returns false, Schemacop
-considers the data to be invalid.
+return true if the data passes the custom check. If it returns false or an error
+message as a string, Schemacop considers the data to be invalid.
 
 The following example illustrates the use of the option `check`: Consider a
 scenario in which you want the following rule set:
@@ -223,6 +223,17 @@ end
 
 The above Type Line has type `:string` and two options (`min` and `check`). The
 option `min` is supported by the `:string` validator (covered later).
+
+You can also specify a custom error message by returning a string:
+
+
+```ruby
+Schema.new do
+  type :integer, check: proc { |i| i.even? ? true : 'Custom error' }
+end
+```
+
+This will include `Custom error` in the validation error message.
 
 ### Field Line
 

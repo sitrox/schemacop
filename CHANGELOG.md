@@ -10,6 +10,12 @@
 ### Changes
 -->
 
+## 2.3.2 (2019-09-26)
+
+### New features
+
+* Add ability to return custom error messages from `:check` blocks
+
 ## 2.3.1 (2019-08-19)
 
 ### Changes

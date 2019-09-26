@@ -12,6 +12,13 @@ module Schemacop
       assert_verr { s.validate!(2.1) }
     end
 
+    def test_custom_error_message
+      s = Schema.new :integer, check: proc { |i| i.even? ? true : 'Custom error' }
+      assert_nil s.validate!(2)
+      exception = assert_verr { s.validate!(3) }
+      assert_match(/Custom :check failed: Custom error\./, exception.message)
+    end
+
     def test_integer_check_with_lambda
       s = Schema.new do
         type :integer, check: ->(i) { i.even? }

@@ -119,8 +119,12 @@ module Schemacop
     protected
 
     def validate_custom_check(data, collector)
-      if option?(:check) && !option(:check).call(data)
-        collector.error 'Custom :check failed.'
+      if option?(:check) && (check_result = option(:check).call(data)) != true
+        if check_result.is_a?(String)
+          collector.error "Custom :check failed: #{check_result}."
+        else
+          collector.error 'Custom :check failed.'
+        end
       end
     end
   end
