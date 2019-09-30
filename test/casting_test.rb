@@ -78,5 +78,13 @@ module Schemacop
                    'but type Schemacop::NumberValidator has classes ["Integer", "Float"].',
                    e.message
     end
+
+    def test_custom_castings
+      s = Schema.new do
+        type :integer, cast: { String => proc { |v| Integer(v) } }
+      end
+
+      assert_equal 42, s.validate!('42')
+    end
   end
 end

@@ -547,6 +547,92 @@ of type Array with children of type Array with children of type Hash in which at
 least one of the Symbol keys `:food` and `:drink` (with any non-nil value type)
 is present.
 
+## Type casting
+
+Starting from version 2.4.0, Schemacop allows you to specify type castings that
+can alter the validated data. Consider the following:
+
+```ruby
+s = Schema.new do
+  req :id, :integer, cast: [String]
+end
+
+data = s.validate!(id: '42')
+data # => { id: 42 }
+```
+
+### Specifying type castings
+
+Type castings can be specified using two forms: Either as a hash or as an array.
+While using an array only allows you to specify the supported source types to be
+casted, using a hash allows you to specify custom casting logic as blocks.
+
+For hashes, the key must be a class and the value must be either `:default` for
+using a built-in caster or a callable object (proc or lambda) that receives the
+value and is supposed to cast it. If the value can't be casted, the proc must
+fail with an exception. The exception message will then be contained in the
+collected validation errors.
+
+Example:
+
+```ruby
+Schema.new do
+  # Pass array to `cast`. This enables casting from String or Float to Integer
+  # using the built-in casters.
+  req: id_1, :integer, cast: [String, Float]
+
+  # Pass hash to `cast`. This enables casting from Float to Integer using the
+  # built-in caster and from String to Integer using a custom callback.
+  req :id_2, :integer, cast: { Float => :default, String => proc { |s| Integer(s) }
+end
+```
+
+### Built-in casters
+
+Schemacop comes with the following casters:
+
+- `String` to `Integer` and `Float`
+- `Float` to `Integer`
+- `Integer` to `Float`
+
+Note that all built-in casters are precise, so the string `foo` will fail with
+an error if casted to an Integer. When casting float values and strings
+containing float values to integers, the decimal places will be discarded
+however.
+
+### Execution order
+
+The casting is done *before* the options `if` and `check` are evaluated.
+Example:
+
+```ruby
+s = Schema.new do
+  type :integer, if: proc { |i| i == 42 }    # 1
+  type :integer, check: proc { |i| i < 3 }   # 2
+  type :string
+end
+
+s.validate!('42')  # 1 will match
+s.validate!('2')   # 2 will match
+s.validate!('234') # 3 will match
+s.validate!(5)     # Will fail, as nothing matches
+```
+
+### Caveats
+
+Casting only works with type definitions that only include one type. For
+instance, the `Numeric` validator includes both `Integer` and `Float`, which
+would made it unclear what to cast a string into:
+
+```ruby
+# This does not work, as it is unclear whether to cast the String into an
+# Integer or a Float.
+type :number, cast: [String]
+```
+
+The same also applies to booleans, as they compound both `TrueClass` and
+`FalseClass`. This may be tackled in future releases.
+
 ## Exceptions
 
 Schemacop will throw one of the following checked exceptions:

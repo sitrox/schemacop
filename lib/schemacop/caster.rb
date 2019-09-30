@@ -8,7 +8,7 @@ module Schemacop
 
       if casts.is_a?(Array)
         from_types = casts
-      elsif option(:cast).is_a?(Hash)
+      elsif casts.is_a?(Hash)
         from_types = casts.keys
       else
         fail Exceptions::InvalidSchemaError, "Option `cast` must be either an array or a hash."
