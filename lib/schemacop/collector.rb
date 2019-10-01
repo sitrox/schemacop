@@ -11,6 +11,7 @@ module Schemacop
     end
 
     def data
+      return nil unless valid?
       @current_datappoint_path.first
     end
 
@@ -19,7 +20,7 @@ module Schemacop
     end
 
     # Construct the current path
-    def path(segment, index)
+    def path(segment, index, type)
       ignore_this_segment = false
 
       previous_index = @current_index
@@ -28,6 +29,13 @@ module Schemacop
         ignore_this_segment = true
         @ignore_next_segment = false
       else
+        unless @current_datappoint_path.last
+          if type == :hash
+            @current_datappoint_path[-1] = {}
+          else
+            @current_datappoint_path[-1] = []
+          end
+        end
         @current_path << segment unless ignore_this_segment
         @current_datappoint_path << @current_datappoint_path.last[index]
         @current_index = index

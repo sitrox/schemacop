@@ -14,6 +14,8 @@
 
 ### New features
 
+* Add support for default values
+
 * Add support for type casting
 
 ### Bug fixes

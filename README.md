@@ -124,11 +124,39 @@ We will see Type and Field lines in more detail below.
 ### `validate` vs `validate!` vs `valid?`
 
 The method `validate` will return a `Collector` object that contains all
-validation errors (if any), whereas `validate!` will accumulate all violations
-and finally throw an exception describing them.
+validation errors (if any) as well as a deep copy of your data with applied
+defaults and castings, whereas `validate!` will accumulate all violations
+and finally throw an exception describing them or, if the validation was
+successful, a deep-copy of your supplied data with defaults and castings
+applied.
 
 For simply querying the validity of some data, use the methods `valid?` or
 `invalid?`.
+
+Examples:
+
+```ruby
+# validate! returns your modified data or throws a validation error
+s = Schema.new do
+  req :foo, default: 42
+end
+s.validate!({}) # => { foo: 42 }
+
+# validate returns a collector
+s = Schema.new do
+  req :foo, default: 42
+end
+
+collector = s.validate({}) 
+collector.valid? # true
+collector.data   # => { foo: 42 }
+
+collector = s.validate({ foo: 'invalid' }) 
+collector.valid?     # false
+collector.data       # => nil
+collector.exceptions # => Validation error
+```
+
 
 ## Schemacop's DSL
 
@@ -489,6 +517,10 @@ Schema.new do
 end
 ```
 
+Note that this does not allow you to specify any options for the hash itself.
+You still need to specify `:hash` as a type if you want to pass any options to
+the hash (i.e. a `default`).
+
 ### Shortform for subtypes
 
 In case of nested arrays, you can group all Type Lines to a single one.
@@ -547,6 +579,59 @@ of type Array with children of type Array with children of type Hash in which at
 least one of the Symbol keys `:food` and `:drink` (with any non-nil value type)
 is present.
 
+## Defaults
+
+Starting from version 2.4.0, Schemacop allows you to define default values at
+any point in your schema. If the validated data contains a nil value, it will be
+substituted by the given default value.
+
+Note that Schemacop never modifies the data you pass to it. If you want to
+benefit from Schemacop-applied defaults, you need to access the cloned, modified
+data returned by `validate` or `validate!`.
+
+Applying defaults is done before validating the substructure and before any type
+casting. The provided default will be validated same as user-supplied data, so
+if your given default does not validate properly, a validation error is thrown.
+Make sure your default values always match the underlying schema.
+
+Defaults can be specified at any point:
+
+
+```ruby
+# Basic usage
+Schema.new do
+  type :string, default: 'Hello World'
+end
+
+# The default given for the first type will match
+Schema.new do
+  type :string, default: 'Hello World' # This will always be applied of no value is supplied
+  type :integer, default: 42
+end
+
+# You can also pass entire hashes or arrays to your defaults
+Schema.new do
+  req :foo, :hash, default: { foo: :bar } do
+    req :foo, :symbol
+  end
+  req :bar, :array, :integer, default: [1, 2, 3]
+end
+
+# Defaults must match the given schema. The following will fail.
+Schema.new do
+  req :foo, default: { bar: :baz } do
+    req :foo
+  end
+end
+```
+
+### Required data points
+
+Note that any *required* validation is done before applying the defaults. If you
+specify a `req` field, it must always be given, no matter if you have specified
+a default or not. Therefore, specifying `req` fields do not make sense in
+conjunction with defaults, as the default is always ignored.
+
 ## Type casting
 
 Starting from version 2.4.0, Schemacop allows you to specify type castings that
@@ -560,6 +645,10 @@ end
 data = s.validate!(id: '42')
 data # => { id: 42 }
 ```
+
+Note that Schemacop never modifies the data you pass to it. If you want to
+benefit from Schemacop-applied castings, you need to access the cloned, modified
+data returned by `validate` or `validate!`.
 
 ### Specifying type castings
 

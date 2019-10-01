@@ -18,6 +18,7 @@ module Schemacop
     option :if
     option :check
     option :cast
+    option :default
 
     def type_label
       str = (symbols.first || 'unknown').to_s
