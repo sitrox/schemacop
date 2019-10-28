@@ -177,11 +177,37 @@ FalseClass).</p>
 <h3><code>validate</code> vs <code>validate!</code> vs <code>valid?</code></h3>
 
 <p>The method <code>validate</code> will return a <code>Collector</code> object that contains all
-validation errors (if any), whereas <code>validate!</code> will accumulate all violations
-and finally throw an exception describing them.</p>
+validation errors (if any) as well as a deep copy of your data with applied
+defaults and castings, whereas <code>validate!</code> will accumulate all violations
+and finally throw an exception describing them or, if the validation was
+successful, a deep-copy of your supplied data with defaults and castings
+applied.</p>
 
 <p>For simply querying the validity of some data, use the methods <code>valid?</code> or
 <code>invalid?</code>.</p>
+
+<p>Examples:</p>
+
+<pre class="code ruby"><code class="ruby"><span class='comment'># validate! returns your modified data or throws a validation error
+</span><span class='id identifier rubyid_s'>s</span> <span class='op'>=</span> <span class='const'>Schema</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span> <span class='kw'>do</span>
+  <span class='id identifier rubyid_req'>req</span> <span class='symbol'>:foo</span><span class='comma'>,</span> <span class='label'>default:</span> <span class='int'>42</span>
+<span class='kw'>end</span>
+<span class='id identifier rubyid_s'>s</span><span class='period'>.</span><span class='id identifier rubyid_validate!'>validate!</span><span class='lparen'>(</span><span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span> <span class='comment'># =&gt; { foo: 42 }
+</span>
+<span class='comment'># validate returns a collector
+</span><span class='id identifier rubyid_s'>s</span> <span class='op'>=</span> <span class='const'>Schema</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span> <span class='kw'>do</span>
+  <span class='id identifier rubyid_req'>req</span> <span class='symbol'>:foo</span><span class='comma'>,</span> <span class='label'>default:</span> <span class='int'>42</span>
+<span class='kw'>end</span>
+
+<span class='id identifier rubyid_collector'>collector</span> <span class='op'>=</span> <span class='id identifier rubyid_s'>s</span><span class='period'>.</span><span class='id identifier rubyid_validate'>validate</span><span class='lparen'>(</span><span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span> 
+<span class='id identifier rubyid_collector'>collector</span><span class='period'>.</span><span class='id identifier rubyid_valid?'>valid?</span> <span class='comment'># true
+</span><span class='id identifier rubyid_collector'>collector</span><span class='period'>.</span><span class='id identifier rubyid_data'>data</span>   <span class='comment'># =&gt; { foo: 42 }
+</span>
+<span class='id identifier rubyid_collector'>collector</span> <span class='op'>=</span> <span class='id identifier rubyid_s'>s</span><span class='period'>.</span><span class='id identifier rubyid_validate'>validate</span><span class='lparen'>(</span><span class='lbrace'>{</span> <span class='label'>foo:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>invalid</span><span class='tstring_end'>&#39;</span></span> <span class='rbrace'>}</span><span class='rparen'>)</span> 
+<span class='id identifier rubyid_collector'>collector</span><span class='period'>.</span><span class='id identifier rubyid_valid?'>valid?</span>     <span class='comment'># false
+</span><span class='id identifier rubyid_collector'>collector</span><span class='period'>.</span><span class='id identifier rubyid_data'>data</span>       <span class='comment'># =&gt; nil
+</span><span class='id identifier rubyid_collector'>collector</span><span class='period'>.</span><span class='id identifier rubyid_exceptions'>exceptions</span> <span class='comment'># =&gt; Validation error
+</span></code></pre>
 
 <h2>Schemacop&#39;s DSL</h2>
 
@@ -540,6 +566,10 @@ write Field Lines in the schema instantiation:</p>
 <span class='kw'>end</span>
 </code></pre>
 
+<p>Note that this does not allow you to specify any options for the hash itself.
+You still need to specify <code>:hash</code> as a type if you want to pass any options to
+the hash (i.e. a <code>default</code>).</p>
+
 <h3>Shortform for subtypes</h3>
 
 <p>In case of nested arrays, you can group all Type Lines to a single one.</p>
@@ -595,6 +625,145 @@ of type Array with children of type Array with children of type Hash in which at
 least one of the Symbol keys <code>:food</code> and <code>:drink</code> (with any non-nil value type)
 is present.</p>
 
+<h2>Defaults</h2>
+
+<p>Starting from version 2.4.0, Schemacop allows you to define default values at
+any point in your schema. If the validated data contains a nil value, it will be
+substituted by the given default value.</p>
+
+<p>Note that Schemacop never modifies the data you pass to it. If you want to
+benefit from Schemacop-applied defaults, you need to access the cloned, modified
+data returned by <code>validate</code> or <code>validate!</code>.</p>
+
+<p>Applying defaults is done before validating the substructure and before any type
+casting. The provided default will be validated same as user-supplied data, so
+if your given default does not validate properly, a validation error is thrown.
+Make sure your default values always match the underlying schema.</p>
+
+<p>Defaults can be specified at any point:</p>
+
+<pre class="code ruby"><code class="ruby"><span class='comment'># Basic usage
+</span><span class='const'>Schema</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span> <span class='kw'>do</span>
+  <span class='id identifier rubyid_type'>type</span> <span class='symbol'>:string</span><span class='comma'>,</span> <span class='label'>default:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Hello World</span><span class='tstring_end'>&#39;</span></span>
+<span class='kw'>end</span>
+
+<span class='comment'># The default given for the first type will match
+</span><span class='const'>Schema</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span> <span class='kw'>do</span>
+  <span class='id identifier rubyid_type'>type</span> <span class='symbol'>:string</span><span class='comma'>,</span> <span class='label'>default:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Hello World</span><span class='tstring_end'>&#39;</span></span> <span class='comment'># This will always be applied of no value is supplied
+</span>  <span class='id identifier rubyid_type'>type</span> <span class='symbol'>:integer</span><span class='comma'>,</span> <span class='label'>default:</span> <span class='int'>42</span>
+<span class='kw'>end</span>
+
+<span class='comment'># You can also pass entire hashes or arrays to your defaults
+</span><span class='const'>Schema</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span> <span class='kw'>do</span>
+  <span class='id identifier rubyid_req'>req</span> <span class='symbol'>:foo</span><span class='comma'>,</span> <span class='symbol'>:hash</span><span class='comma'>,</span> <span class='label'>default:</span> <span class='lbrace'>{</span> <span class='label'>foo:</span> <span class='symbol'>:bar</span> <span class='rbrace'>}</span> <span class='kw'>do</span>
+    <span class='id identifier rubyid_req'>req</span> <span class='symbol'>:foo</span><span class='comma'>,</span> <span class='symbol'>:symbol</span>
+  <span class='kw'>end</span>
+  <span class='id identifier rubyid_req'>req</span> <span class='symbol'>:bar</span><span class='comma'>,</span> <span class='symbol'>:array</span><span class='comma'>,</span> <span class='symbol'>:integer</span><span class='comma'>,</span> <span class='label'>default:</span> <span class='lbracket'>[</span><span class='int'>1</span><span class='comma'>,</span> <span class='int'>2</span><span class='comma'>,</span> <span class='int'>3</span><span class='rbracket'>]</span>
+<span class='kw'>end</span>
+
+<span class='comment'># Defaults must match the given schema. The following will fail.
+</span><span class='const'>Schema</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span> <span class='kw'>do</span>
+  <span class='id identifier rubyid_req'>req</span> <span class='symbol'>:foo</span><span class='comma'>,</span> <span class='label'>default:</span> <span class='lbrace'>{</span> <span class='label'>bar:</span> <span class='symbol'>:baz</span> <span class='rbrace'>}</span> <span class='kw'>do</span>
+    <span class='id identifier rubyid_req'>req</span> <span class='symbol'>:foo</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span>
+</code></pre>
+
+<h3>Required data points</h3>
+
+<p>Note that any <em>required</em> validation is done before applying the defaults. If you
+specify a <code>req</code> field, it must always be given, no matter if you have specified
+a default or not. Therefore, specifying <code>req</code> fields do not make sense in
+conjunction with defaults, as the default is always ignored.</p>
+
+<h2>Type casting</h2>
+
+<p>Starting from version 2.4.0, Schemacop allows you to specify type castings that
+can alter the validated data. Consider the following:</p>
+
+<pre class="code ruby"><code class="ruby"><span class='id identifier rubyid_s'>s</span> <span class='op'>=</span> <span class='const'>Schema</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span> <span class='kw'>do</span>
+  <span class='id identifier rubyid_req'>req</span> <span class='symbol'>:id</span><span class='comma'>,</span> <span class='symbol'>:integer</span><span class='comma'>,</span> <span class='label'>cast:</span> <span class='lbracket'>[</span><span class='const'>String</span><span class='rbracket'>]</span>
+<span class='kw'>end</span>
+
+<span class='id identifier rubyid_data'>data</span> <span class='op'>=</span> <span class='id identifier rubyid_s'>s</span><span class='period'>.</span><span class='id identifier rubyid_validate!'>validate!</span><span class='lparen'>(</span><span class='label'>id:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>42</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+<span class='id identifier rubyid_data'>data</span> <span class='comment'># =&gt; { id: 42 }
+</span></code></pre>
+
+<p>Note that Schemacop never modifies the data you pass to it. If you want to
+benefit from Schemacop-applied castings, you need to access the cloned, modified
+data returned by <code>validate</code> or <code>validate!</code>.</p>
+
+<h3>Specifying type castings</h3>
+
+<p>Type castings can be specified using two forms: Either as a hash or as an array.
+While using an array only allows you to specify the supported source types to be
+casted, using a hash allows you to specify custom casting logic as blocks.</p>
+
+<p>For hashes, the key must be a class and the value must be either <code>:default</code> for
+using a built-in caster or a callable object (proc or lambda) that receives the
+value and is supposed to cast it. If the value can&#39;t be casted, the proc must
+fail with an exception. The exception message will then be contained in the
+collected validation errors.</p>
+
+<p>Example:</p>
+
+<pre class="code ruby"><code class="ruby">Schema.new do
+  # Pass array to `cast`. This enables casting from String or Float to Integer
+  # using the built-in casters.
+  req: id_1, :integer, cast: [String, Float]
+
+  # Pass hash to `cast`. This enables casting from Float to Integer using the
+  # built-in caster and from String to Integer using a custom callback.
+  req :id_2, :integer, cast: { Float =&gt; :default, String =&gt; proc { |s| Integer(s) }
+end
+</code></pre>
+
+<h3>Built-in casters</h3>
+
+<p>Schemacop comes with the following casters:</p>
+
+<ul>
+<li><code>String</code> to <code>Integer</code> and <code>Float</code></li>
+<li><code>Float</code> to <code>Integer</code></li>
+<li><code>Integer</code> to <code>Float</code></li>
+</ul>
+
+<p>Note that all built-in casters are precise, so the string <code>foo</code> will fail with
+an error if casted to an Integer. When casting float values and strings
+containing float values to integers, the decimal places will be discarded
+however.</p>
+
+<h3>Execution order</h3>
+
+<p>The casting is done <em>before</em> the options <code>if</code> and <code>check</code> are evaluated.
+Example:</p>
+
+<pre class="code ruby"><code class="ruby"><span class='id identifier rubyid_s'>s</span> <span class='op'>=</span> <span class='const'>Schema</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span> <span class='kw'>do</span>
+  <span class='id identifier rubyid_type'>type</span> <span class='symbol'>:integer</span><span class='comma'>,</span> <span class='label'>if:</span> <span class='id identifier rubyid_proc'>proc</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_i'>i</span><span class='op'>|</span> <span class='id identifier rubyid_i'>i</span> <span class='op'>==</span> <span class='int'>42</span> <span class='rbrace'>}</span>    <span class='comment'># 1
+</span>  <span class='id identifier rubyid_type'>type</span> <span class='symbol'>:integer</span><span class='comma'>,</span> <span class='label'>check:</span> <span class='id identifier rubyid_proc'>proc</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_i'>i</span><span class='op'>|</span> <span class='id identifier rubyid_i'>i</span> <span class='op'>&lt;</span> <span class='int'>3</span> <span class='rbrace'>}</span>   <span class='comment'># 2
+</span>  <span class='id identifier rubyid_type'>type</span> <span class='symbol'>:string</span>
+<span class='kw'>end</span>
+
+<span class='id identifier rubyid_s'>s</span><span class='period'>.</span><span class='id identifier rubyid_validate!'>validate!</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>42</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>  <span class='comment'># 1 will match
+</span><span class='id identifier rubyid_s'>s</span><span class='period'>.</span><span class='id identifier rubyid_validate!'>validate!</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>2</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>   <span class='comment'># 2 will match
+</span><span class='id identifier rubyid_s'>s</span><span class='period'>.</span><span class='id identifier rubyid_validate!'>validate!</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>234</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span> <span class='comment'># 3 will match
+</span><span class='id identifier rubyid_s'>s</span><span class='period'>.</span><span class='id identifier rubyid_validate!'>validate!</span><span class='lparen'>(</span><span class='int'>5</span><span class='rparen'>)</span>     <span class='comment'># Will fail, as nothing matches
+</span></code></pre>
+
+<h3>Caveats</h3>
+
+<p>Casting only works with type definitions that only include one type. For
+instance, the <code>Numeric</code> validator includes both <code>Integer</code> and <code>Float</code>, which
+would made it unclear what to cast a string into:</p>
+
+<pre class="code ruby"><code class="ruby"><span class='comment'># This does not work, as it is unclear whether to cast the String into an
+</span><span class='comment'># Integer or a Float.
+</span><span class='id identifier rubyid_type'>type</span> <span class='symbol'>:number</span><span class='comma'>,</span> <span class='label'>cast:</span> <span class='lbracket'>[</span><span class='const'>String</span><span class='rbracket'>]</span>
+</code></pre>
+
+<p>The same also applies to booleans, as they compound both <code>TrueClass</code> and
+<code>FalseClass</code>. This may be tackled in future releases.</p>
+
 <h2>Exceptions</h2>
 
 <p>Schemacop will throw one of the following checked exceptions:</p>
@@ -623,6 +792,18 @@ needs to be given only if field <code>b</code> is present).</p></li>
 <li><p>Schemacop does not yet support string regex matching.</p></li>
 </ul>
 
+<h2>Development</h2>
+
+<p>To run tests:</p>
+
+<ul>
+<li><p>Check out the source</p></li>
+<li><p>Run <code>bundle install</code></p></li>
+<li><p>Run <code>bundle exec rake test</code> to run all tests</p></li>
+<li><p>Run <code>bundle exec rake test TEST=test/unit/some/file.rb</code> to run a single test
+file</p></li>
+</ul>
+
 <h2>Contributors</h2>
 
 <p>Thanks to <a href="https://github.com/bbatsov/rubocop">Rubocop</a> for great inspiration
@@ -635,7 +816,7 @@ to <a href="http://www.subgit.com/">SubGit</a> for their great open source licen
 </div></div>
 
       <div id="footer">
-  Generated on Thu Sep 26 13:19:46 2019 by
+  Generated on Mon Oct 28 16:21:59 2019 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.20 (ruby-2.6.2).
 </div>

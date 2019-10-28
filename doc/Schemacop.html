@@ -79,7 +79,7 @@
   <dl>
     <dt>Defined in:</dt>
     <dd>lib/schemacop.rb<span class="defines">,<br />
-  lib/schemacop/node.rb,<br /> lib/schemacop/schema.rb,<br /> lib/schemacop/collector.rb,<br /> lib/schemacop/root_node.rb,<br /> lib/schemacop/field_node.rb,<br /> lib/schemacop/node_resolver.rb,<br /> lib/schemacop/node_with_block.rb,<br /> lib/schemacop/node_supporting_type.rb,<br /> lib/schemacop/node_supporting_field.rb,<br /> lib/schemacop/validator/nil_validator.rb,<br /> lib/schemacop/validator/hash_validator.rb,<br /> lib/schemacop/validator/array_validator.rb,<br /> lib/schemacop/validator/float_validator.rb,<br /> lib/schemacop/validator/number_validator.rb,<br /> lib/schemacop/validator/object_validator.rb,<br /> lib/schemacop/validator/string_validator.rb,<br /> lib/schemacop/validator/symbol_validator.rb,<br /> lib/schemacop/validator/boolean_validator.rb,<br /> lib/schemacop/validator/integer_validator.rb</span>
+  lib/schemacop/node.rb,<br /> lib/schemacop/caster.rb,<br /> lib/schemacop/schema.rb,<br /> lib/schemacop/collector.rb,<br /> lib/schemacop/root_node.rb,<br /> lib/schemacop/field_node.rb,<br /> lib/schemacop/node_resolver.rb,<br /> lib/schemacop/node_with_block.rb,<br /> lib/schemacop/node_supporting_type.rb,<br /> lib/schemacop/node_supporting_field.rb,<br /> lib/schemacop/validator/nil_validator.rb,<br /> lib/schemacop/validator/hash_validator.rb,<br /> lib/schemacop/validator/array_validator.rb,<br /> lib/schemacop/validator/float_validator.rb,<br /> lib/schemacop/validator/number_validator.rb,<br /> lib/schemacop/validator/object_validator.rb,<br /> lib/schemacop/validator/string_validator.rb,<br /> lib/schemacop/validator/symbol_validator.rb,<br /> lib/schemacop/validator/boolean_validator.rb,<br /> lib/schemacop/validator/integer_validator.rb</span>
 </dd>
   </dl>
   
@@ -93,10 +93,37 @@
     
   
     
-      <strong class="classes">Classes:</strong> <span class='object_link'><a href="Schemacop/ArrayValidator.html" title="Schemacop::ArrayValidator (class)">ArrayValidator</a></span>, <span class='object_link'><a href="Schemacop/BooleanValidator.html" title="Schemacop::BooleanValidator (class)">BooleanValidator</a></span>, <span class='object_link'><a href="Schemacop/Collector.html" title="Schemacop::Collector (class)">Collector</a></span>, <span class='object_link'><a href="Schemacop/FieldNode.html" title="Schemacop::FieldNode (class)">FieldNode</a></span>, <span class='object_link'><a href="Schemacop/FloatValidator.html" title="Schemacop::FloatValidator (class)">FloatValidator</a></span>, <span class='object_link'><a href="Schemacop/HashValidator.html" title="Schemacop::HashValidator (class)">HashValidator</a></span>, <span class='object_link'><a href="Schemacop/IntegerValidator.html" title="Schemacop::IntegerValidator (class)">IntegerValidator</a></span>, <span class='object_link'><a href="Schemacop/NilValidator.html" title="Schemacop::NilValidator (class)">NilValidator</a></span>, <span class='object_link'><a href="Schemacop/Node.html" title="Schemacop::Node (class)">Node</a></span>, <span class='object_link'><a href="Schemacop/NodeResolver.html" title="Schemacop::NodeResolver (class)">NodeResolver</a></span>, <span class='object_link'><a href="Schemacop/NodeSupportingField.html" title="Schemacop::NodeSupportingField (class)">NodeSupportingField</a></span>, <span class='object_link'><a href="Schemacop/NodeSupportingType.html" title="Schemacop::NodeSupportingType (class)">NodeSupportingType</a></span>, <span class='object_link'><a href="Schemacop/NodeWithBlock.html" title="Schemacop::NodeWithBlock (class)">NodeWithBlock</a></span>, <span class='object_link'><a href="Schemacop/NumberValidator.html" title="Schemacop::NumberValidator (class)">NumberValidator</a></span>, <span class='object_link'><a href="Schemacop/ObjectValidator.html" title="Schemacop::ObjectValidator (class)">ObjectValidator</a></span>, <span class='object_link'><a href="Schemacop/RootNode.html" title="Schemacop::RootNode (class)">RootNode</a></span>, <span class='object_link'><a href="Schemacop/Schema.html" title="Schemacop::Schema (class)">Schema</a></span>, <span class='object_link'><a href="Schemacop/StringValidator.html" title="Schemacop::StringValidator (class)">StringValidator</a></span>, <span class='object_link'><a href="Schemacop/SymbolValidator.html" title="Schemacop::SymbolValidator (class)">SymbolValidator</a></span>
+      <strong class="classes">Classes:</strong> <span class='object_link'><a href="Schemacop/ArrayValidator.html" title="Schemacop::ArrayValidator (class)">ArrayValidator</a></span>, <span class='object_link'><a href="Schemacop/BooleanValidator.html" title="Schemacop::BooleanValidator (class)">BooleanValidator</a></span>, <span class='object_link'><a href="Schemacop/Caster.html" title="Schemacop::Caster (class)">Caster</a></span>, <span class='object_link'><a href="Schemacop/Collector.html" title="Schemacop::Collector (class)">Collector</a></span>, <span class='object_link'><a href="Schemacop/FieldNode.html" title="Schemacop::FieldNode (class)">FieldNode</a></span>, <span class='object_link'><a href="Schemacop/FloatValidator.html" title="Schemacop::FloatValidator (class)">FloatValidator</a></span>, <span class='object_link'><a href="Schemacop/HashValidator.html" title="Schemacop::HashValidator (class)">HashValidator</a></span>, <span class='object_link'><a href="Schemacop/IntegerValidator.html" title="Schemacop::IntegerValidator (class)">IntegerValidator</a></span>, <span class='object_link'><a href="Schemacop/NilValidator.html" title="Schemacop::NilValidator (class)">NilValidator</a></span>, <span class='object_link'><a href="Schemacop/Node.html" title="Schemacop::Node (class)">Node</a></span>, <span class='object_link'><a href="Schemacop/NodeResolver.html" title="Schemacop::NodeResolver (class)">NodeResolver</a></span>, <span class='object_link'><a href="Schemacop/NodeSupportingField.html" title="Schemacop::NodeSupportingField (class)">NodeSupportingField</a></span>, <span class='object_link'><a href="Schemacop/NodeSupportingType.html" title="Schemacop::NodeSupportingType (class)">NodeSupportingType</a></span>, <span class='object_link'><a href="Schemacop/NodeWithBlock.html" title="Schemacop::NodeWithBlock (class)">NodeWithBlock</a></span>, <span class='object_link'><a href="Schemacop/NumberValidator.html" title="Schemacop::NumberValidator (class)">NumberValidator</a></span>, <span class='object_link'><a href="Schemacop/ObjectValidator.html" title="Schemacop::ObjectValidator (class)">ObjectValidator</a></span>, <span class='object_link'><a href="Schemacop/RootNode.html" title="Schemacop::RootNode (class)">RootNode</a></span>, <span class='object_link'><a href="Schemacop/Schema.html" title="Schemacop::Schema (class)">Schema</a></span>, <span class='object_link'><a href="Schemacop/StringValidator.html" title="Schemacop::StringValidator (class)">StringValidator</a></span>, <span class='object_link'><a href="Schemacop/SymbolValidator.html" title="Schemacop::SymbolValidator (class)">SymbolValidator</a></span>
     
   
 </p>
+
+  
+    <h2>
+      Constant Summary
+      <small><a href="#" class="constants_summary_toggle">collapse</a></small>
+    </h2>
+
+    <dl class="constants">
+      
+        <dt id="DEFAULT_CASTERS-constant" class="">DEFAULT_CASTERS =
+          
+        </dt>
+        <dd><pre class="code"><span class='lbrace'>{</span>
+  <span class='const'>String</span> <span class='op'>=&gt;</span> <span class='lbrace'>{</span>
+    <span class='const'>Integer</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_proc'>proc</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_s'>s</span><span class='op'>|</span> <span class='const'>Integer</span><span class='lparen'>(</span><span class='id identifier rubyid_s'>s</span><span class='rparen'>)</span> <span class='rbrace'>}</span><span class='comma'>,</span>
+    <span class='const'>Float</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_proc'>proc</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_s'>s</span><span class='op'>|</span> <span class='const'>Float</span><span class='lparen'>(</span><span class='id identifier rubyid_s'>s</span><span class='rparen'>)</span> <span class='rbrace'>}</span>
+  <span class='rbrace'>}</span><span class='comma'>,</span>
+  <span class='const'>Float</span> <span class='op'>=&gt;</span> <span class='lbrace'>{</span>
+    <span class='const'>Integer</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_proc'>proc</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_f'>f</span><span class='op'>|</span> <span class='const'>Integer</span><span class='lparen'>(</span><span class='id identifier rubyid_f'>f</span><span class='rparen'>)</span> <span class='rbrace'>}</span>
+  <span class='rbrace'>}</span><span class='comma'>,</span>
+  <span class='const'>Integer</span> <span class='op'>=&gt;</span> <span class='lbrace'>{</span>
+    <span class='const'>Float</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_proc'>proc</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_f'>f</span><span class='op'>|</span> <span class='const'>Float</span><span class='lparen'>(</span><span class='id identifier rubyid_f'>f</span><span class='rparen'>)</span> <span class='rbrace'>}</span>
+  <span class='rbrace'>}</span>
+<span class='rbrace'>}</span></pre></dd>
+      
+    </dl>
+  
 
 
 
@@ -109,7 +136,7 @@
 </div>
 
       <div id="footer">
-  Generated on Thu Sep 26 13:19:46 2019 by
+  Generated on Mon Oct 28 16:21:59 2019 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.20 (ruby-2.6.2).
 </div>

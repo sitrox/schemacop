@@ -375,7 +375,13 @@
 21
 22
 23
-24</pre>
+24
+25
+26
+27
+28
+29
+30</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/schemacop/field_node.rb', line 16</span>
@@ -383,10 +389,16 @@
 <span class='kw'>def</span> <span class='id identifier rubyid_validate'>validate</span><span class='lparen'>(</span><span class='id identifier rubyid_data'>data</span><span class='comma'>,</span> <span class='id identifier rubyid_collector'>collector</span><span class='rparen'>)</span>
   <span class='kw'>unless</span> <span class='id identifier rubyid_data'>data</span><span class='period'>.</span><span class='id identifier rubyid_key?'>key?</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span>
     <span class='id identifier rubyid_collector'>collector</span><span class='period'>.</span><span class='id identifier rubyid_error'>error</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Missing key </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_name'>name</span><span class='period'>.</span><span class='id identifier rubyid_inspect'>inspect</span><span class='embexpr_end'>}</span><span class='tstring_content'>.</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>if</span> <span class='ivar'>@required</span>
-    <span class='kw'>return</span>
   <span class='kw'>end</span>
-  <span class='id identifier rubyid_collector'>collector</span><span class='period'>.</span><span class='id identifier rubyid_path'>path</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>/</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>do</span>
-    <span class='kw'>super</span><span class='lparen'>(</span><span class='id identifier rubyid_data'>data</span><span class='lbracket'>[</span><span class='id identifier rubyid_name'>name</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='id identifier rubyid_collector'>collector</span><span class='rparen'>)</span>
+
+  <span class='id identifier rubyid_collector'>collector</span><span class='period'>.</span><span class='id identifier rubyid_path'>path</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>/</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='symbol'>:hash</span> <span class='kw'>do</span>
+    <span class='id identifier rubyid_value'>value</span><span class='comma'>,</span> <span class='id identifier rubyid_default_applied'>default_applied</span> <span class='op'>=</span> <span class='id identifier rubyid_apply_default!'>apply_default!</span><span class='lparen'>(</span><span class='id identifier rubyid_data'>data</span><span class='lbracket'>[</span><span class='id identifier rubyid_name'>name</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='id identifier rubyid_collector'>collector</span><span class='rparen'>)</span>
+
+    <span class='kw'>unless</span> <span class='id identifier rubyid_data'>data</span><span class='period'>.</span><span class='id identifier rubyid_key?'>key?</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='id identifier rubyid_default_applied'>default_applied</span>
+      <span class='kw'>next</span>
+    <span class='kw'>end</span>
+
+    <span class='kw'>super</span><span class='lparen'>(</span><span class='id identifier rubyid_value'>value</span><span class='comma'>,</span> <span class='id identifier rubyid_collector'>collector</span><span class='rparen'>)</span>
   <span class='kw'>end</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -399,7 +411,7 @@
 </div>
 
       <div id="footer">
-  Generated on Thu Sep 26 13:19:46 2019 by
+  Generated on Mon Oct 28 16:21:59 2019 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.20 (ruby-2.6.2).
 </div>

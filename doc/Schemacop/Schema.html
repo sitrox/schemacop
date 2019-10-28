@@ -567,7 +567,7 @@ throughout the validation.</p>
       <pre class="code"><span class="info file"># File 'lib/schemacop/schema.rb', line 39</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_validate'>validate</span><span class='lparen'>(</span><span class='id identifier rubyid_data'>data</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_collector'>collector</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Collector.html" title="Schemacop::Collector (class)">Collector</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Collector.html#initialize-instance_method" title="Schemacop::Collector#initialize (method)">new</a></span></span>
+  <span class='id identifier rubyid_collector'>collector</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Collector.html" title="Schemacop::Collector (class)">Collector</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Collector.html#initialize-instance_method" title="Schemacop::Collector#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_data'>data</span><span class='period'>.</span><span class='id identifier rubyid_deep_dup'>deep_dup</span><span class='rparen'>)</span>
   <span class='ivar'>@root</span><span class='period'>.</span><span class='id identifier rubyid_fields'>fields</span><span class='lbracket'>[</span><span class='symbol'>:root</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_validate'>validate</span><span class='lparen'>(</span><span class='lbrace'>{</span> <span class='label'>root:</span> <span class='id identifier rubyid_data'>data</span> <span class='rbrace'>}</span><span class='comma'>,</span> <span class='id identifier rubyid_collector'>collector</span><span class='period'>.</span><span class='id identifier rubyid_ignore_next_segment'>ignore_next_segment</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='id identifier rubyid_collector'>collector</span>
 <span class='kw'>end</span></pre>
@@ -675,7 +675,7 @@ this exception is thrown.</p>
     <span class='id identifier rubyid_fail'>fail</span> <span class='const'><span class='object_link'><a href="Exceptions.html" title="Schemacop::Exceptions (module)">Exceptions</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Exceptions/ValidationError.html" title="Schemacop::Exceptions::ValidationError (class)">ValidationError</a></span></span><span class='comma'>,</span> <span class='id identifier rubyid_collector'>collector</span><span class='period'>.</span><span class='id identifier rubyid_exception_message'>exception_message</span>
   <span class='kw'>end</span>
 
-  <span class='kw'>return</span> <span class='kw'>nil</span>
+  <span class='kw'>return</span> <span class='id identifier rubyid_collector'>collector</span><span class='period'>.</span><span class='id identifier rubyid_data'>data</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -687,7 +687,7 @@ this exception is thrown.</p>
 </div>
 
       <div id="footer">
-  Generated on Thu Sep 26 13:19:46 2019 by
+  Generated on Mon Oct 28 16:21:59 2019 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.20 (ruby-2.6.2).
 </div>
