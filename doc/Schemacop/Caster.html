@@ -251,7 +251,7 @@
   <span class='kw'>elsif</span> <span class='id identifier rubyid_casts'>casts</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>Hash</span><span class='rparen'>)</span>
     <span class='id identifier rubyid_from_types'>from_types</span> <span class='op'>=</span> <span class='id identifier rubyid_casts'>casts</span><span class='period'>.</span><span class='id identifier rubyid_keys'>keys</span>
   <span class='kw'>else</span>
-    <span class='id identifier rubyid_fail'>fail</span> <span class='const'><span class='object_link'><a href="Exceptions.html" title="Schemacop::Exceptions (module)">Exceptions</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Exceptions/InvalidSchemaError.html" title="Schemacop::Exceptions::InvalidSchemaError (class)">InvalidSchemaError</a></span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Option `cast` must be either an array or a hash.</span><span class='tstring_end'>&quot;</span></span>
+    <span class='id identifier rubyid_fail'>fail</span> <span class='const'><span class='object_link'><a href="Exceptions.html" title="Schemacop::Exceptions (module)">Exceptions</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Exceptions/InvalidSchemaError.html" title="Schemacop::Exceptions::InvalidSchemaError (class)">InvalidSchemaError</a></span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Option `cast` must be either an array or a hash.</span><span class='tstring_end'>&#39;</span></span>
   <span class='kw'>end</span>
 
   <span class='kw'>return</span> <span class='kw'>unless</span> <span class='id identifier rubyid_from_types'>from_types</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_data'>data</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='rparen'>)</span>
@@ -369,7 +369,7 @@
 </div>
 
       <div id="footer">
-  Generated on Mon Oct 28 16:21:59 2019 by
+  Generated on Mon Oct 28 16:25:03 2019 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.20 (ruby-2.6.2).
 </div>
