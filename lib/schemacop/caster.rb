@@ -11,7 +11,7 @@ module Schemacop
       elsif casts.is_a?(Hash)
         from_types = casts.keys
       else
-        fail Exceptions::InvalidSchemaError, "Option `cast` must be either an array or a hash."
+        fail Exceptions::InvalidSchemaError, 'Option `cast` must be either an array or a hash.'
       end
 
       return unless from_types.include?(data.class)

@@ -35,11 +35,10 @@ module Schemacop
       return data, false unless data.nil?
 
       @types.each do |type|
-        if type.option?(:default)
-          default = type.option(:default)
-          collector.override_value(default)
-          return default, true
-        end
+        next unless type.option?(:default)
+        default = type.option(:default)
+        collector.override_value(default)
+        return default, true
       end
 
       return nil, false

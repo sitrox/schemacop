@@ -51,7 +51,7 @@ module Schemacop
 
       assert_equal(
         { foo: [1, 2, 3] },
-        s.validate!(foo: ['1', '2', '3'])
+        s.validate!(foo: %w(1 2 3))
       )
     end
 

@@ -18,7 +18,7 @@ module Schemacop
 
       input = { foo: nil }
       output = s.validate!(input)
-      assert_equal({ foo: 'bar'}, output)
+      assert_equal({ foo: 'bar' }, output)
     end
 
     def test_missing_hash_key
@@ -28,7 +28,7 @@ module Schemacop
 
       input = {}
       output = s.validate!(input)
-      assert_equal({ foo: 'bar'}, output)
+      assert_equal({ foo: 'bar' }, output)
     end
 
     def test_entire_hash
@@ -48,7 +48,7 @@ module Schemacop
 
     def test_entire_array
       s = Schema.new do
-        opt :foo, :array, default: [{ bar: 42}] do
+        opt :foo, :array, default: [{ bar: 42 }] do
           req :bar
         end
       end
