@@ -10,6 +10,12 @@
 ### Changes
 -->
 
+## 2.4.1 (2019-10-28)
+
+### Bug fixes
+
+* Re-format code to comply with rubocop. There are no functional implications.
+
 ## 2.4.0 (2019-10-28)
 
 ### New features
