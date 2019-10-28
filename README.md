@@ -760,12 +760,6 @@ To run tests:
 * Run `bundle exec rake test TEST=test/unit/some/file.rb` to run a single test
   file
 
-## Contributors
-
-Thanks to [Rubocop](https://github.com/bbatsov/rubocop) for great inspiration
-concerning their name and the structure of their README file. And special thanks
-to [SubGit](http://www.subgit.com/) for their great open source licensing.
-
 ## Copyright
 
 Copyright (c) 2019 Sitrox. See `LICENSE` for further details.
