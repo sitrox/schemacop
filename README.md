@@ -739,9 +739,6 @@ Schemacop will throw one of the following checked exceptions:
 
 * Schemacop does not yet allow cyclic structures with infinite depth.
 
-* Schemacop aborts when it encounters an error. It is not able to collect a full
-  list of multiple errors.
-
 * Schemacop is not made for validating complex causalities (i.e. field `a`
   needs to be given only if field `b` is present).
 
