@@ -5,6 +5,17 @@ module Schemacop
     class User; end
     class Group; end
 
+    def test_untyped
+      s = Schema.new do
+        req :foo
+      end
+
+      assert_nothing_raised { s.validate!(foo: 3) }
+      assert_nothing_raised { s.validate!(foo: '42') }
+      assert_nothing_raised { s.validate!(foo: Object.new) }
+      assert_verr { s.validate!(foo: nil) }
+    end
+
     def test_constructor_defaults_to_hash
       s = Schema.new do
         req! :r do
