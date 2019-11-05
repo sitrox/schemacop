@@ -10,6 +10,14 @@
 ### Changes
 -->
 
+## 2.4.2 (2019-11-05)
+
+### Bug fixes
+
+* The object validator, if given no classes, now supports any object of classes
+  that derive from `BasicObject`. This allows you to specify types that reside
+  out of the ruby standard library, such as `Tempfile`.
+
 ## 2.4.1 (2019-10-28)
 
 ### Bug fixes

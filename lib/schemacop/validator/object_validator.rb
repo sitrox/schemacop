@@ -1,6 +1,6 @@
 module Schemacop
   class ObjectValidator < Node
-    register symbols: :object, klasses: Object
+    register symbols: :object, klasses: BasicObject
 
     option :classes
     option :strict

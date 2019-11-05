@@ -17,6 +17,40 @@ module Schemacop
       assert_verr { s.validate!(AdminUser.new) }
     end
 
+    # In modern versions of ruby, some classes such as Tempfile are not derived
+    # from Object but from BasicObject. Before the time of writing this test,
+    # the ObjectValidator only accepted subclasses of Object and classes like
+    # Tempfile did not work at all. This test ensures that this is working now.
+    def test_basic_object
+      refute Tempfile <= Object
+      assert Tempfile <= BasicObject
+
+      s = Schema.new do
+        type :object
+      end
+
+      assert_nothing_raised { s.validate!(Tempfile.new) }
+
+      s = Schema.new do
+        req :foo
+      end
+
+      assert_nothing_raised { s.validate!(foo: Tempfile.new) }
+
+      s = Schema.new do
+        req :foo, Tempfile
+      end
+
+      assert_nothing_raised { s.validate!(foo: Tempfile.new) }
+      assert_verr { s.validate!(foo: Time.new) }
+
+      s = Schema.new do
+        req :foo, :object, classes: Tempfile
+      end
+
+      assert_nothing_raised { s.validate!(foo: Tempfile.new) }
+    end
+
     def test_multiple_classes_long
       s = Schema.new do
         type :object, classes: User
