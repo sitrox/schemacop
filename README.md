@@ -668,7 +668,7 @@ Example:
 Schema.new do
   # Pass array to `cast`. This enables casting from String or Float to Integer
   # using the built-in casters.
-  req: id_1, :integer, cast: [String, Float]
+  req :id_1, :integer, cast: [String, Float]
 
   # Pass hash to `cast`. This enables casting from Float to Integer using the
   # built-in caster and from String to Integer using a custom callback.
