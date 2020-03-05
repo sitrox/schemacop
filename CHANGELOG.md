@@ -10,6 +10,11 @@
 ### Changes
 -->
 
+## 2.4.3 (2020-03-05)
+
+* Only dup hashes and arrays but not the values when creating the modified
+  datastructure that is returned by `validate!`.
+
 ## 2.4.2 (2019-11-05)
 
 ### Bug fixes
