@@ -561,13 +561,15 @@ throughout the validation.</p>
 40
 41
 42
-43</pre>
+43
+44</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/schemacop/schema.rb', line 39</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_validate'>validate</span><span class='lparen'>(</span><span class='id identifier rubyid_data'>data</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_collector'>collector</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Collector.html" title="Schemacop::Collector (class)">Collector</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Collector.html#initialize-instance_method" title="Schemacop::Collector#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_data'>data</span><span class='period'>.</span><span class='id identifier rubyid_deep_dup'>deep_dup</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_dupped_data'>dupped_data</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../Schemacop.html" title="Schemacop (module)">Schemacop</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Dupper.html" title="Schemacop::Dupper (class)">Dupper</a></span></span><span class='period'>.</span><span class='id identifier rubyid_dup_data'><span class='object_link'><a href="Dupper.html#dup_data-class_method" title="Schemacop::Dupper.dup_data (method)">dup_data</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_data'>data</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_collector'>collector</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Collector.html" title="Schemacop::Collector (class)">Collector</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Collector.html#initialize-instance_method" title="Schemacop::Collector#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_dupped_data'>dupped_data</span><span class='rparen'>)</span>
   <span class='ivar'>@root</span><span class='period'>.</span><span class='id identifier rubyid_fields'>fields</span><span class='lbracket'>[</span><span class='symbol'>:root</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_validate'>validate</span><span class='lparen'>(</span><span class='lbrace'>{</span> <span class='label'>root:</span> <span class='id identifier rubyid_data'>data</span> <span class='rbrace'>}</span><span class='comma'>,</span> <span class='id identifier rubyid_collector'>collector</span><span class='period'>.</span><span class='id identifier rubyid_ignore_next_segment'>ignore_next_segment</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='id identifier rubyid_collector'>collector</span>
 <span class='kw'>end</span></pre>
@@ -655,7 +657,6 @@ this exception is thrown.</p>
       <pre class="lines">
 
 
-51
 52
 53
 54
@@ -663,10 +664,11 @@ this exception is thrown.</p>
 56
 57
 58
-59</pre>
+59
+60</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/schemacop/schema.rb', line 51</span>
+      <pre class="code"><span class="info file"># File 'lib/schemacop/schema.rb', line 52</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_validate!'>validate!</span><span class='lparen'>(</span><span class='id identifier rubyid_data'>data</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_collector'>collector</span> <span class='op'>=</span> <span class='id identifier rubyid_validate'>validate</span><span class='lparen'>(</span><span class='id identifier rubyid_data'>data</span><span class='rparen'>)</span>
@@ -687,7 +689,7 @@ this exception is thrown.</p>
 </div>
 
       <div id="footer">
-  Generated on Tue Nov  5 11:16:28 2019 by
+  Generated on Thu Mar  5 15:46:21 2020 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.20 (ruby-2.6.2).
 </div>
