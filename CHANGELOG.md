@@ -10,6 +10,11 @@
 ### Changes
 -->
 
+## 2.4.4 (2020-03-9)
+
+* Add option `allow_obsolete_keys` to `:hash` validator in order to allow
+  validating arbitrary hashes with dynamic keys not specifiable in schema.
+
 ## 2.4.3 (2020-03-05)
 
 * Only dup hashes and arrays but not the values when creating the modified

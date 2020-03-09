@@ -2,6 +2,8 @@ module Schemacop
   class HashValidator < NodeSupportingField
     register symbols: :hash, klasses: Hash
 
+    option :allow_obsolete_keys
+
     def validate(data, collector)
       super
 
@@ -21,7 +23,9 @@ module Schemacop
 
       obsolete_keys = data_keys - allowed_fields
 
-      collector.error "Obsolete keys: #{obsolete_keys.inspect}." if obsolete_keys.any?
+      unless option?(:allow_obsolete_keys)
+        collector.error "Obsolete keys: #{obsolete_keys.inspect}." if obsolete_keys.any?
+      end
 
       @fields.values.each do |field|
         field.validate(data, collector)

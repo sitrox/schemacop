@@ -395,6 +395,10 @@ The following types are supported by Schemacop by default:
 
   - accepts a block with an arbitrary number of Field Lines.
 
+  - `allow_obsolete_keys`: If enabled (default `false`), this allows arbitrary
+    keys within your hash. Keys not specified in your schema will not be
+    validated further, but keys specified explicitly are still validated.
+
 * `:nil`: accepts a Ruby NilClass instance. If you want to allow `nil` as a
   value in a field, see above for the usage of the suffixes `-!` and `-?` for
   Field Lines.

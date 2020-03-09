@@ -21,6 +21,28 @@ module Schemacop
       assert_verr { s.validate!(one: 3, three: true) }
     end
 
+    def test_allow_obsolete_keys
+      s = Schema.new do
+        type :hash, allow_obsolete_keys: true
+      end
+
+      assert_nothing_raised { s.validate!(foo: :bar) }
+      assert_equal({ foo: { bar: :baz } }, s.validate!(foo: { bar: :baz }))
+
+      assert_verr { s.validate!(3) }
+    end
+
+    def test_allow_obsolete_keys_with_substructore
+      s = Schema.new do
+        type :hash, allow_obsolete_keys: true do
+          req :foo
+        end
+      end
+
+      assert_nothing_raised { s.validate!(foo: :bar, bar: :baz) }
+      assert_verr { s.validate!(bar: :baz) }
+    end
+
     def test_nested
       s = Schema.new do
         type :hash do
