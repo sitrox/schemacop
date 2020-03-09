@@ -446,7 +446,10 @@ validator_array_test#test_multiple_arrays</p>
 <ul>
 <li><code>:hash</code> accepts a Ruby Hash or an <code>ActiveSupport::HashWithIndifferentAccess</code>.</li>
 </ul></li>
-<li><p>accepts a block with an arbitrary number of Field Lines.</p>
+<li><p>accepts a block with an arbitrary number of Field Lines.</p></li>
+<li><p><code>allow_obsolete_keys</code>: If enabled (default <code>false</code>), this allows arbitrary
+keys within your hash. Keys not specified in your schema will not be
+validated further, but keys specified explicitly are still validated.</p>
 
 <ul>
 <li><code>:nil</code>: accepts a Ruby NilClass instance. If you want to allow <code>nil</code> as a
@@ -808,7 +811,7 @@ file</p></li>
 </div></div>
 
       <div id="footer">
-  Generated on Thu Mar  5 15:46:21 2020 by
+  Generated on Mon Mar  9 10:36:30 2020 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.20 (ruby-2.6.2).
 </div>
