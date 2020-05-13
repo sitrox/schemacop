@@ -37,6 +37,7 @@ module Schemacop
       @types.each do |type|
         next unless type.option?(:default)
         default = type.option(:default)
+        default = default.call if default.is_a?(Proc)
         collector.override_value(default)
         return default, true
       end

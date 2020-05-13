@@ -10,6 +10,10 @@
 ### Changes
 -->
 
+## 2.4.4 (2020-05-13)
+
+* Allow procs for `default` that will be evaluated at runtime
+
 ## 2.4.4 (2020-03-9)
 
 * Add option `allow_obsolete_keys` to `:hash` validator in order to allow

@@ -58,6 +58,28 @@ module Schemacop
       assert_equal({ foo: [{ bar: 42 }] }, output)
     end
 
+    def test_proc
+      s = Schema.new do
+        opt :year, :integer, default: ->() { Time.now.year }
+      end
+
+      input = {}
+      output = s.validate!(input)
+      assert_equal({ year: Time.now.year }, output)
+    end
+
+    def test_nested_proc
+      myproc = proc { 42 }
+
+      s = Schema.new do
+        opt :myproc, Proc, default: ->() { myproc }
+      end
+
+      input = {}
+      output = s.validate!(input)
+      assert_equal({ myproc: myproc }, output)
+    end
+
     def test_invalid_default
       s = Schema.new :integer, default: '42'
 

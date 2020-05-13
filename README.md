@@ -627,6 +627,18 @@ Schema.new do
     req :foo
   end
 end
+
+# You can also specify blocks (without params) as defaults that will be
+# evaluated at time of validation.
+Schema.new do
+  opt :year, :integer, default: ->() { Time.now.year }
+end
+
+# If, for some very specific reason, you *need* the default to be an actual
+# proc, wrap it inside another proc.
+Schema.new do
+  opt :myproc, Proc, default: ->() { ->() { 42 } }
+end
 ```
 
 ### Required data points
