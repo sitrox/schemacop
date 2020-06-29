@@ -86,5 +86,15 @@ module Schemacop
 
       assert_equal 42, s.validate!('42')
     end
+
+    def test_decimal_basis_castings
+      s = Schema.new do
+        type :integer, cast: [String]
+      end
+
+      assert_equal 1, s.validate!('01')
+      assert_equal 8, s.validate!('08')
+      assert_equal 11, s.validate!('011')
+    end
   end
 end

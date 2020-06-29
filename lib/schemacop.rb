@@ -1,7 +1,7 @@
 module Schemacop
   DEFAULT_CASTERS = {
     String => {
-      Integer => proc { |s| Integer(s) },
+      Integer => proc { |s| Integer(s, 10) },
       Float => proc { |s| Float(s) }
     },
     Float => {
