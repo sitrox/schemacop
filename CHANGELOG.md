@@ -10,6 +10,10 @@
 ### Changes
 -->
 
+## 2.4.5 (2020-06-29)
+
+* Use basis 10 (decimal system) when casting a `String` to an `Integer`
+
 ## 2.4.4 (2020-05-13)
 
 * Allow procs for `default` that will be evaluated at runtime
