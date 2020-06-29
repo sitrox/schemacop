@@ -105,12 +105,12 @@ module Schemacop
 
         next unless caster.castable?
         begin
-                    data = caster.cast
-                    collector.override_value(data)
-                    return data
-                  rescue Exceptions::InvalidSchemaError => e
-                    collector.error e.message
-                  end
+          data = caster.cast
+          collector.override_value(data)
+          return data
+        rescue Exceptions::InvalidSchemaError => e
+          collector.error e.message
+        end
       end
 
       return data
