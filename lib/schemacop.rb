@@ -1,8 +1,8 @@
 module Schemacop
   DEFAULT_CASTERS = {
     String => {
-      Integer => proc { |s| Integer(s, 10) },
-      Float => proc { |s| Float(s) }
+      Integer => proc { |s| s.blank? ? nil : Integer(s, 10) },
+      Float => proc { |s| s.blank? ? nil : Float(s) }
     },
     Float => {
       Integer => proc { |f| Integer(f) }
@@ -15,6 +15,7 @@ end
 
 require 'set'
 require 'active_support/core_ext/class/attribute'
+require 'active_support/core_ext/object/blank'
 require 'active_support/hash_with_indifferent_access'
 
 require 'schemacop/scoped_env'

@@ -96,5 +96,23 @@ module Schemacop
       assert_equal 8, s.validate!('08')
       assert_equal 11, s.validate!('011')
     end
+
+    def test_string_to_nil_castings
+      s = Schema.new do
+        opt :int_field, :integer, cast: [String]
+        opt :float_field, :float, cast: [String]
+      end
+
+      expected_int = { int_field: nil }
+      expected_float = { float_field: nil }
+
+      assert_equal expected_int, s.validate!(int_field: nil)
+      assert_equal expected_int, s.validate!(int_field: "")
+      assert_equal expected_int, s.validate!(int_field: "     ")
+
+      assert_equal expected_float, s.validate!(float_field: nil)
+      assert_equal expected_float, s.validate!(float_field: "")
+      assert_equal expected_float, s.validate!(float_field: "     ")
+    end
   end
 end
