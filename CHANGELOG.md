@@ -10,6 +10,11 @@
 ### Changes
 -->
 
+## 2.4.7 (2020-07-02)
+
+* Return nil when casting an empty string to an Integer or a Float,
+  such that these cases can then be handled by the `opt` or `req`.
+
 ## 2.4.6 (2020-06-29)
 
 * Use basis 10 (decimal system) when casting a `String` to an `Integer`
