@@ -18,15 +18,12 @@ task :gemspec do
     # needs access to ActiveSupport::HashWithIndifferentAccess and expects
     # behavior of that as in version 5 of ActiveSupport.
     spec.add_dependency 'activesupport', '>= 4.0'
-    spec.add_development_dependency 'bundler', '~> 1.3'
-    spec.add_development_dependency 'rake'
-    spec.add_development_dependency 'ci_reporter', '~> 2.0'
-    spec.add_development_dependency 'ci_reporter_minitest'
-    spec.add_development_dependency 'haml'
+    spec.add_dependency 'sorbet-runtime', '0.4.4667'
+    spec.add_development_dependency 'bundler'
+    spec.add_development_dependency 'minitest'
+    spec.add_development_dependency 'minitest-reporters'
     spec.add_development_dependency 'colorize'
-    spec.add_development_dependency 'yard'
     spec.add_development_dependency 'rubocop', '0.35.1'
-    spec.add_development_dependency 'redcarpet'
     spec.add_development_dependency 'pry'
   end
 
@@ -36,7 +33,6 @@ end
 # rubocop: disable Lint/HandleExceptions
 begin
   require 'rake/testtask'
-  require 'ci/reporter/rake/minitest'
   Rake::TestTask.new do |t|
     t.pattern = 'test/unit/**/*_test.rb'
     t.verbose = false
