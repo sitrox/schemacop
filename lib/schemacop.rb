@@ -3,6 +3,7 @@ module Schemacop
 
   mattr_accessor :load_paths
   self.load_paths = ['app/schemas']
+
   def self.with_context(context)
     prev_context = Thread.current[CONTEXT_THREAD_KEY]
     Thread.current[CONTEXT_THREAD_KEY] = context
@@ -18,14 +19,12 @@ end
 
 # External dependencies
 require 'active_support/all'
-# require 'active_support/core_ext/object/blank'
-# require 'active_support/inflector/methods'
-# require 'active_support/hash_with_indifferent_access'
 require 'set'
 require 'sorbet-runtime'
 
 # Shared
 require 'schemacop/scoped_env'
+require 'schemacop/exceptions'
 
 # Version 3 files
 require 'schemacop/context'
@@ -47,6 +46,11 @@ require 'schemacop/reference_node'
 require 'schemacop/string_node'
 require 'schemacop/symbol_node'
 require 'schemacop/ruby_node'
+
+# Railtie
+if defined?(Rails)
+  require 'schemacop/railtie'
+end
 
 # Legacy version 2
 require 'schemacop/v2'

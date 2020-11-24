@@ -1,6 +1,9 @@
-module Schemacop::V2; end
+module Schemacop::V2
+  module Exceptions
+    include Schemacop::Exceptions
+  end
+end
 
-require 'schemacop/v2/exceptions'
 require 'schemacop/v2/schema'
 require 'schemacop/v2/collector'
 require 'schemacop/v2/node_resolver'
