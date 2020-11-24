@@ -48,7 +48,7 @@ module Schemacop::V2
     # @param data The data to validate.
     # @raise [Schemacop::Exceptions::ValidationError] If the data is invalid,
     #   this exception is thrown.
-    # @return nil
+    # @return The processed data
     def validate!(data)
       collector = validate(data)
 
