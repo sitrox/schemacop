@@ -17,7 +17,7 @@ module Schemacop
       super + %i[
         dsl_str! dsl_str? dsl_obj! dsl_obj? dsl_int! dsl_int? dsl_num!
         dsl_num? dsl_boo! dsl_boo? dsl_ary? dsl_ary! dsl_ref! dsl_ref?
-        dsl_add dsl_dep
+        dsl_add dsl_dep dsl_sym! dsl_sym?
         dsl_all_of! dsl_all_of? dsl_any_of! dsl_any_of?
         dsl_one_of! dsl_one_of? dsl_is_not! dsl_is_not?
       ]
@@ -109,6 +109,14 @@ module Schemacop
 
     def dsl_is_not?(name, **options, &block)
       @properties[name] = create(:is_not, **options.merge(name: name, required: false), &block)
+    end
+
+    def dsl_sym!(name, **options, &block)
+      @properties[name] = create(:symbol, **options.merge(name: name, required: true), &block)
+    end
+
+    def dsl_sym?(name, **options, &block)
+      @properties[name] = create(:symbol, **options.merge(name: name, required: true), &block)
     end
 
     def dsl_add(type, **options, &block)

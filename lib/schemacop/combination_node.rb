@@ -2,7 +2,7 @@ module Schemacop
   # @abstract
   class CombinationNode < Node
     def self.dsl_methods
-      %i[dsl_str dsl_obj dsl_int dsl_num dsl_boo dsl_ary dsl_ref dsl_all_of dsl_any_of dsl_one_of dsl_is_not dsl_add_item]
+      %i[dsl_str dsl_obj dsl_int dsl_num dsl_boo dsl_ary dsl_ref dsl_sym dsl_all_of dsl_any_of dsl_one_of dsl_is_not dsl_add_item]
     end
 
     def init
@@ -51,6 +51,10 @@ module Schemacop
 
     def dsl_is_not(**options, &block)
       add_item create(:is_not, **options, &block)
+    end
+
+    def dsl_sym(**options, &block)
+      add_item create(:symbol, **options, &block)
     end
 
     def dsl_add_item(node)
