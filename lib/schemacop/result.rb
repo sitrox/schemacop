@@ -11,6 +11,10 @@ module Schemacop
       @original_data = original_data
     end
 
+    def valid?
+      errors.empty?
+    end
+
     def data
       if errors.any?
         return nil

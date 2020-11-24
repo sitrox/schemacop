@@ -104,10 +104,45 @@ module Schemacop
       {}
     end
 
+    # Query data validity
+    #
+    # @param data The data to validate.
+    # @return [Boolean] True if the data is valid, false otherwise.
+    def valid?(data)
+      validate(data).valid?
+    end
+
+    # Query data validity
+    #
+    # @param data The data to validate.
+    # @return [Boolean] True if data is invalid, false otherwise.
+    def invalid?(data)
+      validate(data).valid?
+    end
+
+    # Validate data
+    #
+    # @param data The data to validate.
+    # @return [Schemacop::Result] Result object
     def validate(data)
       result = Result.new(self, data)
       _validate(data, result: result)
       return result
+    end
+
+    # Validate data
+    #
+    # @param data The data to validate.
+    # @raise [Schemacop::Exceptions::ValidationError] If the data is invalid,
+    #   this exception is thrown.
+    # @return The processed data
+    def validate!(data)
+      result = validate(data)
+      if result.valid?
+        return result.data
+      else
+        fail Exceptions::ValidationError, result.messages
+      end
     end
 
     def cast(value)
