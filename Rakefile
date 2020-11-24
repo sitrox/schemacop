@@ -38,9 +38,9 @@ begin
   require 'rake/testtask'
   require 'ci/reporter/rake/minitest'
   Rake::TestTask.new do |t|
-    t.pattern = 'test/*_test.rb'
+    t.pattern = 'test/unit/**/*_test.rb'
     t.verbose = false
-    t.libs << 'test'
+    t.libs << 'test/lib'
   end
 rescue LoadError
 end

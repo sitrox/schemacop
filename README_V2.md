@@ -1,12 +1,7 @@
-[![Build Status](https://travis-ci.org/sitrox/schemacop.svg?branch=master)](https://travis-ci.org/sitrox/schemacop)
-[![Gem Version](https://badge.fury.io/rb/schemacop.svg)](https://badge.fury.io/rb/schemacop)
+# Schemacop V2 Legacy
 
-# Schemacop
-
-This is the README for Schemacop 3, which provides an all-new schema DSL
-**breaks backwards compatibility** with version 2. Schemacop 3 still includes
-the legacy functionality contained in V2. See [the V2 README](README_V2.md) for
-a documentation of the V2 legacy functionality.
+This is the readme for the V2 legacy functionality contained in Schemacop 3. See
+[the main README](README.md) for documentation of the new V3 functionality.
 
 Schemacop validates ruby structures consisting of nested hashes and arrays
 against schema definitions described by a simple DSL.
