@@ -1,6 +1,8 @@
 module Schemacop
   CONTEXT_THREAD_KEY = :schemacop_schema_context
 
+  mattr_accessor :load_paths
+  self.load_paths = ['app/schemas']
   def self.with_context(context)
     prev_context = Thread.current[CONTEXT_THREAD_KEY]
     Thread.current[CONTEXT_THREAD_KEY] = context
