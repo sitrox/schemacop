@@ -44,6 +44,7 @@ require 'schemacop/one_of_node'
 require 'schemacop/reference_node'
 require 'schemacop/string_node'
 require 'schemacop/symbol_node'
+require 'schemacop/ruby_node'
 
 # Legacy version 2
 require 'schemacop/v2'

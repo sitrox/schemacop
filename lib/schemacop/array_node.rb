@@ -12,7 +12,7 @@ module Schemacop
 
     def self.dsl_methods
       super + %i[dsl_str dsl_obj dsl_int dsl_boo dsl_ary
-                 dsl_num dsl_ref dsl_sym dsl_all_of dsl_any_of
+                 dsl_num dsl_ref dsl_sym dsl_rby dsl_all_of dsl_any_of
                  dsl_one_of dsl_is_not dsl_add]
     end
 
@@ -64,6 +64,10 @@ module Schemacop
 
     def dsl_sym(**options, &block)
       @items << create(:symbol, **options, &block)
+    end
+
+    def dsl_rby(classes, **options, &block)
+      @items << create(:ruby, **options.merge(classes: classes), &block)
     end
 
     def dsl_add(type, **options, &block)
