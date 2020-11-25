@@ -3,7 +3,7 @@ module Schemacop
     initializer 'schemacop' do
       # Load global schemas
       unless Rails.env.development?
-        Schemacop::GlobalContext.reload!
+        V3::GlobalContext.reload!
       end
     end
   end

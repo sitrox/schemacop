@@ -68,7 +68,8 @@ class V3Test < Minitest::Test
   end
 
   def schema(type = :hash, **options, &block)
-    @schema = Schemacop::Node.create(type, **options, &block)
+    # TODO: Create schema instead of node
+    @schema = Schemacop::V3::Node.create(type, **options, &block)
   end
 
   def with_context(context, &block)
