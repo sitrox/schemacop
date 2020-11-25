@@ -33,6 +33,11 @@ end
 # Shared
 require 'schemacop/scoped_env'
 require 'schemacop/exceptions'
+
+# Shared: Schemas
+require 'schemacop/base_schema'
+require 'schemacop/schema2'
+require 'schemacop/schema3'
 require 'schemacop/schema'
 
 # Version 3 files

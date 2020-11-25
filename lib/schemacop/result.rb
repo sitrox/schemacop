@@ -32,6 +32,11 @@ module Schemacop
       @errors.transform_keys { |k| "/#{k.join('/')}" }
     end
 
+    # TODO: Get rid of messages
+    def exception_message
+      messages
+    end
+
     def messages
       messages = []
 
