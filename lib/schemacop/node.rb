@@ -8,24 +8,36 @@ module Schemacop
     attr_reader :options
     attr_reader :parent
 
-    def self.resolve_class(type)
-      "Schemacop::#{type.to_s.classify}Node".safe_constantize
+    class_attribute :_supports_children
+    self._supports_children = nil
+
+    def self.supports_children(name: false)
+      self._supports_children = { name: name }
     end
 
-    def self.create(type, **options, &block)
+    def self.supports_children_options
+      self._supports_children
+    end
+
+    def self.resolve_class(type)
+      Schemacop::NodeRegistry.find(type)
+    end
+
+    def self.create(type = self, **options, &block)
       klass = resolve_class(type)
       fail "Could not find node for type #{type.inspect}." unless klass
 
       node = klass.new(**options, &block)
 
       if options.delete(:cast_str)
+        format = Schemacop::NodeRegistry.name(klass)
         one_of_options = {
           required: options.delete(:required),
           name:     options.delete(:name)
         }
         node = create(:one_of, **one_of_options) do
           add_item node
-          add_item Node.create(:string, format: type, format_options: options)
+          add_item Node.create(:string, format: format, format_options: options)
         end
       end
 
@@ -76,7 +88,11 @@ module Schemacop
 
       # Run DSL block #
       if block_given?
-        env = ScopedEnv.new(self, self.class.dsl_methods, nil, :dsl_)
+        unless self.class.supports_children_options
+          fail "Node #{self.class} does not support blocks."
+        end
+        scope = Schemacop::DslScope.new(self)
+        env = ScopedEnv.new(self, self.class.dsl_methods, scope, :dsl_)
         env.instance_exec(&block)
       end
 
@@ -93,7 +109,7 @@ module Schemacop
 
     sig { params(name: Symbol, type: Symbol, options: Object, block: T.nilable(T.proc.void)).void }
     def dsl_scm(name, type = :object, **options, &block)
-      @schemas[name] = create(type, **options, &block)
+      @schemas[name] = Node.create(type, **options, &block)
     end
 
     def schemas

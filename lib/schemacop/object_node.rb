@@ -9,6 +9,8 @@ module Schemacop
       dependencies
     ].freeze
 
+    supports_children(name: true)
+
     def self.allowed_options
       super + ATTRIBUTES - %i[dependencies] + %i[additional_properties]
     end
@@ -23,108 +25,11 @@ module Schemacop
       ]
     end
 
-    def dsl_str!(name, **options, &block)
-      @properties[name] = create(:string, **options.merge(name: name, required: true), &block)
-    end
-
-    def dsl_str?(name, **options, &block)
-      @properties[name] = create(:string, **options.merge(name: name, required: false), &block)
-    end
-
-    def dsl_obj!(name, **options, &block)
-      @properties[name] = create(:object, **options.merge(name: name, required: true), &block)
-    end
-
-    def dsl_obj?(name, **options, &block)
-      @properties[name] = create(:object, **options.merge(name: name, required: false), &block)
-    end
-
-    def dsl_int!(name, **options, &block)
-      @properties[name] = create(:integer, **options.merge(name: name, required: true), &block)
-    end
-
-    def dsl_int?(name, **options, &block)
-      @properties[name] = create(:integer, **options.merge(name: name, required: false), &block)
-    end
-
-    def dsl_num!(name, **options, &block)
-      @properties[name] = create(:number, **options.merge(name: name, required: true), &block)
-    end
-
-    def dsl_num?(name, **options, &block)
-      @properties[name] = create(:number, **options.merge(name: name, required: false), &block)
-    end
-
-    def dsl_boo!(name, **options, &block)
-      @properties[name] = create(:boolean, **options.merge(name: name, required: true), &block)
-    end
-
-    def dsl_boo?(name, **options, &block)
-      @properties[name] = create(:boolean, **options.merge(name: name, required: false), &block)
-    end
-
-    def dsl_ary!(name, **options, &block)
-      @properties[name] = create(:array, **options.merge(name: name, required: true), &block)
-    end
-
-    def dsl_ary?(name, **options, &block)
-      @properties[name] = create(:array, **options.merge(name: name, required: false), &block)
-    end
-
-    def dsl_ref!(name, path, **options, &block)
-      @properties[name] = create(:reference, **options.merge(name: name, path: path, required: true), &block)
-    end
-
-    def dsl_ref?(name, path, **options, &block)
-      @properties[name] = create(:reference, **options.merge(name: name, path: path, required: false), &block)
-    end
-
-    def dsl_all_of!(name, **options, &block)
-      @properties[name] = create(:all_of, **options.merge(name: name, required: true), &block)
-    end
-
-    def dsl_all_of?(name, **options, &block)
-      @properties[name] = create(:all_of, **options.merge(name: name, required: false), &block)
-    end
-
-    def dsl_any_of!(name, **options, &block)
-      @properties[name] = create(:any_of, **options.merge(name: name, required: true), &block)
-    end
-
-    def dsl_any_of?(name, **options, &block)
-      @properties[name] = create(:any_of, **options.merge(name: name, required: false), &block)
-    end
-
-    def dsl_one_of!(name, **options, &block)
-      @properties[name] = create(:one_of, **options.merge(name: name, required: true), &block)
-    end
-
-    def dsl_one_of?(name, **options, &block)
-      @properties[name] = create(:one_of, **options.merge(name: name, required: false), &block)
-    end
-
-    def dsl_is_not!(name, **options, &block)
-      @properties[name] = create(:is_not, **options.merge(name: name, required: true), &block)
-    end
-
-    def dsl_is_not?(name, **options, &block)
-      @properties[name] = create(:is_not, **options.merge(name: name, required: false), &block)
-    end
-
-    def dsl_sym!(name, **options, &block)
-      @properties[name] = create(:symbol, **options.merge(name: name, required: true), &block)
-    end
-
-    def dsl_sym?(name, **options, &block)
-      @properties[name] = create(:symbol, **options.merge(name: name, required: true), &block)
-    end
-
-    def dsl_rby!(name, classes, **options, &block)
-      @properties[name] = create(:ruby, **options.merge(name: name, classes: classes, required: true), &block)
-    end
-
-    def dsl_rby?(name, classes, **options, &block)
-      @properties[name] = create(:ruby, **options.merge(name: name, classes: classes, required: false), &block)
+    def add_child(node)
+      unless node.name
+        fail 'Child nodes must have a name.'
+      end
+      @properties[node.name] = node
     end
 
     def dsl_add(type, **options, &block)

@@ -4,6 +4,11 @@ module Schemacop
       super + %i[path type]
     end
 
+    def self.create(path, **options, &block)
+      options[:path] = path
+      super(**options, &block)
+    end
+
     def as_json
       process_json([], '$ref': "#/components/schemas/#{@path}")
     end

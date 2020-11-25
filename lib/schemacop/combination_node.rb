@@ -5,64 +5,14 @@ module Schemacop
       %i[dsl_str dsl_obj dsl_int dsl_num dsl_boo dsl_ary dsl_ref dsl_sym dsl_rby dsl_all_of dsl_any_of dsl_one_of dsl_is_not dsl_add_item]
     end
 
+    supports_children
+
     def init
       @items = []
     end
 
-    def dsl_str(**options, &block)
-      add_item create(:string, **options, &block)
-    end
-
-    def dsl_obj(**options, &block)
-      add_item create(:object, **options, &block)
-    end
-
-    def dsl_int(**options, &block)
-      add_item create(:integer, **options, &block)
-    end
-
-    def dsl_num(**options, &block)
-      add_item create(:number, **options, &block)
-    end
-
-    def dsl_boo(**options, &block)
-      add_item create(:boolean, **options, &block)
-    end
-
-    def dsl_ary(**options, &block)
-      add_item create(:array, **options, &block)
-    end
-
-    def dsl_ref(path, **options, &block)
-      add_item create(:reference, **options.merge(path: path), &block)
-    end
-
-    def dsl_all_of(**options, &block)
-      add_item create(:all_of, **options, &block)
-    end
-
-    def dsl_any_of(**options, &block)
-      add_item create(:any_of, **options, &block)
-    end
-
-    def dsl_one_of(**options, &block)
-      add_item create(:one_of, **options, &block)
-    end
-
-    def dsl_is_not(**options, &block)
-      add_item create(:is_not, **options, &block)
-    end
-
-    def dsl_sym(**options, &block)
-      add_item create(:symbol, **options, &block)
-    end
-
-    def dsl_rby(classes, **options, &block)
-      add_item create(:ruby, **options.merge(classes: classes), &block)
-    end
-
     def dsl_add_item(node)
-      add_item node
+      add_child node
     end
 
     def as_json
@@ -75,11 +25,11 @@ module Schemacop
       return item.cast(value)
     end
 
-    protected
-
-    def add_item(node)
+    def add_child(node)
       @items << node
     end
+
+    protected
 
     def type
       fail NotImplementedError

@@ -24,6 +24,10 @@ module Schemacop
   def self.context
     Thread.current[CONTEXT_THREAD_KEY] ||= Context.new
   end
+
+  def self.register(*args)
+    Schemacop::NodeRegistry.register(*args)
+  end
 end
 
 # Shared
@@ -32,6 +36,8 @@ require 'schemacop/exceptions'
 require 'schemacop/schema'
 
 # Version 3 files
+require 'schemacop/node_registry'
+require 'schemacop/dsl_scope'
 require 'schemacop/context'
 require 'schemacop/global_context'
 require 'schemacop/result'
@@ -59,3 +65,18 @@ end
 
 # Legacy version 2
 require 'schemacop/v2'
+
+# Register V3 nodes
+Schemacop.register :all_of,    :all_of, Schemacop::AllOfNode
+Schemacop.register :any_of,    :any_of, Schemacop::AnyOfNode
+Schemacop.register :array,     :ary,    Schemacop::ArrayNode
+Schemacop.register :boolean,   :boo,    Schemacop::BooleanNode
+Schemacop.register :integer,   :int,    Schemacop::IntegerNode
+Schemacop.register :is_not,    :is_not, Schemacop::IsNotNode
+Schemacop.register :number,    :num,    Schemacop::NumberNode
+Schemacop.register :object,    :obj,    Schemacop::ObjectNode
+Schemacop.register :one_of,    :one_of, Schemacop::OneOfNode
+Schemacop.register :reference, :ref,    Schemacop::ReferenceNode
+Schemacop.register :ruby,      :rby,    Schemacop::RubyNode
+Schemacop.register :string,    :str,    Schemacop::StringNode
+Schemacop.register :symbol,    :sym,    Schemacop::SymbolNode

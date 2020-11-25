@@ -11,9 +11,13 @@ module Schemacop
       symbol = :"#{@prefix}#{symbol}" if @prefix
 
       if @methods.include?(symbol)
-        @delegation_object.send(symbol, *args, &block)
-      elsif @backup_binding&.respond_to?(symbol)
-        @backup_binding.send(symbol, *args, &block)
+        if @delegation_object.respond_to?(symbol)
+          @delegation_object.send(symbol, *args, &block)
+        elsif @backup_binding.respond_to?(symbol)
+          @backup_binding.send(symbol, *args, &block)
+        else
+          super
+        end
       else
         super
       end

@@ -6,6 +6,8 @@ module Schemacop
       unique_items
     ].freeze
 
+    supports_children
+
     def self.allowed_options
       super + ATTRIBUTES + %i[additional_items contains]
     end
@@ -18,60 +20,12 @@ module Schemacop
 
     attr_reader :items
 
-    def dsl_str(**options, &block)
-      @items << create(:string, **options, &block)
-    end
-
-    def dsl_obj(**options, &block)
-      @items << create(:object, **options, &block)
-    end
-
-    def dsl_int(**options, &block)
-      @items << create(:integer, **options, &block)
-    end
-
-    def dsl_num(**options, &block)
-      @items << create(:number, **options, &block)
-    end
-
-    def dsl_boo(**options, &block)
-      @items << create(:boolean, **options, &block)
-    end
-
-    def dsl_ary(**options, &block)
-      @items << create(:array, **options, &block)
-    end
-
-    def dsl_ref(path, **options, &block)
-      @items << create(:reference, **options.merge(path: path), &block)
-    end
-
-    def dsl_all_of(**options, &block)
-      @items << create(:all_of, **options, &block)
-    end
-
-    def dsl_any_of(**options, &block)
-      @items << create(:any_of, **options, &block)
-    end
-
-    def dsl_one_of(**options, &block)
-      @items << create(:one_of, **options, &block)
-    end
-
-    def dsl_is_not(**options, &block)
-      @items << create(:is_not, **options, &block)
-    end
-
-    def dsl_sym(**options, &block)
-      @items << create(:symbol, **options, &block)
-    end
-
-    def dsl_rby(classes, **options, &block)
-      @items << create(:ruby, **options.merge(classes: classes), &block)
-    end
-
     def dsl_add(type, **options, &block)
       @options[:additional_items] = create(type, **options, &block)
+    end
+
+    def add_child(node)
+      @items << node
     end
 
     def as_json
