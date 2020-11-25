@@ -1,7 +1,7 @@
 require 'test_helper'
 
 module Schemacop
-  class ArrayNodeTest < SchemacopTest
+  class ArrayNodeTest < V3Test
     EXP_INVALID_TYPE = 'Invalid type, expected "array".'.freeze
 
     def test_basic

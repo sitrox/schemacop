@@ -1,7 +1,7 @@
 require 'test_helper'
 
 module Schemacop
-  class ReferenceNodeTest < SchemacopTest
+  class ReferenceNodeTest < V3Test
     def test_in_object
       context = Schemacop::Context.new
       context.schema :MyString, :string

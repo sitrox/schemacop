@@ -1,7 +1,7 @@
 require 'test_helper'
 
 module Schemacop
-  class NodeTest < SchemacopTest
+  class NodeTest < V3Test
     def test_cast_in_root
       schema :integer, cast_str: true, required: true
 

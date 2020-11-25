@@ -1,7 +1,7 @@
 require 'test_helper'
 
 module Schemacop
-  class BooleanNodeTest < SchemacopTest
+  class BooleanNodeTest < V3Test
     EXP_INVALID_TYPE = 'Invalid type, expected "boolean".'.freeze
 
     def test_basic

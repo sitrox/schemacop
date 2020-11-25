@@ -1,4 +1,6 @@
-module Schemacop::V2
-  class RootNode < NodeSupportingType
+module Schemacop
+  module V2
+    class RootNode < NodeSupportingType
+    end
   end
 end

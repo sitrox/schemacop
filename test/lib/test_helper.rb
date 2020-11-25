@@ -17,7 +17,13 @@ require 'colorize'
 
 Minitest::Reporters.use! [Minitest::Reporters::DefaultReporter.new(color: true)]
 
-class SchemacopTest < Minitest::Test
+class V2Test < Minitest::Test
+  def setup
+    Schemacop.default_schema_version = 2
+  end
+end
+
+class V3Test < Minitest::Test
   class ValidationAssertion
     attr_reader :errors
 
@@ -30,6 +36,10 @@ class SchemacopTest < Minitest::Test
       @errors[path] ||= []
       @errors[path] << exp
     end
+  end
+
+  def setup
+    Schemacop.default_schema_version = 3
   end
 
   # Help test raise errors message

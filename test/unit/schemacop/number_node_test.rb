@@ -1,7 +1,7 @@
 require 'test_helper'
 
 module Schemacop
-  class NumberNodeTest < SchemacopTest
+  class NumberNodeTest < V3Test
     EXP_INVALID_TYPE = 'Invalid type, expected "number".'.freeze
 
     def test_basic

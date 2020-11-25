@@ -1,7 +1,7 @@
 require 'test_helper'
 
 module Schemacop
-  class StringNodeTest < SchemacopTest
+  class StringNodeTest < V3Test
     EXP_INVALID_TYPE = 'Invalid type, expected "string".'.freeze
 
     def test_basic

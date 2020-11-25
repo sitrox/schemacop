@@ -10,6 +10,9 @@ module Schemacop
   mattr_accessor :load_paths
   self.load_paths = ['app/schemas']
 
+  mattr_accessor :default_schema_version
+  self.default_schema_version = 3
+
   def self.with_context(context)
     prev_context = Thread.current[CONTEXT_THREAD_KEY]
     Thread.current[CONTEXT_THREAD_KEY] = context
@@ -26,6 +29,7 @@ end
 # Shared
 require 'schemacop/scoped_env'
 require 'schemacop/exceptions'
+require 'schemacop/schema'
 
 # Version 3 files
 require 'schemacop/context'

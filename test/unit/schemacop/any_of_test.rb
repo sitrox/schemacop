@@ -1,7 +1,7 @@
 require 'test_helper'
 
 module Schemacop
-  class AnyOfTest < SchemacopTest
+  class AnyOfTest < V3Test
     def test_optional
       schema :any_of do
         str

@@ -1,7 +1,7 @@
 require 'test_helper'
 
 module Schemacop
-  class ObjectNodeTest < SchemacopTest
+  class ObjectNodeTest < V3Test
     EXP_INVALID_TYPE = 'Invalid type, expected "object".'.freeze
 
     def test_basic

@@ -4,7 +4,6 @@ module Schemacop::V2
   end
 end
 
-require 'schemacop/v2/schema'
 require 'schemacop/v2/collector'
 require 'schemacop/v2/node_resolver'
 require 'schemacop/v2/node'
