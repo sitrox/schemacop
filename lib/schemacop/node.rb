@@ -108,7 +108,7 @@ module Schemacop
     def init; end
 
     sig { params(name: Symbol, type: Symbol, options: Object, block: T.nilable(T.proc.void)).void }
-    def dsl_scm(name, type = :object, **options, &block)
+    def dsl_scm(name, type = :hash, **options, &block)
       @schemas[name] = Node.create(type, **options, &block)
     end
 

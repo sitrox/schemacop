@@ -26,7 +26,7 @@ module Schemacop
 
     def test_object_contents
       schema :array do
-        obj do
+        hsh do
           str! :name
         end
       end
@@ -179,7 +179,7 @@ module Schemacop
       schema :array do
         str
         int
-        obj do
+        hsh do
           str! :name
         end
       end
@@ -293,7 +293,7 @@ module Schemacop
       )
 
       schema :array do
-        obj do
+        hsh do
           str? :name, default: 'John'
         end
       end

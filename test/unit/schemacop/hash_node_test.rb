@@ -1,15 +1,15 @@
 require 'test_helper'
 
 module Schemacop
-  class ObjectNodeTest < V3Test
-    EXP_INVALID_TYPE = 'Invalid type, expected "object".'.freeze
+  class HashNodeTest < V3Test
+    EXP_INVALID_TYPE = 'Invalid type, expected "hash".'.freeze
 
     def test_basic
       schema
       assert_validation({})
       assert_json(type: :object, additionalProperties: false)
 
-      schema :object
+      schema :hash
       assert_validation({})
 
       assert_json(type: :object, additionalProperties: false)
@@ -26,7 +26,7 @@ module Schemacop
     end
 
     def test_additional_properties_true
-      schema :object, additional_properties: true
+      schema :hash, additional_properties: true
       assert_validation({})
       assert_validation(foo: :bar)
       assert_validation(foo: { bar: :baz })
@@ -35,7 +35,7 @@ module Schemacop
     end
 
     def test_additional_properties_schema
-      schema :object do
+      schema :hash do
         str! :foo
         add :string
       end
@@ -56,7 +56,7 @@ module Schemacop
     end
 
     def test_property_names
-      schema :object, additional_properties: true, property_names: '^[a-zA-Z0-9]+$'
+      schema :hash, additional_properties: true, property_names: '^[a-zA-Z0-9]+$'
       assert_validation({})
       assert_validation(foo: :bar)
       assert_validation('foo' => 'bar')
@@ -100,7 +100,7 @@ module Schemacop
     end
 
     def test_min_properties
-      schema :object, min_properties: 2, additional_properties: true
+      schema :hash, min_properties: 2, additional_properties: true
       assert_validation(foo: :bar, bar: :baz)
       assert_validation(foo: :bar, bar: :baz, baz: :foo)
 
@@ -120,7 +120,7 @@ module Schemacop
     end
 
     def test_max_properties
-      schema :object, max_properties: 3, additional_properties: true
+      schema :hash, max_properties: 3, additional_properties: true
       assert_validation(foo: :bar, bar: :baz)
       assert_validation(foo: :bar, bar: :baz, baz: :foo)
 
@@ -136,7 +136,7 @@ module Schemacop
     end
 
     def test_min_max_properties
-      schema :object, min_properties: 3, max_properties: 3, additional_properties: true
+      schema :hash, min_properties: 3, max_properties: 3, additional_properties: true
       assert_validation(foo: :bar, bar: :baz, baz: :foo)
 
       assert_validation(foo: :bar, bar: :baz, baz: :foo, answer: 42) do
@@ -156,7 +156,7 @@ module Schemacop
     end
 
     def test_dependencies
-      schema :object do
+      schema :hash do
         str! :name
         str? :credit_card
         str? :billing_address
@@ -258,7 +258,7 @@ module Schemacop
         str? :first_name, default: 'John'
         str? :last_name, default: 'Doe'
         str! :active, format: :boolean
-        obj? :address, default: {} do
+        hsh? :address, default: {} do
           str? :street, default: 'Example 42'
         end
       end
@@ -270,7 +270,7 @@ module Schemacop
       assert_equal data_was, data
 
       schema do
-        obj? :address do
+        hsh? :address do
           str? :street, default: 'Example 42'
         end
       end

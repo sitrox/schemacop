@@ -14,8 +14,8 @@ module Schemacop
 
     def self.dsl_methods
       super + %i[dsl_str dsl_obj dsl_int dsl_boo dsl_ary
-                 dsl_num dsl_ref dsl_sym dsl_rby dsl_all_of dsl_any_of
-                 dsl_one_of dsl_is_not dsl_add]
+                 dsl_num dsl_ref dsl_sym dsl_all_of dsl_any_of
+                 dsl_one_of dsl_is_not dsl_add dsl_hsh]
     end
 
     attr_reader :items

@@ -67,7 +67,7 @@ class V3Test < Minitest::Test
     return ex
   end
 
-  def schema(type = :object, **options, &block)
+  def schema(type = :hash, **options, &block)
     @schema = Schemacop::Node.create(type, **options, &block)
   end
 

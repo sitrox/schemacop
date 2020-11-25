@@ -43,7 +43,7 @@ module Schemacop
 
     def test_nested
       schema :any_of do
-        obj do
+        hsh do
           any_of! :foo do
             int
             str
@@ -69,17 +69,17 @@ module Schemacop
     def test_all_types
       schema :any_of do
         all_of do
-          obj { str! :foo }
+          hsh { str! :foo }
         end
         any_of
         ary
         boo
         int
         num
-        obj { int! :bar }
+        hsh { int! :bar }
         one_of do
-          obj { str! :a, pattern: '^a' }
-          obj { str! :a, pattern: 'z$' }
+          hsh { str! :a, pattern: '^a' }
+          hsh { str! :a, pattern: 'z$' }
         end
         ref :MyDate
         str max_length: 2
@@ -137,8 +137,8 @@ module Schemacop
     def test_defaults
       schema do
         any_of! :foo do
-          obj { str? :bar }
-          obj { str? :baz, default: 'Baz' }
+          hsh { str? :bar }
+          hsh { str? :baz, default: 'Baz' }
         end
       end
 
@@ -161,8 +161,8 @@ module Schemacop
 
       schema do
         any_of! :foo do
-          obj { str? :bar, format: :date }
-          obj { str? :bar, default: 'Baz', format: :date_time }
+          hsh { str? :bar, format: :date }
+          hsh { str? :bar, default: 'Baz', format: :date_time }
         end
       end
 

@@ -53,6 +53,7 @@ require 'schemacop/all_of_node'
 require 'schemacop/any_of_node'
 require 'schemacop/array_node'
 require 'schemacop/boolean_node'
+require 'schemacop/hash_node'
 require 'schemacop/integer_node'
 require 'schemacop/is_not_node'
 require 'schemacop/number_node'
@@ -61,7 +62,6 @@ require 'schemacop/one_of_node'
 require 'schemacop/reference_node'
 require 'schemacop/string_node'
 require 'schemacop/symbol_node'
-require 'schemacop/ruby_node'
 
 # Railtie
 if defined?(Rails)
@@ -79,9 +79,9 @@ Schemacop.register :boolean,   :boo,    Schemacop::BooleanNode
 Schemacop.register :integer,   :int,    Schemacop::IntegerNode
 Schemacop.register :is_not,    :is_not, Schemacop::IsNotNode
 Schemacop.register :number,    :num,    Schemacop::NumberNode
-Schemacop.register :object,    :obj,    Schemacop::ObjectNode
+Schemacop.register :hash,      :hsh,    Schemacop::HashNode
 Schemacop.register :one_of,    :one_of, Schemacop::OneOfNode
 Schemacop.register :reference, :ref,    Schemacop::ReferenceNode
-Schemacop.register :ruby,      :rby,    Schemacop::RubyNode
+Schemacop.register :object,    :obj,    Schemacop::ObjectNode
 Schemacop.register :string,    :str,    Schemacop::StringNode
 Schemacop.register :symbol,    :sym,    Schemacop::SymbolNode

@@ -2,7 +2,7 @@ module Schemacop
   # @abstract
   class CombinationNode < Node
     def self.dsl_methods
-      %i[dsl_str dsl_obj dsl_int dsl_num dsl_boo dsl_ary dsl_ref dsl_sym dsl_rby dsl_all_of dsl_any_of dsl_one_of dsl_is_not dsl_add_item]
+      %i[dsl_str dsl_obj dsl_int dsl_num dsl_boo dsl_ary dsl_ref dsl_sym dsl_all_of dsl_any_of dsl_one_of dsl_is_not dsl_add_item dsl_hsh]
     end
 
     supports_children

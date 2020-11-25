@@ -6,7 +6,7 @@ module Schemacop
       @schemas = {}.freeze
     end
 
-    def schema(name, type = :object, **options, &block)
+    def schema(name, type = :hash, **options, &block)
       @schemas = @schemas.merge(
         name => Schemacop::Node.create(type, **options, &block)
       ).freeze
