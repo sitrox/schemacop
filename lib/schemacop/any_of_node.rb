@@ -5,6 +5,7 @@ module Schemacop
     end
 
     def _validate(data, result:)
+      data = super
       return if data.nil?
 
       match = match(data)
@@ -14,8 +15,6 @@ module Schemacop
       else
         result.error 'Does not match any anyOf condition.'
       end
-
-      super
     end
   end
 end

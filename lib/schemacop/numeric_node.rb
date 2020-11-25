@@ -14,6 +14,7 @@ module Schemacop
     end
 
     def _validate(data, result:)
+      data = super
       return if data.nil?
 
       # Validate minimum #
@@ -38,9 +39,6 @@ module Schemacop
       if options[:multiple_of] && (data % options[:multiple_of]) != 0.0
         result.error "Value must be a multiple of #{options[:multiple_of]}."
       end
-
-      # Super #
-      super
     end
   end
 end

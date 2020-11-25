@@ -4,13 +4,11 @@ module Schemacop
       process_json([], type: :boolean)
     end
 
-    def _validate(data, result:)
-      # Validate type #
-      data = validate_type(data, [TrueClass, FalseClass], :boolean, result)
-      return if data.nil?
-
-      # Super #
-      super
+    def allowed_types
+      {
+        TrueClass  => :boolean,
+        FalseClass => :boolean
+      }
     end
   end
 end

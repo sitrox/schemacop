@@ -81,11 +81,11 @@ module Schemacop
       assert_validation(foo: 'sdfsd', bar: 42)
 
       assert_validation(bar: 42) do
-        error '/foo', 'Missing required property "foo".'
+        error '/foo', 'Value must be given.'
       end
 
       assert_validation({}) do
-        error '/foo', 'Missing required property "foo".'
+        error '/foo', 'Value must be given.'
       end
 
       assert_json(
@@ -226,7 +226,7 @@ module Schemacop
     end
 
     def test_pattern_properties_w_additional
-      schema do
+      schema additional_properties: true do
         int? :builtin
         str?(/^S_/)
         int?(/^I_/)
@@ -305,7 +305,7 @@ module Schemacop
       assert_validation(str: '12345')
       assert_validation(str: '123')
       assert_validation(str: nil) do
-        error '/str', 'Missing required property "str".'
+        error '/str', 'Value must be given.'
       end
       assert_validation(str: '1234') do
         error '/str', 'Matches 2 definitions but should match exactly 1.'
@@ -363,7 +363,7 @@ module Schemacop
 
     def test_is_not_required
       schema do
-        is_not! :foo do
+        is_not! :foo, required: true do
           str
         end
       end
@@ -372,7 +372,7 @@ module Schemacop
       assert_validation(foo: true)
       assert_validation(foo: { bar: :baz })
       assert_validation(foo: nil) do
-        error '/foo', 'Missing required property "foo".'
+        error '/foo', 'Value must be given.'
       end
       assert_validation(foo: 'string') do
         error '/foo', 'Must not match schema: {"type"=>"string"}.'

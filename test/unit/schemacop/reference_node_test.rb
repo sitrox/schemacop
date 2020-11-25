@@ -3,36 +3,45 @@ require 'test_helper'
 module Schemacop
   class ReferenceNodeTest < SchemacopTest
     def test_in_object
-      schema do
-        scm :MyString, :string
-        ref? :foo, :MyString
-        ref? :int, :MyInteger
-        obj? :bar do
+      context = Schemacop::Context.new
+      context.schema :MyString, :string
+      context.schema :MyInteger, :integer
+
+      Schemacop.with_context context do
+        schema do
           ref? :foo, :MyString
-          scm :MyInteger, :integer
-          obj? :baz do
-            ref! :foo, :MyInteger
+          ref? :int, :MyInteger
+          obj? :bar do
+            ref? :foo, :MyString
+            obj? :baz do
+              ref! :foo, :MyInteger
+            end
           end
         end
-      end
 
-      assert_validation({})
-      assert_validation(foo: 'String')
-      assert_validation(bar: { foo: 'String' })
-      assert_validation(bar: { foo: 'String', baz: { foo: 42 } })
+        assert_validation({})
+        assert_validation(foo: 'String')
+        assert_validation(bar: { foo: 'String' })
+        assert_validation(bar: { foo: 'String', baz: { foo: 42 } })
 
-      assert_validation(foo: 42) do
-        error '/foo', 'Invalid type, expected "string".'
+        assert_validation(foo: 42) do
+          error '/foo', 'Invalid type, expected "string".'
+        end
+        assert_validation(bar: { foo: 42 }) do
+          error '/bar/foo', 'Invalid type, expected "string".'
+        end
+        assert_validation(bar: { foo: 'String', baz: { foo: '42' } }) do
+          error '/bar/baz/foo', 'Invalid type, expected "integer".'
+        end
       end
-      assert_validation(bar: { foo: 42 }) do
-        error '/bar/foo', 'Invalid type, expected "string".'
-      end
-      assert_validation(bar: { foo: 'String', baz: { foo: '42' } }) do
-        error '/bar/baz/foo', 'Invalid type, expected "integer".'
-      end
+    end
 
+    def test_schema_not_found
       assert_raises_with_message RuntimeError, 'Schema "MyInteger" not found.' do
-        assert_validation(int: 42)
+        schema do
+          ref? :int, :MyInteger
+        end
+        assert_validation(int: 5)
       end
     end
 
@@ -116,7 +125,7 @@ module Schemacop
         assert_validation(person: { first_name: 'John', last_name: 'Doe', info: { born_at: '1990-01-13' } })
         assert_validation(person: { first_name_x: 'John', last_name: 'Doe' }) do
           error '/person', 'Obsolete property "first_name_x".'
-          error '/person/first_name', 'Missing required property "first_name".'
+          error '/person/first_name', 'Value must be given.'
         end
         assert_validation(person: { first_name: 'John', last_name: 'Doe', info: { born_at: 'never' } }) do
           error '/person/info/born_at', 'String does not match format "date".'

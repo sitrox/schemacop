@@ -209,7 +209,7 @@ module Schemacop
       end
 
       assert_validation(['foo', 42, { namex: 'Hello' }]) do
-        error '/[2]/name', 'Missing required property "name".'
+        error '/[2]/name', 'Value must be given.'
         error '/[2]', 'Obsolete property "namex".'
       end
     end

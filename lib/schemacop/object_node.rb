@@ -177,9 +177,12 @@ module Schemacop
       return exp
     end
 
+    def allowed_types
+      { Hash => :object }
+    end
+
     def _validate(data, result: Result.new)
-      # Validate type #
-      data = validate_type(data, Hash, :object, result)
+      data = super
       return if data.nil?
 
       # Validate min_properties #
@@ -196,12 +199,7 @@ module Schemacop
       @properties.values.each do |node|
         result.in_path(node.name) do
           next if node.name.is_a?(Regexp)
-
-          if data.include?(node.name) && !(value = data[node.name]).nil?
-            node._validate(value, result: result)
-          elsif node.required?
-            result.error "Missing required property #{node.name.to_s.inspect}."
-          end
+          node._validate(data[node.name], result: result)
         end
       end
 
@@ -249,9 +247,6 @@ module Schemacop
           end
         end
       end
-
-      # Super #
-      super
     end
 
     def children

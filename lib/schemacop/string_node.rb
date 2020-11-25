@@ -23,13 +23,16 @@ module Schemacop
       super + ATTRIBUTES - %i[cast_str] + %i[format_options]
     end
 
+    def allowed_types
+      { String => :string }
+    end
+
     def as_json
       process_json(ATTRIBUTES, type: :string)
     end
 
     def _validate(data, result:)
-      # Validate type #
-      data = validate_type(data, String, :string, result)
+      data = super
       return if data.nil?
 
       # Validate length #
@@ -60,9 +63,6 @@ module Schemacop
           node._validate(cast(data), result: result)
         end
       end
-
-      # Super #
-      super
     end
 
     def cast(value)

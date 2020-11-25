@@ -4,11 +4,8 @@ module Schemacop
       process_json(ATTRIBUTES, type: :number)
     end
 
-    def _validate(data, result:)
-      data = validate_type(data, Numeric, :number, result)
-
-      # Super #
-      super
+    def allowed_types
+      { Numeric => :number }
     end
   end
 end

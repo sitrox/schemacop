@@ -8,13 +8,8 @@ module Schemacop
       {} # Not supported by Json Schema
     end
 
-    def _validate(data, result:)
-      # Validate type #
-      data = validate_type(data, @classes, :ruby, result)
-      return if data.nil?
-
-      # Super #
-      super
+    def allowed_types
+      Hash[@classes.map { |c| [c, c.name] }]
     end
 
     def init

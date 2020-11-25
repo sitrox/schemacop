@@ -1,3 +1,9 @@
+# External dependencies
+require 'active_support/all'
+require 'set'
+require 'sorbet-runtime'
+
+# Schemacop module
 module Schemacop
   CONTEXT_THREAD_KEY = :schemacop_schema_context
 
@@ -16,11 +22,6 @@ module Schemacop
     Thread.current[CONTEXT_THREAD_KEY] ||= Context.new
   end
 end
-
-# External dependencies
-require 'active_support/all'
-require 'set'
-require 'sorbet-runtime'
 
 # Shared
 require 'schemacop/scoped_env'

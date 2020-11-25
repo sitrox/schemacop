@@ -13,6 +13,18 @@ module Schemacop
       assert_json(type: :boolean)
     end
 
+    def test_required
+      schema :boolean, required: true
+
+      assert_validation true
+      assert_validation false
+      assert_validation nil do
+        error '/', 'Value must be given.'
+      end
+
+      assert_json(type: :boolean)
+    end
+
     def test_hash
       schema { boo! :alive }
       assert_json(

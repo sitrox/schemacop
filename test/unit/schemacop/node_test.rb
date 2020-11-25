@@ -14,8 +14,9 @@ module Schemacop
 
       assert_validation(5)
 
-      # TODO: The following assertion should not be true
-      assert_validation(nil)
+      assert_validation(nil) do
+        error '/', 'Value must be given.'
+      end
 
       assert_validation('5')
       assert_validation('5.3') do

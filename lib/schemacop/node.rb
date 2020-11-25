@@ -40,6 +40,10 @@ module Schemacop
       %i[dsl_scm]
     end
 
+    def allowed_types
+      {}
+    end
+
     def used_external_schemas
       children.map(&:used_external_schemas).flatten.uniq
     end
@@ -151,21 +155,6 @@ module Schemacop
 
     protected
 
-    sig { params(data: T.nilable(Object), type: T.any(T::Array[Class], Class), type_name: Symbol, result: Result).returns(T.nilable(Object)) }
-
-    def validate_type(data, type, type_name, result)
-      types = Array(type)
-
-      if data.nil? && default
-        data = default
-      elsif types.none? { |t| data.is_a?(t) }
-        result.error %(Invalid type, expected #{type_name.to_s.inspect}.)
-        data = nil
-      end
-
-      return data
-    end
-
     def item_matches?(item, data)
       item_result = Result.new(self)
       item._validate(data, result: item_result)
@@ -188,16 +177,35 @@ module Schemacop
     end
 
     def _validate(data, result:)
+      # Validate nil #
+      if data.nil? && required?
+        result.error "Value must be given."
+        return nil
+      end
+
+      # Apply default #
+      if data.nil?
+        if default
+          data = default
+        else
+          return nil
+        end
+      end
+
+      # Validate type #
+      if allowed_types.any? && !allowed_types.keys.any? { |c| data.is_a?(c) }
+        collection = allowed_types.values.map { |t| "\"#{t}\"" }.uniq.sort.join(' or ')
+        result.error %(Invalid type, expected #{collection}.)
+        return nil
+      end
+
+      # Validate enums #
       if @enum && !@enum.include?(data)
         result.error "Value not included in enum #{@enum.to_a.inspect}."
       end
 
-      return result
+      return data
     end
-
-    # def collect(_data)
-    #   nil
-    # end
 
     def validate_self; end
   end

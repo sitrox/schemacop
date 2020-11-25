@@ -96,8 +96,12 @@ module Schemacop
       return process_json(ATTRIBUTES, json)
     end
 
+    def allowed_types
+      { Array => :array }
+    end
+
     def _validate(data, result:)
-      data = validate_type(data, Array, :array, result)
+      data = super
       return if data.nil?
 
       # Validate length #
@@ -158,9 +162,6 @@ module Schemacop
       if options[:unique_items] && data.size != data.uniq.size
         result.error 'Array has duplicate items.'
       end
-
-      # Super #
-      super
     end
 
     def children

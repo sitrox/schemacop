@@ -11,6 +11,15 @@ module Schemacop
       assert_json(type: :string)
     end
 
+    def test_required
+      schema :string, required: true
+      assert_validation 'Hello World'
+      assert_validation ''
+      assert_validation nil do
+        error '/', 'Value must be given.'
+      end
+    end
+
     def test_hash
       schema { str! :name }
       assert_validation name: 'Hello World'
