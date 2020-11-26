@@ -41,6 +41,21 @@ module Schemacop
           result.error "Value must be a multiple of #{options[:multiple_of]}."
         end
       end
+
+      def validate_self
+        if options[:minimum] && options[:maximum] && options[:minimum] > options[:maximum]
+          fail 'Option "minimum" can\'t be greater than "maximum".'
+        end
+
+        if options[:exclusive_minimum] && options[:exclusive_maximum]\
+           && options[:exclusive_minimum] > options[:exclusive_maximum]
+          fail 'Option "exclusive_minimum" can\'t be greater than "exclusive_maximum".'
+        end
+
+        if options[:multiple_of] && options[:multiple_of] == 0
+          fail 'Option "multiple_of" can\'t be 0.'
+        end
+      end
     end
   end
 end

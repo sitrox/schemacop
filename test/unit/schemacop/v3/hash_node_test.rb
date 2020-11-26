@@ -395,6 +395,15 @@ module Schemacop
           error '/foo', 'Must not match schema: {"type"=>"string"}.'
         end
       end
+
+      def test_validate_self
+        assert_raises_with_message Exceptions::InvalidSchemaError,
+                                   'Pattern properties can\'t be required.' do
+          schema :hash do
+            str! /[a-z]+/
+          end
+        end
+      end
     end
   end
 end

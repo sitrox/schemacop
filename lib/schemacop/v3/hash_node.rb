@@ -179,7 +179,7 @@ module Schemacop
 
       def validate_self
         if @properties.values.any? { |p| p.name.is_a?(Regexp) && p.required? }
-          fail 'Pattern properties cannot be required.'
+          fail 'Pattern properties can\'t be required.'
         end
       end
     end

@@ -94,7 +94,21 @@ module Schemacop
       def validate_self
         if options.include?(:format)
           unless FORMAT_PATTERNS.include?(options[:format])
-            fail "Format #{options[:format].inspect} is not supported."
+            fail "Format #{options[:format].to_s.inspect} is not supported."
+          end
+        end
+
+        if options[:min_length] && options[:max_length] && options[:min_length] > options[:max_length]
+          fail 'Option "min_length" can\'t be greater than "max_length".'
+        end
+
+        if options[:pattern]
+          fail 'Option "pattern" must be a string.' unless options[:pattern].is_a?(String)
+
+          begin
+            Regexp.compile(options[:pattern])
+          rescue RegexpError => e
+            fail "Option \"pattern\" can't be parsed: #{e.message}."
           end
         end
       end

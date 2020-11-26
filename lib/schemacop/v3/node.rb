@@ -98,7 +98,11 @@ module Schemacop
         end
 
         # Validate self #
-        validate_self
+        begin
+          validate_self
+        rescue StandardError => e
+          fail Exceptions::InvalidSchemaError, e.message
+        end
       end
 
       def create(type, **options, &block)

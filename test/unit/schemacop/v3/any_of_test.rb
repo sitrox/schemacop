@@ -72,7 +72,7 @@ module Schemacop
           all_of do
             hsh { str! :foo }
           end
-          any_of
+          any_of { obj(Date); obj(Time) }
           ary
           boo
           int

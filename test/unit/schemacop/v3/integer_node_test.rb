@@ -183,6 +183,24 @@ module Schemacop
         assert_cast(6, 6)
         assert_cast(nil, 5)
       end
+
+      def test_validate_self
+        assert_raises_with_message Exceptions::InvalidSchemaError,
+                                   'Option "minimum" can\'t be greater than "maximum".' do
+          schema :integer, minimum: 5, maximum: 4
+        end
+
+        assert_raises_with_message Exceptions::InvalidSchemaError,
+                                   'Option "exclusive_minimum" can\'t be '\
+                                   'greater than "exclusive_maximum".' do
+          schema :integer, exclusive_minimum: 5, exclusive_maximum: 4
+        end
+
+        assert_raises_with_message Exceptions::InvalidSchemaError,
+                                   'Option "multiple_of" can\'t be 0.' do
+          schema :integer, multiple_of: 0
+        end
+      end
     end
   end
 end

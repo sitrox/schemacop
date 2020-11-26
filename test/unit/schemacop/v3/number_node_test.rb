@@ -167,6 +167,24 @@ module Schemacop
           error '/', 'Value must be a multiple of 1.2.'
         end
       end
+
+      def test_validate_self
+        assert_raises_with_message Exceptions::InvalidSchemaError,
+                                   'Option "minimum" can\'t be greater than "maximum".' do
+          schema :number, minimum: 5, maximum: 4
+        end
+
+        assert_raises_with_message Exceptions::InvalidSchemaError,
+                                   'Option "exclusive_minimum" can\'t be '\
+                                   'greater than "exclusive_maximum".' do
+          schema :number, exclusive_minimum: 5, exclusive_maximum: 4
+        end
+
+        assert_raises_with_message Exceptions::InvalidSchemaError,
+                                   'Option "multiple_of" can\'t be 0.' do
+          schema :number, multiple_of: 0
+        end
+      end
     end
   end
 end

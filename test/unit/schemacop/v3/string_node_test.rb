@@ -223,6 +223,29 @@ module Schemacop
         assert_cast('Foo', 'Foo')
         assert_cast(nil, 'Hello')
       end
+
+      def test_validate_self
+        assert_raises_with_message Exceptions::InvalidSchemaError,
+                                   'Format "not-existing" is not supported.' do
+          schema :string, format: :not_existing
+        end
+
+        assert_raises_with_message Exceptions::InvalidSchemaError,
+                                   'Option "min_length" can\'t be greater than "max_length".' do
+          schema :string, min_length: 5, max_length: 4
+        end
+
+        assert_raises_with_message Exceptions::InvalidSchemaError,
+                                   'Option "pattern" must be a string.' do
+          schema :string, pattern: //
+        end
+
+        assert_raises_with_message Exceptions::InvalidSchemaError,
+                                   'Option "pattern" can\'t be parsed: end pattern '\
+                                   'with unmatched parenthesis: /(abcde/.' do
+          schema :string, pattern: '(abcde'
+        end
+      end
     end
   end
 end
