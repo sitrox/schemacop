@@ -128,49 +128,14 @@ module Schemacop
         {}
       end
 
-      # Query data validity
-      #
-      # @param data The data to validate.
-      # @return [Boolean] True if the data is valid, false otherwise.
-      def valid?(data)
-        validate(data).valid?
+      def cast(value)
+        value || default
       end
 
-      # Query data validity
-      #
-      # @param data The data to validate.
-      # @return [Boolean] True if data is invalid, false otherwise.
-      def invalid?(data)
-        validate(data).valid?
-      end
-
-      # Validate data
-      #
-      # @param data The data to validate.
-      # @return [Schemacop::Result] Result object
       def validate(data)
         result = Result.new(self, data)
         _validate(data, result: result)
         return result
-      end
-
-      # Validate data
-      #
-      # @param data The data to validate.
-      # @raise [Schemacop::Exceptions::ValidationError] If the data is invalid,
-      #   this exception is thrown.
-      # @return The processed data
-      def validate!(data)
-        result = validate(data)
-        if result.valid?
-          return result.data
-        else
-          fail Exceptions::ValidationError, result.messages
-        end
-      end
-
-      def cast(value)
-        value || default
       end
 
       protected
@@ -196,6 +161,10 @@ module Schemacop
         return json.as_json
       end
 
+      def type_assertion_method
+        :is_a?
+      end
+
       def _validate(data, result:)
         # Validate nil #
         if data.nil? && required?
@@ -213,7 +182,8 @@ module Schemacop
         end
 
         # Validate type #
-        if allowed_types.any? && !allowed_types.keys.any? { |c| data.is_a?(c) }
+        if allowed_types.any? && !allowed_types.keys.any? { |c| data.send(type_assertion_method, c) }
+          effective_type = data.class.name
           collection = allowed_types.values.map { |t| "\"#{t}\"" }.uniq.sort.join(' or ')
           result.error %(Invalid type, expected #{collection}.)
           return nil
