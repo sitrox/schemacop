@@ -8,7 +8,7 @@ against schema definitions described by a simple DSL. It is also able to
 generate [JSON Schema](https://json-schema.org) compliant JSON output, i.e. for
 use in conjunction with [OpenAPI](https://swagger.io/specification/).
 
-Examples:
+## Basic example
 
 ```ruby
 schema = Schemacop::Schema3.new do
