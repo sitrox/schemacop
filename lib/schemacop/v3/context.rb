@@ -4,7 +4,7 @@ module Schemacop
       attr_accessor :schemas
 
       def initialize
-        @schemas = {}.freeze
+        @schemas = {}.with_indifferent_access.freeze
       end
 
       def schema(name, type = :hash, **options, &block)

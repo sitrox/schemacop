@@ -17,13 +17,20 @@ require 'colorize'
 
 Minitest::Reporters.use! [Minitest::Reporters::DefaultReporter.new(color: true)]
 
-class V2Test < Minitest::Test
+class SchemacopTest < Minitest::Test
+  def assert_is_a(klass, object)
+    assert object.is_a?(klass),
+           "Expected object with class #{object.class.inspect} to be a #{klass.inspect}."
+  end
+end
+
+class V2Test < SchemacopTest
   def setup
     Schemacop.default_schema_version = 2
   end
 end
 
-class V3Test < Minitest::Test
+class V3Test < SchemacopTest
   class ValidationAssertion
     attr_reader :errors
 

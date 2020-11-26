@@ -1,7 +1,7 @@
 module Schemacop
   class Schema3 < BaseSchema
     def initialize(*args, &block)
-      @root = Schemacop::Node.create(*args, &block)
+      @root = V3::Node.create(*args, &block)
     end
 
     # Validate data for the defined Schema

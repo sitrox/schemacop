@@ -27,7 +27,7 @@ module Schemacop
       end
 
       def target
-        schemas[@path] || Schemacop.context.schemas[@path] || GlobalContext.schemas[@path]
+        schemas[@path] || Schemacop.context.schemas[@path] || GlobalContext.schema_for(@path)
       end
 
       def cast(data)
