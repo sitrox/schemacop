@@ -17,14 +17,8 @@ module Schemacop
       end
 
       def self.dsl_methods
-        super + %i[
-          dsl_str! dsl_str? dsl_obj! dsl_obj? dsl_int! dsl_int? dsl_num!
-          dsl_num? dsl_boo! dsl_boo? dsl_ary? dsl_ary! dsl_ref! dsl_ref?
-          dsl_add dsl_dep dsl_sym! dsl_sym?
-          dsl_all_of! dsl_all_of? dsl_any_of! dsl_any_of?
-          dsl_one_of! dsl_one_of? dsl_is_not! dsl_is_not?
-          dsl_hsh! dsl_hsh?
-        ]
+        # TODO: Do we need dsl_add_item and dsl_add?
+        super + NodeRegistry.dsl_methods(true) + %i[dsl_add dsl_dep dsl_add_item]
       end
 
       def add_child(node)

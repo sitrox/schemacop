@@ -11,6 +11,16 @@ module Schemacop
         @by_class[klass] = { name: name.to_sym, short_name: short_name.to_sym }
       end
 
+      def self.dsl_methods(bang)
+        return @by_short_name.keys.map do |short_name|
+          if bang
+            ["dsl_#{short_name}!", "dsl_#{short_name}?"]
+          else
+            ["dsl_#{short_name}"]
+          end
+        end.flatten.map(&:to_sym)
+      end
+
       def self.find(name_or_klass)
         if name_or_klass.is_a?(Class)
           return name_or_klass
