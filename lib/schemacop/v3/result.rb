@@ -1,5 +1,4 @@
 module Schemacop
-  # TODO: Rename to validator?
   class Result
     attr_reader :current_path
     attr_reader :errors
@@ -32,9 +31,8 @@ module Schemacop
       @errors.transform_keys { |k| "/#{k.join('/')}" }
     end
 
-    # TODO: Get rid of messages
     def exception_message
-      messages
+      messages.join("\n")
     end
 
     def messages

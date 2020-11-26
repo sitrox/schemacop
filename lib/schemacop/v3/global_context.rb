@@ -1,6 +1,5 @@
 module Schemacop
   module V3
-    # TODO: Cache schemas in development mode and load only what's necessary
     class GlobalContext < Context
       DSL_METHODS = %i[schema].freeze
 

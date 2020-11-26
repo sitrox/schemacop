@@ -12,5 +12,9 @@ module Schemacop
     def validate(data)
       root.validate(data)
     end
+
+    def as_json
+      root.as_json
+    end
   end
 end

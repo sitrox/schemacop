@@ -14,7 +14,6 @@ module Schemacop
       end
 
       def self.dsl_methods
-        # TODO: Do we need dsl_add?
         super + NodeRegistry.dsl_methods(false) + %i[dsl_add]
       end
 

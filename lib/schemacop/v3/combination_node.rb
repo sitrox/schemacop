@@ -3,18 +3,13 @@ module Schemacop
     # @abstract
     class CombinationNode < Node
       def self.dsl_methods
-        # TODO: Do we need dsl_add_item?
-        super + NodeRegistry.dsl_methods(false) + %i[dsl_add_item]
+        super + NodeRegistry.dsl_methods(false)
       end
 
       supports_children
 
       def init
         @items = []
-      end
-
-      def dsl_add_item(node)
-        add_child node
       end
 
       def as_json

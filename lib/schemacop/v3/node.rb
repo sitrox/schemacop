@@ -37,8 +37,8 @@ module Schemacop
             name:     options.delete(:name)
           }
           node = create(:one_of, **one_of_options) do
-            add_item node
-            add_item Node.create(:string, format: format, format_options: options)
+            self.node node
+            str format: format, format_options: options
           end
         end
 
@@ -50,7 +50,7 @@ module Schemacop
       end
 
       def self.dsl_methods
-        %i[dsl_scm]
+        %i[dsl_scm dsl_node]
       end
 
       def allowed_types
@@ -108,9 +108,12 @@ module Schemacop
 
       def init; end
 
-      sig { params(name: Symbol, type: Symbol, options: Object, block: T.nilable(T.proc.void)).void }
       def dsl_scm(name, type = :hash, **options, &block)
         @schemas[name] = create(type, **options, &block)
+      end
+
+      def dsl_node(node)
+        add_child node
       end
 
       def schemas
