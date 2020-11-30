@@ -105,7 +105,7 @@ module Schemacop
 
         # Validate additional properties #
         specified_properties = @properties.keys.to_set
-        additional_properties = data.reject { |k, _v| specified_properties.include?(k.to_sym) }
+        additional_properties = data.reject { |k, _v| specified_properties.include?(k.to_s.to_sym) }
 
         property_patterns = {}
 
@@ -124,7 +124,7 @@ module Schemacop
           end
 
           if options[:additional_properties].blank?
-            match = property_patterns.keys.find { |p| p.match?(name) }
+            match = property_patterns.keys.find { |p| p.match?(name.to_s) }
             if match
               result.in_path(name) do
                 property_patterns[match]._validate(additional_property, result: result)

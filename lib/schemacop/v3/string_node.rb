@@ -7,7 +7,6 @@ module Schemacop
         pattern
         format
         enum
-        boolean
       ].freeze
 
       FORMAT_PATTERNS = {

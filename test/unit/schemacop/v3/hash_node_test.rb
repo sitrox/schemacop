@@ -204,7 +204,7 @@ module Schemacop
         end
 
         assert_validation(name: 'John', foo_bar: 'John')
-        assert_validation(name: 'John', foo_bar: 'John', bar_baz: 42)
+        assert_validation(name: 'John', foo_bar: 'John', bar_baz: 42, foo_baz: '42')
         assert_validation(name: 'John', foo_baz: 'John', bar_baz: 42)
 
         assert_validation(name: 'John', xy: 'John', bar_baz: 'Doe') do
@@ -403,6 +403,47 @@ module Schemacop
             str! /[a-z]+/
           end
         end
+      end
+
+      def test_doc_example
+        schema :hash do
+          scm :address do
+            str! :street
+            int! :number
+            str! :zip
+          end
+          int? :id
+          str! :name
+          ref! :address, :address
+          ary! :additional_addresses, default: [] do
+            ref :address
+          end
+          ary? :comments, :array, default: [] do
+            str
+          end
+          hsh! :jobs, min_properties: 1 do
+            str? /^[0-9]+$/
+          end
+        end
+
+        assert_validation(
+          id:      42,
+          name:    'John Doe',
+          address: {
+            street: 'Silver Street',
+            number: 4,
+            zip:    '38234C'
+          },
+          additional_addresses: [
+            { street: 'Example street', number: 42, zip: '8048' }
+          ],
+          comments: [
+            'This is a comment'
+          ],
+          jobs: {
+            2020 => 'Software Engineer'
+          }
+        )
       end
     end
   end
