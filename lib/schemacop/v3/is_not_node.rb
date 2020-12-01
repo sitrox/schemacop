@@ -22,6 +22,10 @@ module Schemacop
         end
       end
 
+      def as_json
+        process_json([], type => @items.first.as_json)
+      end
+
       def validate_self
         if @items.size < 1
           binding.pry

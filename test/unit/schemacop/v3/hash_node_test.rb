@@ -291,7 +291,7 @@ module Schemacop
         assert_validation(str: '1234')
         assert_validation(str: '12345')
         assert_validation(str: '0') do
-          error '/str', 'Does not match any allOf condition.'
+          error '/str', 'Does not match all allOf conditions.'
         end
       end
 

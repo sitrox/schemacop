@@ -10,7 +10,7 @@ module Schemacop
         return if data.nil?
 
         if matches(data).size != @items.size
-          result.error 'Does not match any allOf condition.'
+          result.error 'Does not match all allOf conditions.'
         end
       end
     end
