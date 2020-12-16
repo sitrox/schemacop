@@ -29,10 +29,9 @@ module Schemacop
         assert_validation('string')
         assert_validation(42)
 
-        # TODO: Fix this bug in validation
-        # assert_validation(nil) do
-        #   error '/', 'Does not match any anyOf condition.'
-        # end
+        assert_validation(nil) do
+          error '/', 'Value must be given.'
+        end
 
         assert_validation(42.1) do
           error '/', 'Does not match any anyOf condition.'
@@ -53,6 +52,7 @@ module Schemacop
           int
         end
 
+        assert_validation(nil)
         assert_validation(42)
         assert_validation(foo: 42)
         assert_validation(foo: 'str')
@@ -93,6 +93,7 @@ module Schemacop
         context.schema :MyDate, :string, format: :date
 
         Schemacop.with_context context do
+          assert_validation(nil)
           assert_validation(foo: 'str')
           assert_validation([1, 2, 3])
           assert_validation(true)
