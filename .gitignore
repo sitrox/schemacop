@@ -15,3 +15,4 @@ tmtags
 .idea
 /*.gem
 tags
+.byebug_history

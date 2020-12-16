@@ -25,6 +25,7 @@ task :gemspec do
     spec.add_development_dependency 'colorize'
     spec.add_development_dependency 'rubocop', '0.35.1'
     spec.add_development_dependency 'pry'
+    spec.add_development_dependency 'byebug'
   end
 
   File.open('schemacop.gemspec', 'w') { |f| f.write(gemspec.to_ruby.strip) }
