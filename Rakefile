@@ -20,10 +20,11 @@ task :gemspec do
     spec.add_dependency 'activesupport', '>= 4.0'
     spec.add_dependency 'sorbet-runtime', '0.4.4667'
     spec.add_development_dependency 'bundler'
+    spec.add_development_dependency 'rake'
     spec.add_development_dependency 'minitest'
     spec.add_development_dependency 'minitest-reporters'
     spec.add_development_dependency 'colorize'
-    spec.add_development_dependency 'rubocop', '0.35.1'
+    spec.add_development_dependency 'rubocop', '0.92.0'
     spec.add_development_dependency 'pry'
     spec.add_development_dependency 'byebug'
   end
