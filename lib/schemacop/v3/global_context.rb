@@ -35,7 +35,7 @@ module Schemacop
         fail "Global context can't be eager loaded more than once." if @eager_loaded
 
         Schemacop.load_paths.each do |load_path|
-          Dir.glob(File.join(load_path, '**', '*.rb')).each do |file|
+          Dir.glob(File.join(load_path, '**', '*.rb')).sort.each do |file|
             load_file(file, load_path)
           end
         end
