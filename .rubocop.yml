@@ -94,3 +94,15 @@ Layout/HashAlignment:
 
 Style/FrozenStringLiteralComment:
   Enabled: false
+
+Style/AccessorGrouping:
+  Enabled: false
+
+Style/DoubleNegation:
+  Enabled: false
+
+Style/ConditionalAssignment:
+  Enabled: false
+
+Style/CaseLikeIf:
+  Enabled: false
