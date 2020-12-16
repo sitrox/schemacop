@@ -20,7 +20,6 @@ module Schemacop
 
       def validate_self
         if @items.size < 1
-          binding.pry
           fail 'Node any_of makes only sense with at least 1 item.'
         end
       end
