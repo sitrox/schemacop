@@ -24,6 +24,7 @@ module Schemacop
         unless node.name
           fail 'Child nodes must have a name.'
         end
+
         @properties[node.name] = node
       end
 
@@ -82,34 +83,35 @@ module Schemacop
       end
 
       def _validate(data, result: Result.new)
-        data = super
-        return if data.nil?
+        super_data = super
+        return if super_data.nil?
 
         # Validate min_properties #
-        if options[:min_properties] && data.size < options[:min_properties]
-          result.error "Has #{data.size} properties but needs at least #{options[:min_properties]}."
+        if options[:min_properties] && super_data.size < options[:min_properties]
+          result.error "Has #{super_data.size} properties but needs at least #{options[:min_properties]}."
         end
 
         # Validate max_properties #
-        if options[:max_properties] && data.size > options[:max_properties]
-          result.error "Has #{data.size} properties but needs at most #{options[:max_properties]}."
+        if options[:max_properties] && super_data.size > options[:max_properties]
+          result.error "Has #{super_data.size} properties but needs at most #{options[:max_properties]}."
         end
 
         # Validate specified properties #
-        @properties.values.each do |node|
+        @properties.each_value do |node|
           result.in_path(node.name) do
             next if node.name.is_a?(Regexp)
-            node._validate(data[node.name], result: result)
+
+            node._validate(super_data[node.name], result: result)
           end
         end
 
         # Validate additional properties #
         specified_properties = @properties.keys.to_set
-        additional_properties = data.reject { |k, _v| specified_properties.include?(k.to_s.to_sym) }
+        additional_properties = super_data.reject { |k, _v| specified_properties.include?(k.to_s.to_sym) }
 
         property_patterns = {}
 
-        @properties.values.each do |property|
+        @properties.each_value do |property|
           if property.name.is_a?(Regexp)
             property_patterns[property.name] = property
           end
@@ -142,7 +144,7 @@ module Schemacop
         # Validate dependencies #
         options[:dependencies]&.each do |source, targets|
           targets.each do |target|
-            if data[source].present? && data[target].blank?
+            if super_data[source].present? && super_data[target].blank?
               result.error "Missing property #{target.to_s.inspect} because #{source.to_s.inspect} is given."
             end
           end
@@ -159,7 +161,7 @@ module Schemacop
         return nil if data.nil?
 
         # TODO: How to handle additional keys / regex / etc.?
-        @properties.values.each do |prop|
+        @properties.each_value do |prop|
           result[prop.name] = prop.cast(data[prop.name])
 
           if result[prop.name].nil? && !data.include?(prop.name)

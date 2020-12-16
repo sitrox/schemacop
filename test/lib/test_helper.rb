@@ -1,6 +1,6 @@
 # TODO: Move to more sensible location
-def assert_verr(&_block)
-  assert_raises(Schemacop::V2::Exceptions::ValidationError) { yield }
+def assert_verr(&block)
+  assert_raises(Schemacop::V2::Exceptions::ValidationError, &block)
 end
 
 # TODO: Move to more sensible location

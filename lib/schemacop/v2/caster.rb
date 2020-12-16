@@ -1,17 +1,17 @@
 module Schemacop::V2
   class Caster
     DEFAULT_CASTERS = {
-      String => {
+      String  => {
         Integer => proc { |s| s.blank? ? nil : Integer(s, 10) },
-        Float => proc { |s| s.blank? ? nil : Float(s) }
+        Float   => proc { |s| s.blank? ? nil : Float(s) }
       },
-      Float => {
+      Float   => {
         Integer => proc { |f| Integer(f) }
       },
       Integer => {
         Float => proc { |f| Float(f) }
       }
-    }
+    }.freeze
 
     def initialize(casts, data, target_type)
       @casts = casts
@@ -42,8 +42,9 @@ module Schemacop::V2
 
     def cast
       fail 'Not castable.' unless castable?
+
       return @caster.call(@data)
-    rescue => e
+    rescue StandardError => e
       fail Exceptions::InvalidSchemaError,
            "Could not cast value #{@value.inspect} to #{@target_type}: #{e.message}."
     end

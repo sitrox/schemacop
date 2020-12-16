@@ -54,11 +54,11 @@ module Schemacop
       end
 
       def _validate(data, result:)
-        data = super
-        return if data.nil?
+        super_data = super
+        return if super_data.nil?
 
         # Validate length #
-        length = data.size
+        length = super_data.size
 
         if options[:min_items] && length < options[:min_items]
           result.error "Array has #{length} items but needs at least #{options[:min_items]}."
@@ -71,16 +71,17 @@ module Schemacop
         # Validate contains #
         if options[:contains]
           fail 'Array nodes with "contains" must have exactly one item.' unless items.size == 1
+
           item = items.first
 
-          unless data.any? { |obj| item_matches?(item, obj) }
+          unless super_data.any? { |obj| item_matches?(item, obj) }
             result.error "At least one entry must match schema #{item.as_json.inspect}."
           end
         # Validate list #
         elsif items.size == 1
           node = items.first
 
-          data.each_with_index do |value, index|
+          super_data.each_with_index do |value, index|
             result.in_path :"[#{index}]" do
               node._validate(value, result: result)
             end
@@ -89,18 +90,18 @@ module Schemacop
         # Validate tuple #
         elsif items.size > 1
           if length == items.size || (options[:additional_items] != false && length >= items.size)
-            items.each_with_index do |node, index|
-              value = data[index]
+            items.each_with_index do |child_node, index|
+              value = super_data[index]
 
               result.in_path :"[#{index}]" do
-                node._validate(value, result: result)
+                child_node._validate(value, result: result)
               end
             end
 
             # Validate additional items #
             if options[:additional_items].is_a?(Node)
               (items.size..(length - 1)).each do |index|
-                additional_item = data[index]
+                additional_item = super_data[index]
                 result.in_path :"[#{index}]" do
                   options[:additional_items]._validate(additional_item, result: result)
                 end
@@ -112,7 +113,7 @@ module Schemacop
         end
 
         # Validate uniqueness #
-        if options[:unique_items] && data.size != data.uniq.size
+        if options[:unique_items] && super_data.size != super_data.uniq.size
           result.error 'Array has duplicate items.'
         end
       end
@@ -139,6 +140,7 @@ module Schemacop
       def item_for_data(data)
         item = children.find { |c| item_matches?(c, data) }
         return item if item
+
         fail "Could not find specification for item #{data.inspect}."
       end
 

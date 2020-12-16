@@ -24,11 +24,11 @@ module Schemacop
 
         obsolete_keys = data_keys - allowed_fields
 
-        unless option?(:allow_obsolete_keys)
-          collector.error "Obsolete keys: #{obsolete_keys.inspect}." if obsolete_keys.any?
+        if !option?(:allow_obsolete_keys) && obsolete_keys.any?
+          collector.error "Obsolete keys: #{obsolete_keys.inspect}."
         end
 
-        @fields.values.each do |field|
+        @fields.each_value do |field|
           field.validate(data, collector)
         end
       end

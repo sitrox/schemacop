@@ -17,7 +17,7 @@ module Schemacop
       end
 
       def self.supports_children_options
-        self._supports_children
+        _supports_children
       end
 
       def self.resolve_class(type)
@@ -92,6 +92,7 @@ module Schemacop
           unless self.class.supports_children_options
             fail "Node #{self.class} does not support blocks."
           end
+
           scope = DslScope.new(self)
           env = ScopedEnv.new(self, self.class.dsl_methods, scope, :dsl_)
           env.instance_exec(&block)
@@ -172,7 +173,7 @@ module Schemacop
       def _validate(data, result:)
         # Validate nil #
         if data.nil? && required?
-          result.error "Value must be given."
+          result.error 'Value must be given.'
           return nil
         end
 
@@ -186,7 +187,7 @@ module Schemacop
         end
 
         # Validate type #
-        if allowed_types.any? && !allowed_types.keys.any? { |c| data.send(type_assertion_method, c) }
+        if allowed_types.any? && allowed_types.keys.none? { |c| data.send(type_assertion_method, c) }
           collection = allowed_types.values.map { |t| "\"#{t}\"" }.uniq.sort.join(' or ')
           result.error %(Invalid type, expected #{collection}.)
           return nil

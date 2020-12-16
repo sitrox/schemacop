@@ -14,10 +14,10 @@ module Schemacop
       end
 
       def _validate(data, result:)
-        data = super
-        return if data.nil?
+        super_data = super
+        return if super_data.nil?
 
-        if matches(data).any?
+        if matches(super_data).any?
           result.error "Must not match schema: #{@items.first.as_json.as_json.inspect}."
         end
       end
@@ -27,7 +27,7 @@ module Schemacop
       end
 
       def validate_self
-        if @items.size < 1
+        if @items.empty?
           fail 'Node is_not makes only sense with at least 1 item.'
         end
       end

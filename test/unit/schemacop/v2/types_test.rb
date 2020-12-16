@@ -6,15 +6,15 @@ module Schemacop
       def setup
         super
 
-        @datatype_samples = { array: [],
+        @datatype_samples = { array:   [],
                               boolean: true,
-                              float: 2.3,
-                              hash: {},
+                              float:   2.3,
+                              hash:    {},
                               integer: -5,
-                              number: -3.2,
-                              symbol: :thing,
-                              object: self,
-                              string: 'miau' }.freeze
+                              number:  -3.2,
+                              symbol:  :thing,
+                              object:  self,
+                              string:  'miau' }.freeze
       end
 
       def test_multitype
@@ -22,17 +22,17 @@ module Schemacop
           Schema.new do
             type :integer
             type :boolean
-          end, [:integer, :boolean]
+          end, %i[integer boolean]
         )
 
         assert_only_types_allowed(
-          Schema.new([:integer, :boolean]),
-          [:integer, :boolean]
+          Schema.new(%i[integer boolean]),
+          %i[integer boolean]
         )
       end
 
       def test_all_data_types
-        @datatype_samples.keys.each do |type|
+        @datatype_samples.each_key do |type|
           assert_only_types_allowed(Schema.new(type), type)
         end
       end

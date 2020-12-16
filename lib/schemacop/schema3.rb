@@ -1,6 +1,7 @@
 module Schemacop
   class Schema3 < BaseSchema
     def initialize(*args, &block)
+      super()
       @root = V3::Node.create(*args, &block)
     end
 

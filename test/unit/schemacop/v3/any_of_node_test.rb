@@ -72,7 +72,10 @@ module Schemacop
           all_of do
             hsh { str! :foo }
           end
-          any_of { obj(Date); obj(Time) }
+          any_of do
+            obj(Date)
+            obj(Time)
+          end
           ary
           boo
           int
@@ -101,6 +104,8 @@ module Schemacop
           assert_validation(a: 'hello z')
           assert_validation('1990-01-13')
           assert_validation('12')
+          assert_validation(Date.new(1990, 1, 13))
+          assert_validation(Time.now)
 
           assert_validation('1990-01-13 12') do
             error '/', 'Does not match any anyOf condition.'

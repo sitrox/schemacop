@@ -54,7 +54,7 @@ module Schemacop
       end
 
       def path_for(virtual_path)
-        virtual_path.to_s.underscore + '.rb'
+        "#{virtual_path.to_s.underscore}.rb"
       end
 
       def virtual_path_for(path, load_path)
@@ -87,7 +87,7 @@ module Schemacop
           @current_schemas = []
           env = ScopedEnv.new(self, DSL_METHODS)
           env.instance_eval IO.read(path)
-        rescue Exception => e
+        rescue StandardError => e
           fail "Could not load schema #{path.inspect}: #{e.message}"
         end
 

@@ -12,6 +12,7 @@ module Schemacop::V2
 
     def data
       return nil unless valid?
+
       @current_datappoint_path.first
     end
 
@@ -57,14 +58,16 @@ module Schemacop::V2
     end
 
     def exception_message
+      # rubocop:disable Style/StringConcatenation
       return "Schemacop validation failed:\n" + @exceptions.map do |e|
         "- #{e[:path].join('')}: #{e[:message]}"
       end.join("\n")
+      # rubocop:enable Style/StringConcatenation
     end
 
     def error(error_msg)
       @exceptions << {
-        path: @current_path.dup,
+        path:    @current_path.dup,
         message: error_msg
       }
     end

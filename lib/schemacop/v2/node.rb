@@ -61,11 +61,13 @@ module Schemacop
 
       def self.symbol_matches?(type)
         return false unless type.is_a?(Symbol)
+
         symbols.include?(type)
       end
 
       def self.class_matches?(type)
         return false unless type.is_a?(Class)
+
         klasses.each do |klass|
           return true if type <= klass
         end
@@ -96,9 +98,7 @@ module Schemacop
       end
 
       def option?(key)
-        # rubocop:disable Style/DoubleNegation
         !!options[key]
-        # rubocop:enable Style/DoubleNegation
       end
 
       def exec_block
@@ -110,6 +110,7 @@ module Schemacop
         unless klass
           fail Exceptions::InvalidSchemaError, "No validation class found for type #{type.inspect}."
         end
+
         return klass
       end
 

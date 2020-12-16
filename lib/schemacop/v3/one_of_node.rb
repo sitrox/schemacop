@@ -6,13 +6,13 @@ module Schemacop
       end
 
       def _validate(data, result:)
-        data = super
-        return if data.nil?
+        super_data = super
+        return if super_data.nil?
 
-        matches = matches(data)
+        matches = matches(super_data)
 
         if matches.size == 1
-          matches.first._validate(data, result: result)
+          matches.first._validate(super_data, result: result)
         else
           result.error "Matches #{matches.size} definitions but should match exactly 1."
         end

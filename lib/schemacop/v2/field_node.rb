@@ -14,8 +14,8 @@ module Schemacop::V2
     end
 
     def validate(data, collector)
-      unless data.key?(name)
-        collector.error "Missing key #{name.inspect}." if @required
+      if !data.key?(name) && @required
+        collector.error "Missing key #{name.inspect}."
       end
 
       collector.path "/#{name}", name, :hash do
@@ -36,6 +36,7 @@ module Schemacop::V2
 
       @types.each do |type|
         next unless type.option?(:default)
+
         default = type.option(:default)
         default = default.call if default.is_a?(Proc)
         collector.override_value(default)

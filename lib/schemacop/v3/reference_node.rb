@@ -15,15 +15,15 @@ module Schemacop
       end
 
       def _validate(data, result:)
-        data = super
-        return if data.nil?
+        super_data = super
+        return if super_data.nil?
 
         # Lookup schema #
         node = target
         fail "Schema #{@path.to_s.inspect} not found." unless node
 
         # Validate schema #
-        node._validate(data, result: result)
+        node._validate(super_data, result: result)
       end
 
       def target

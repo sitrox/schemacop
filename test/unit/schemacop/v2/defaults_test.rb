@@ -61,7 +61,7 @@ module Schemacop
 
       def test_proc
         s = Schema.new do
-          opt :year, :integer, default: ->() { Time.now.year }
+          opt :year, :integer, default: -> { Time.now.year }
         end
 
         input = {}
@@ -73,7 +73,7 @@ module Schemacop
         myproc = proc { 42 }
 
         s = Schema.new do
-          opt :myproc, Proc, default: ->() { myproc }
+          opt :myproc, Proc, default: -> { myproc }
         end
 
         input = {}

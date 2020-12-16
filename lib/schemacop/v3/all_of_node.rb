@@ -6,10 +6,10 @@ module Schemacop
       end
 
       def _validate(data, result:)
-        data = super
-        return if data.nil?
+        super_data = super
+        return if super_data.nil?
 
-        if matches(data).size != @items.size
+        if matches(super_data).size != @items.size
           result.error 'Does not match all allOf conditions.'
         end
       end

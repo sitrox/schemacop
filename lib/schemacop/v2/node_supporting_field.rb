@@ -23,7 +23,7 @@ module Schemacop::V2
       field(*args, required: true, allow_nil: false, &block)
     end
 
-    alias_method :req, :req!
+    alias req req!
 
     def opt?(*args, &block)
       field(*args, required: false, allow_nil: true, &block)
@@ -33,7 +33,7 @@ module Schemacop::V2
       field(*args, required: false, allow_nil: false, &block)
     end
 
-    alias_method :opt, :opt?
+    alias opt opt?
 
     protected
 
@@ -42,14 +42,12 @@ module Schemacop::V2
 
       if @fields[name]
         @fields[name].type(*args, &block)
-      else
-        if args.any?
-          @fields[name] = FieldNode.new(name, required) do
-            type(*args, &block)
-          end
-        else
-          @fields[name] = FieldNode.new(name, required, &block)
+      elsif args.any?
+        @fields[name] = FieldNode.new(name, required) do
+          type(*args, &block)
         end
+      else
+        @fields[name] = FieldNode.new(name, required, &block)
       end
 
       @fields[name].type(:nil) if allow_nil

@@ -57,7 +57,7 @@ module Schemacop
           error '/', 'Value must be given.'
         end
       end
-#
+
       def test_hash
         schema { obj! :myobj, String }
         assert_json(

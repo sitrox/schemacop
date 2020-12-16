@@ -93,21 +93,21 @@ module Schemacop
         s = Schema.new do
           type(:array, :string)
         end
-        assert_nothing_raised { s.validate!(%w(a b)) }
+        assert_nothing_raised { s.validate!(%w[a b]) }
       end
 
       # TODO: Get the exception message into the assertion
       def test_array_shortform_invalid
         assert_raises Exceptions::InvalidSchemaError do
           Schema.new do
-            type(:array, [:array, :integer], min: 2)
+            type(:array, %i[array integer], min: 2)
           end
         end
       end
 
       def test_array_shortform_advanced1
         s = Schema.new do
-          type(:array, [:array, :integer])
+          type(:array, %i[array integer])
         end
         assert_nothing_raised { s.validate! [[], 3] }
         assert_nothing_raised { s.validate! [[:a, 9], 3] }
@@ -121,7 +121,7 @@ module Schemacop
       def test_array_shortform_advanced2
         assert_raises Exceptions::InvalidSchemaError, 'No validation class found for type [:array, :integer].' do
           Schema.new do
-            type([:array, [:array, :integer], :boolean])
+            type([:array, %i[array integer], :boolean])
           end
         end
       end
@@ -156,14 +156,14 @@ module Schemacop
             req? :bar, :object, classes: NilClass
           end
           req :name, :integer, min: 5, max: 7
-          req :id, [:integer, :string]
+          req :id, %i[integer string]
           req :callback, :symbol
           req :attrs do
             req :color do
               type :integer
             end
           end
-          req :colors, :array, [:string, :integer]
+          req :colors, :array, %i[string integer]
           req :cars, :array, :hash do
             req? :years, :array, :integer
             req! :make, :string
@@ -174,18 +174,18 @@ module Schemacop
 
         assert_nothing_raised do
           s.validate!(
-            name: 6,
-            foo: { bar: nil },
-            attrs: { color: 5 },
-            id: 'hallo',
+            name:     6,
+            foo:      { bar: nil },
+            attrs:    { color: 5 },
+            id:       'hallo',
             callback: :funky_function,
-            colors: [5, 'sdf'],
-            cars: [
+            colors:   [5, 'sdf'],
+            cars:     [
               {
-                make: 'Tesla',
-                ps: 5,
+                make:     'Tesla',
+                ps:       5,
                 electric: nil,
-                years: [1993, 1990]
+                years:    [1993, 1990]
               }
             ]
           )
@@ -226,7 +226,7 @@ module Schemacop
 
         assert_nothing_raised do
           s.validate!(
-            id: 'meine ID',
+            id:      'meine ID',
             friends: [
               'Rodney',
               true,
@@ -234,10 +234,10 @@ module Schemacop
               {
                 rod: {
                   fritz:
-                  [
-                    [1],
-                    [3]
-                  ]
+                         [
+                           [1],
+                           [3]
+                         ]
                 }
               }
             ]
@@ -262,27 +262,27 @@ module Schemacop
 
         assert_nothing_raised do
           schema.validate!(
-            naming: { first_name: 'John',
-                      last_name: 'Doe' },
-            age: 34,
+            naming:   { first_name: 'John',
+                        last_name:  'Doe' },
+            age:      34,
             password: 'my*pass'
           )
         end
 
         assert_verr do
           schema.validate!(
-            naming: { first_name: 'John',
-                      last_name: 'Doe' },
-            age: 12,
+            naming:   { first_name: 'John',
+                        last_name:  'Doe' },
+            age:      12,
             password: 'my*pass'
           )
         end
 
         assert_verr do
           schema.validate!(
-            naming: { first_name: 'John',
-                      last_name: 'Doe' },
-            age: 12,
+            naming:   { first_name: 'John',
+                        last_name:  'Doe' },
+            age:      12,
             password: 'mypass'
           )
         end
@@ -290,8 +290,8 @@ module Schemacop
         schema2 = Schema.new do
           req :description,
               :string,
-              if: proc { |str| str.start_with?('Abstract: ') },
-              max: 35,
+              if:    proc { |str| str.start_with?('Abstract: ') },
+              max:   35,
               check: proc { |str| !str.end_with?('.') }
           req :description, :string, min: 35
         end

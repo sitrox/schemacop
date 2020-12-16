@@ -11,6 +11,7 @@ module Schemacop
       def method_missing(name, *args, **options, &block)
         match = EXP_NAME.match(name)
         return super unless match
+
         base_name, req_optional = match.captures
 
         if req_optional == '!'
@@ -36,6 +37,7 @@ module Schemacop
       def respond_to_missing?(name, *args)
         match = EXP_NAME.match(name)
         return super unless match
+
         base_name, _req_optional = match.captures
         return NodeRegistry.by_short_name(base_name).present? || super
       end

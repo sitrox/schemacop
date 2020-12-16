@@ -1,4 +1,5 @@
 require 'test_helper'
+# rubocop:disable Lint/BooleanSymbol
 
 module Schemacop
   module V3
@@ -74,3 +75,4 @@ module Schemacop
     end
   end
 end
+# rubocop:enable Lint/BooleanSymbol

@@ -400,7 +400,7 @@ module Schemacop
         assert_raises_with_message Exceptions::InvalidSchemaError,
                                    'Pattern properties can\'t be required.' do
           schema :hash do
-            str! /[a-z]+/
+            str!(/[a-z]+/)
           end
         end
       end
@@ -422,14 +422,14 @@ module Schemacop
             str
           end
           hsh! :jobs, min_properties: 1 do
-            str? /^[0-9]+$/
+            str?(/^[0-9]+$/)
           end
         end
 
         assert_validation(
-          id:      42,
-          name:    'John Doe',
-          address: {
+          id:                   42,
+          name:                 'John Doe',
+          address:              {
             street: 'Silver Street',
             number: 4,
             zip:    '38234C'
@@ -437,10 +437,10 @@ module Schemacop
           additional_addresses: [
             { street: 'Example street', number: 42, zip: '8048' }
           ],
-          comments: [
+          comments:             [
             'This is a comment'
           ],
-          jobs: {
+          jobs:                 {
             2020 => 'Software Engineer'
           }
         )

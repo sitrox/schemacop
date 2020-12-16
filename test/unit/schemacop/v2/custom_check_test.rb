@@ -78,7 +78,7 @@ module Schemacop
         s = Schema.new do
           req :first_name,
               :string,
-              if: proc { |str| str.start_with?('Sand') },
+              if:    proc { |str| str.start_with?('Sand') },
               check: proc { |str| str == 'Sandy' }
           req :first_name, :string, min: 3
         end

@@ -14,6 +14,7 @@ module Schemacop::V2
 
       if @types.none?
         fail Exceptions::InvalidSchemaError, 'Block must contain a type definition or not be given at all.' if block_given?
+
         type :object
       end
 
@@ -101,9 +102,11 @@ module Schemacop::V2
     def cast!(data, collector)
       @types.each do |type|
         next unless type.option?(:cast) && !type.type_matches?(data) && type.type_filter_matches?(data)
+
         caster = Caster.new(type.option(:cast), data, type.class.klasses.first)
 
         next unless caster.castable?
+
         begin
           data = caster.cast
           collector.override_value(data)

@@ -9,6 +9,7 @@ module Schemacop::V2
 
     def exec_block(&block)
       return unless block_given?
+
       se = Schemacop::ScopedEnv.new(self, self.class.block_methods)
       se.instance_exec(&block)
     end

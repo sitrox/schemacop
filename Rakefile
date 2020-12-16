@@ -32,7 +32,6 @@ task :gemspec do
   File.open('schemacop.gemspec', 'w') { |f| f.write(gemspec.to_ruby.strip) }
 end
 
-# rubocop: disable Lint/HandleExceptions
 begin
   require 'rake/testtask'
   Rake::TestTask.new do |t|
@@ -40,5 +39,4 @@ begin
     t.verbose = false
     t.libs << 'test/lib'
   end
-rescue LoadError
 end

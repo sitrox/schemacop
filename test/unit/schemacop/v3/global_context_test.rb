@@ -81,16 +81,16 @@ module Schemacop
 
         assert schema.validate(
           first_name: 'John',
-          last_name: 'Doe',
-          groups: [
+          last_name:  'Doe',
+          groups:     [
             { name: 'Group 1' }
           ]
         ).valid?
 
         refute schema.validate(
           first_name: 'John',
-          last_name: 'Doe',
-          groups: [
+          last_name:  'Doe',
+          groups:     [
             { name_x: 'Group 1' }
           ]
         ).valid?
@@ -98,14 +98,14 @@ module Schemacop
         schema = GlobalContext.instance.schema_for('nested/group')
 
         assert schema.validate(
-          name: 'Group 1',
+          name:  'Group 1',
           users: [
             { first_name: 'John', last_name: 'Doe' }
           ]
         ).valid?
 
         refute schema.validate(
-          name: 'Group 1',
+          name:  'Group 1',
           users: [
             { first_name_x: 'John', last_name: 'Doe' }
           ]
@@ -145,7 +145,7 @@ module Schemacop
         Schemacop.load_paths << dir
         IO.write(File.join(dir, 'user.rb'), %(schema :string))
 
-        assert_raises_with_message RuntimeError, /in both load paths "test\/schemas" and "#{dir}"/ do
+        assert_raises_with_message RuntimeError, %r{in both load paths "test/schemas" and "#{dir}"} do
           GlobalContext.eager_load!
         end
       end
@@ -155,7 +155,7 @@ module Schemacop
         Schemacop.load_paths << dir
         IO.write(File.join(dir, 'user.rb'), %(schema :string))
 
-        assert_raises_with_message RuntimeError, /in both load paths "test\/schemas" and "#{dir}"/ do
+        assert_raises_with_message RuntimeError, %r{in both load paths "test/schemas" and "#{dir}"} do
           GlobalContext.instance.schema_for('user')
         end
       end

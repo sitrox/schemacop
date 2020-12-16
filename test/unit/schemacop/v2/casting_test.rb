@@ -52,7 +52,7 @@ module Schemacop
 
         assert_equal(
           { foo: [1, 2, 3] },
-          s.validate!(foo: %w(1 2 3))
+          s.validate!(foo: %w[1 2 3])
         )
       end
 
@@ -108,12 +108,12 @@ module Schemacop
         expected_float = { float_field: nil }
 
         assert_equal expected_int, s.validate!(int_field: nil)
-        assert_equal expected_int, s.validate!(int_field: "")
-        assert_equal expected_int, s.validate!(int_field: "     ")
+        assert_equal expected_int, s.validate!(int_field: '')
+        assert_equal expected_int, s.validate!(int_field: '     ')
 
         assert_equal expected_float, s.validate!(float_field: nil)
-        assert_equal expected_float, s.validate!(float_field: "")
-        assert_equal expected_float, s.validate!(float_field: "     ")
+        assert_equal expected_float, s.validate!(float_field: '')
+        assert_equal expected_float, s.validate!(float_field: '     ')
       end
     end
   end

@@ -73,7 +73,7 @@ module Schemacop
         end
 
         assert_nothing_raised { s.validate!([1, 2, 3]) }
-        assert_nothing_raised { s.validate!(%w(one two three)) }
+        assert_nothing_raised { s.validate!(%w[one two three]) }
         assert_verr { s.validate!([1, 'mix']) }
         assert_verr { s.validate!([]) }
       end
@@ -91,7 +91,7 @@ module Schemacop
 
         assert_nothing_raised { s.validate!([]) }
         assert_nothing_raised { s.validate!([1, 2, 3]) }
-        assert_nothing_raised { s.validate!(%w(one two three)) }
+        assert_nothing_raised { s.validate!(%w[one two three]) }
         assert_verr { s.validate!([1, 'mix']) }
       end
     end

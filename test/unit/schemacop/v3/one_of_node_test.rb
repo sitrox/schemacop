@@ -66,21 +66,21 @@ module Schemacop
         assert_json(
           oneOf: [
             {
-              type: :object,
-              properties: {
+              type:                 :object,
+              properties:           {
                 foo: {
                   oneOf: [
                     { type: :number, multipleOf: 2 },
                     { type: :number, multipleOf: 3 }
                   ]
-                },
+                }
               },
-              required: %i[foo],
+              required:             %i[foo],
               additionalProperties: false
             },
             {
-              type: :object,
-              properties: {
+              type:                 :object,
+              properties:           {
                 foo: { type: :number, multipleOf: 7 }
               },
               additionalProperties: false

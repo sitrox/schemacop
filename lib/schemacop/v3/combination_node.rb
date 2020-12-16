@@ -19,6 +19,7 @@ module Schemacop
       def cast(value)
         item = match(value)
         return value unless item
+
         return item.cast(value)
       end
 
