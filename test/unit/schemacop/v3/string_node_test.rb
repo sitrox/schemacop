@@ -184,7 +184,11 @@ module Schemacop
         assert_cast 'false', false
       end
 
-      # TODO: Add support for "time"
+      def test_time_casting
+        schema :string, format: :time
+        assert_json(type: :string, format: :time)
+        assert_cast '20:30:39+00:00', Time.strptime("20:30:39+00:00", '%H:%M:%S%z')
+      end
 
       def test_date_casting
         schema :string, format: :date

@@ -13,6 +13,7 @@ module Schemacop
       FORMAT_PATTERNS = {
         date:        /^([0-9]{4})-?(1[0-2]|0[1-9])-?(3[01]|0[1-9]|[12][0-9])$/,
         'date-time': /^(-?(?:[1-9][0-9]*)?[0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])T(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(\.[0-9]+)?(Z|[+-](?:2[0-3]|[01][0-9]):[0-5][0-9])?$/,
+        time:        /^(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(\.[0-9]+)?(Z|[+-](?:2[0-3]|[01][0-9]):[0-5][0-9])?$/,
         email:       URI::MailTo::EMAIL_REGEXP,
         boolean:     /^(true|false)$/,
         binary:      nil,
@@ -73,6 +74,8 @@ module Schemacop
           return Date.parse(value)
         when :'date-time'
           return DateTime.parse(value)
+        when :time
+          Time.parse(value)
         when :integer
           return Integer(value)
         when :number
