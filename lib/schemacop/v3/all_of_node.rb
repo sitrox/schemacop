@@ -13,6 +13,17 @@ module Schemacop
           result.error 'Does not match all allOf conditions.'
         end
       end
+
+      # TODO: put back in when handling of additional keys in hashes is fixed
+      # def cast(value)
+      #   items = matches(value)
+      #   return value unless items
+
+      #   casted_value = value.dup
+
+      #   items.each {|i| casted_value.merge!(i.cast(casted_value)) }
+      #   return casted_value
+      # end
     end
   end
 end

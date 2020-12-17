@@ -445,6 +445,191 @@ module Schemacop
           }
         )
       end
+
+      def test_cast_without_additional
+        schema :hash do
+          str! :foo, format: :integer
+        end
+
+        assert_validation(nil)
+        assert_validation(foo: '1')
+        assert_cast({ foo: '1' }, { foo: 1 })
+
+        assert_validation(foo: '1', bar: '2') do
+          error '/', 'Obsolete property "bar".'
+        end
+
+        assert_json(
+          type:                 'object',
+          properties:           {
+            foo: {
+              type:   :string,
+              format: :integer
+            }
+          },
+          additionalProperties: false,
+          required:             %i[foo]
+        )
+      end
+
+      def test_cast_with_additional
+        schema :hash, additional_properties: true do
+          str! :foo, format: :integer
+        end
+
+        assert_validation(nil)
+        assert_validation(foo: '1')
+        assert_cast({ foo: '1' }, { foo: 1 })
+
+        assert_validation(foo: '1', bar: nil)
+        assert_validation(foo: '1', bar: '2')
+        assert_cast({ foo: '1', bar: '2' }, { foo: 1, bar: '2' })
+
+        assert_json(
+          type:                 'object',
+          properties:           {
+            foo: {
+              type:   :string,
+              format: :integer
+            }
+          },
+          additionalProperties: true,
+          required:             %i[foo]
+        )
+      end
+
+      def test_cast_with_additional_in_block
+        schema :hash do
+          str! :foo, format: :integer
+          add :string
+        end
+
+        assert_validation(nil)
+        assert_validation(foo: '1')
+        assert_cast({ foo: '1' }, { foo: 1 })
+
+        assert_validation(foo: '1', bar: nil)
+        assert_validation(foo: '1', bar: '2')
+        assert_cast({ foo: '1', bar: '2' }, { foo: 1, bar: '2' })
+
+        assert_json(
+          type:                 'object',
+          properties:           {
+            foo: {
+              type:   :string,
+              format: :integer
+            }
+          },
+          additionalProperties: { type: :string },
+          required:             %i[foo]
+        )
+      end
+
+      def test_cast_with_additional_in_block_with_casting
+        schema :hash do
+          str! :foo, format: :integer
+          add :string, format: :integer
+        end
+
+        assert_validation(nil)
+        assert_validation(foo: '1')
+        assert_cast({ foo: '1' }, { foo: 1 })
+
+        assert_validation(foo: '1', bar: nil)
+        assert_validation(foo: '1', bar: '2')
+        assert_cast({ foo: '1', bar: '2' }, { foo: 1, bar: 2 })
+      end
+
+      def test_cast_with_additional_any_of
+        schema :hash do
+          str! :foo, format: :integer
+          add :any_of do
+            str
+            int
+          end
+        end
+
+        assert_validation(nil)
+        assert_validation(foo: '1')
+        assert_cast({ foo: '1' }, { foo: 1 })
+
+        assert_validation(foo: '1', bar: nil)
+        assert_validation(foo: '1', bar: '2')
+        assert_validation(foo: '1', bar: '2', baz: 3)
+        assert_validation(foo: '1', bar: '2', baz: 3, qux: [1, 2]) do
+          error '/qux', 'Does not match any anyOf condition.'
+        end
+
+        assert_cast({ foo: '1', bar: '2' }, { foo: 1, bar: '2' })
+
+        assert_json(
+          type:                 'object',
+          properties:           {
+            foo: {
+              type:   :string,
+              format: :integer
+            }
+          },
+          additionalProperties: {
+            anyOf: [
+              { type: :string },
+              { type: :integer }
+            ]
+          },
+          required:             %i[foo]
+        )
+      end
+
+      def test_cast_with_additional_any_of_with_casting
+        schema :hash do
+          str! :foo, format: :integer
+          add :any_of do
+            str format: :integer
+            str format: :date
+            int
+          end
+        end
+
+        assert_validation(nil)
+        assert_validation(foo: '1')
+        assert_cast({ foo: '1' }, { foo: 1 })
+
+        assert_validation(foo: '1', bar: nil)
+        assert_validation(foo: '1', bar: '2')
+        assert_validation(foo: '1', bar: '2', baz: 3)
+        assert_validation(foo: '1', bar: '2', baz: 3, qux: [1, 2]) do
+          error '/qux', 'Does not match any anyOf condition.'
+        end
+
+        assert_cast({ foo: '1', bar: '2' }, { foo: 1, bar: 2 })
+        assert_cast({ foo: '1', bar: '2', qux: '2020-01-13', asd: 1 }, { foo: 1, bar: 2, qux: Date.new(2020, 1, 13), asd: 1 })
+
+        assert_json(
+          type:                 'object',
+          properties:           {
+            foo: {
+              type:   :string,
+              format: :integer
+            }
+          },
+          additionalProperties: {
+            anyOf: [
+              {
+                type:   :string,
+                format: :integer
+              },
+              {
+                type:   :string,
+                format: :date
+              },
+              {
+                type: :integer
+              }
+            ]
+          },
+          required:             %i[foo]
+        )
+      end
     end
   end
 end

@@ -70,7 +70,66 @@ module Schemacop
         end
       end
 
-      def test_casting
+      def test_simple_casting
+        schema :all_of do
+          str format: :integer
+        end
+
+        assert_validation(nil)
+        assert_validation('1')
+        assert_validation('Foo') do
+          error '/', 'Does not match all allOf conditions.'
+        end
+
+        assert_cast('1', 1)
+        assert_cast('1337', 1337)
+      end
+
+      def test_casting_with_conditions
+        schema :all_of do
+          str format:     :integer
+          str min_length: 2
+          str max_length: 3
+        end
+
+        assert_validation(nil)
+        assert_validation('12')
+        assert_validation('123')
+
+        assert_validation('1') do
+          error '/', 'Does not match all allOf conditions.'
+        end
+
+        assert_validation('1234') do
+          error '/', 'Does not match all allOf conditions.'
+        end
+        assert_cast('42', 42)
+      end
+
+      def test_casting_with_conditions_changed_order
+        schema :all_of do
+          str min_length: 2
+          str max_length: 3
+          str format:     :integer
+        end
+
+        assert_validation(nil)
+        assert_validation('12')
+        assert_validation('123')
+
+        assert_validation('1') do
+          error '/', 'Does not match all allOf conditions.'
+        end
+
+        assert_validation('1234') do
+          error '/', 'Does not match all allOf conditions.'
+        end
+
+        # TODO: Enable again once this works
+        # assert_cast('42', 42)
+      end
+
+      def test_hash_casting
         schema :all_of do
           hsh additional_properties: true do
             str! :foo, format: :integer

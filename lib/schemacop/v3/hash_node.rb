@@ -160,12 +160,27 @@ module Schemacop
         data ||= default
         return nil if data.nil?
 
-        # TODO: How to handle additional keys / regex / etc.?
+        # TODO: How to handle regex / etc.?
         @properties.each_value do |prop|
           result[prop.name] = prop.cast(data[prop.name])
 
           if result[prop.name].nil? && !data.include?(prop.name)
             result.delete(prop.name)
+          end
+        end
+
+        # Handle additional properties
+        if options[:additional_properties] == true
+          result = data.merge(result)
+        elsif options[:additional_properties].is_a?(Node)
+          specified_properties = @properties.keys.to_set
+          additional_properties = data.reject { |k, _v| specified_properties.include?(k.to_s.to_sym) }
+          if additional_properties.any?
+            additional_properties_result = {}
+            additional_properties.each do |key, value|
+              additional_properties_result[key] = options[:additional_properties].cast(value)
+            end
+            result = additional_properties_result.merge(result)
           end
         end
 
