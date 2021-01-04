@@ -125,8 +125,8 @@ module Schemacop
           error '/', 'Does not match all allOf conditions.'
         end
 
-        # TODO: Enable again once this works
-        # assert_cast('42', 42)
+        assert_cast('42', 42)
+        assert_cast('123', 123)
       end
 
       def test_hash_casting
@@ -141,17 +141,41 @@ module Schemacop
 
         assert_validation(foo: '42', bar: '2020-01-15')
 
-        # TODO: Enable again once this works
-        # assert_cast(
-        #   { foo: '42', bar: '2020-01-15' },
-        #   foo: 42,
-        #   bar: Date.new(2020, 1, 15)
-        # )
+        assert_cast(
+          { foo: '42', bar: '2020-01-15' },
+          foo: 42,
+          bar: Date.new(2020, 1, 15)
+        )
       end
 
-      # TODO: Write this test once it works
-      # def test_defaults
-      # end
+      def test_nonsensical_casting
+        schema :all_of do
+          str format: :integer
+          str format: :boolean
+        end
+
+        assert_validation(nil)
+        assert_validation('42') do
+          error '/', 'Does not match all allOf conditions.'
+        end
+        assert_validation('true') do
+          error '/', 'Does not match all allOf conditions.'
+        end
+      end
+
+      def test_defaults
+        schema :all_of do
+          str default: 'foobar'
+        end
+
+        assert_validation(nil)
+        assert_validation('Hello World')
+
+        assert_json(allOf: [
+                      type:    :string,
+                      default: 'foobar'
+                    ])
+      end
     end
   end
 end
