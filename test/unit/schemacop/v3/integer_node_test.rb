@@ -203,6 +203,62 @@ module Schemacop
           schema :integer, multiple_of: 0
         end
       end
+
+      def test_enum_schema
+        schema :integer, enum: [1, 2, 'foo', :bar, { qux: 42 }]
+
+        assert_json({
+                      type: :integer,
+                      enum: [1, 2, 'foo', :bar, { qux: 42 }]
+                    })
+
+        assert_validation(nil)
+        assert_validation(1)
+
+        # Even we put those types in the enum, they need to fail the validations,
+        # as they are not integers
+        assert_validation('foo') do
+          error '/', 'Invalid type, expected "integer".'
+        end
+        assert_validation(:bar) do
+          error '/', 'Invalid type, expected "integer".'
+        end
+        assert_validation({ qux: 42 }) do
+          error '/', 'Invalid type, expected "integer".'
+        end
+
+        # This needs to fail as it is a number (float) and not an integer
+        assert_validation(4.2) do
+          error '/', 'Invalid type, expected "integer".'
+        end
+
+        # These need to fail validation, as they are not in the enum list
+        assert_validation(13) do
+          error '/', 'Value not included in enum [1, 2, "foo", :bar, {:qux=>42}].'
+        end
+        assert_validation(4) do
+          error '/', 'Value not included in enum [1, 2, "foo", :bar, {:qux=>42}].'
+        end
+      end
+
+      def test_with_generic_keywords
+        schema :integer, enum:        [1, 'foo'],
+                         title:       'Integer schema',
+                         description: 'Integer schema holding generic keywords',
+                         examples:    [
+                           1
+                         ]
+
+        assert_json({
+                      type:        :integer,
+                      enum:        [1, 'foo'],
+                      title:       'Integer schema',
+                      description: 'Integer schema holding generic keywords',
+                      examples:    [
+                        1
+                      ]
+                    })
+      end
     end
   end
 end
