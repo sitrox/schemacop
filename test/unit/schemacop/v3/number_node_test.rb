@@ -185,6 +185,60 @@ module Schemacop
           schema :number, multiple_of: 0
         end
       end
+
+      def test_enum_schema
+        schema :number, enum: [1, 2, 'foo', :bar, { qux: 42 }, 4.2]
+
+        assert_json({
+                      type: :number,
+                      enum: [1, 2, 'foo', :bar, { qux: 42 }, 4.2]
+                    })
+
+        assert_validation(nil)
+        assert_validation(1)
+        assert_validation(4.2)
+
+        # Even we put those types in the enum, they need to fail the validations,
+        # as they are not numbers
+        assert_validation('foo') do
+          error '/', 'Invalid type, expected "number".'
+        end
+        assert_validation(:bar) do
+          error '/', 'Invalid type, expected "number".'
+        end
+        assert_validation({ qux: 42 }) do
+          error '/', 'Invalid type, expected "number".'
+        end
+
+        # These need to fail validation, as they are not in the enum list
+        assert_validation(0.5) do
+          error '/', 'Value not included in enum [1, 2, "foo", :bar, {:qux=>42}, 4.2].'
+        end
+        assert_validation(4) do
+          error '/', 'Value not included in enum [1, 2, "foo", :bar, {:qux=>42}, 4.2].'
+        end
+      end
+
+      def test_with_generic_keywords
+        schema :number, enum:        [1, 'foo', 4.2],
+                        title:       'Number schema',
+                        description: 'Number schema holding generic keywords',
+                        examples:    [
+                          1,
+                          4.2
+                        ]
+
+        assert_json({
+                      type:        :number,
+                      enum:        [1, 'foo', 4.2],
+                      title:       'Number schema',
+                      description: 'Number schema holding generic keywords',
+                      examples:    [
+                        1,
+                        4.2
+                      ]
+                    })
+      end
     end
   end
 end
