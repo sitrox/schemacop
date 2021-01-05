@@ -156,22 +156,27 @@ module Schemacop
         end
       end
 
-      # TODO: Should enums be allowed for any type, not just string? Check doc.
       def test_enum
-        schema :string, enum: ['foo', 'some string', 'some other string']
+        schema :string, enum: ['foo', 'some string', 'some other string', 42]
 
-        assert_json(type: :string, enum: ['foo', 'some string', 'some other string'])
+        assert_json(type: :string, enum: ['foo', 'some string', 'some other string', 42])
 
         assert_validation 'foo'
         assert_validation 'some string'
         assert_validation 'some other string'
 
         assert_validation 'fooo' do
-          error '/', 'Value not included in enum ["foo", "some string", "some other string"].'
+          error '/', 'Value not included in enum ["foo", "some string", "some other string", 42].'
         end
 
         assert_validation 'other value' do
-          error '/', 'Value not included in enum ["foo", "some string", "some other string"].'
+          error '/', 'Value not included in enum ["foo", "some string", "some other string", 42].'
+        end
+
+        # Integer value 42 is in the enum of allowed values, but it's not a string,
+        # so the validation still fails
+        assert_validation 42 do
+          error '/', 'Invalid type, expected "string".'
         end
       end
 

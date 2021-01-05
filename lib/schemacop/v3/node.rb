@@ -5,6 +5,7 @@ module Schemacop
 
       attr_reader :name
       attr_reader :default
+      attr_reader :title
       attr_reader :description
       attr_reader :options
       attr_reader :parent
@@ -46,7 +47,7 @@ module Schemacop
       end
 
       def self.allowed_options
-        %i[name required default description example enum parent options cast_str]
+        %i[name required default description examples enum parent options cast_str title]
       end
 
       def self.dsl_methods
@@ -77,8 +78,9 @@ module Schemacop
         @name = options.delete(:name)
         @required = !!options.delete(:required)
         @default = options.delete(:default)
+        @title = options.delete(:title)
         @description = options.delete(:description)
-        @example = options.delete(:example)
+        @examples = options.delete(:examples)
         @enum = options.delete(:enum)&.to_set
         @parent = options.delete(:parent)
         @options = options
@@ -130,7 +132,7 @@ module Schemacop
       end
 
       def as_json
-        {}
+        process_json([], {})
       end
 
       def cast(value)
@@ -158,7 +160,8 @@ module Schemacop
           end
         end
 
-        json[:example] = @example if @example
+        json[:title] = @title if @title
+        json[:examples] = @examples if @examples
         json[:description] = @description if @description
         json[:default] = @default if @default
         json[:enum] = @enum.to_a if @enum

@@ -3,6 +3,66 @@ require 'test_helper'
 module Schemacop
   module V3
     class NodeTest < V3Test
+      def test_empty_schema
+        # Basic, empty schema, which will allow anything
+        @schema = Schemacop::Schema3.new
+
+        assert_json({})
+
+        assert_validation(nil)
+        assert_validation([nil])
+        assert_validation(1)
+        assert_validation('foo')
+        assert_validation(:bar)
+        assert_validation({ foo: 'bar', baz: 123 })
+        assert_validation([nil, 'foo', 1234, { bar: :bar }])
+      end
+
+      def test_empty_enum_schema
+        @schema = Schemacop::Schema3.new enum: [1, 2, 'foo', :bar, { qux: 42 }]
+
+        assert_json({ enum: [1, 2, 'foo', :bar, { qux: 42 }] })
+
+        assert_validation(nil)
+        assert_validation(1)
+        assert_validation('foo')
+        assert_validation(:bar)
+        assert_validation({ qux: 42 })
+
+        assert_validation(3) do
+          error '/', 'Value not included in enum [1, 2, "foo", :bar, {:qux=>42}].'
+        end
+        assert_validation('bar') do
+          error '/', 'Value not included in enum [1, 2, "foo", :bar, {:qux=>42}].'
+        end
+        assert_validation(:foo) do
+          error '/', 'Value not included in enum [1, 2, "foo", :bar, {:qux=>42}].'
+        end
+        assert_validation({ qux: 13 }) do
+          error '/', 'Value not included in enum [1, 2, "foo", :bar, {:qux=>42}].'
+        end
+      end
+
+      def test_empty_schema_with_generic_keywords
+        @schema = Schemacop::Schema3.new enum:        [1, 'foo'],
+                                         title:       'Empty schema',
+                                         description: 'Empty schema holding generic keywords',
+                                         examples:    [
+                                           1,
+                                           'foo'
+                                         ]
+
+        assert_json({
+          enum: [1, 'foo'],
+          title: 'Empty schema',
+          description: 'Empty schema holding generic keywords',
+          examples: [
+            1,
+            'foo'
+          ]
+        })
+      end
+
       def test_cast_in_root
         schema :integer, cast_str: true, required: true
 
