@@ -11,7 +11,7 @@ use in conjunction with [OpenAPI](https://swagger.io/specification/).
 ## Basic example
 
 ```ruby
-schema = Schemacop::Schema3.new do
+schema = Schemacop::Schema3.new :hash do
   scm :group do
     str! :name
   end
@@ -62,7 +62,7 @@ Using the method `as_json` on any V3 schema will produce a JSON schema compliant
 to the JSON Schema standard.
 
 ```ruby
-Schemacop::Schema3.new do
+Schemacop::Schema3.new :hash do
   str! :name
 end.as_json
 
@@ -72,6 +72,7 @@ end.as_json
   properties: {
     name: { type: :string }
   },
+  additionalProperties: false,
   required: [:name]
 }
 ```
