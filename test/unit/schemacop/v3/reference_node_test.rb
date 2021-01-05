@@ -36,36 +36,36 @@ module Schemacop
           end
 
           assert_json({
-            properties: {
-              foo: {
-                '$ref' => "#/definitions/MyString"
-              },
-              int: {
-                '$ref' => "#/definitions/MyInteger"
-              },
-              bar: {
-                properties: {
-                  foo: {
-                    '$ref' => "#/definitions/MyString"
-                  },
-                  baz: {
-                    properties: {
-                      foo: {
-                        "$ref"=>"#/definitions/MyInteger"
-                      }
-                    },
-                    additionalProperties: false,
-                    required: ['foo'],
-                    type: :object
-                  }
-                },
-                additionalProperties: false,
-                type: :object
-              }
-            },
-            additionalProperties: false,
-            type: :object
-          })
+                        properties:           {
+                          foo: {
+                            '$ref' => '#/definitions/MyString'
+                          },
+                          int: {
+                            '$ref' => '#/definitions/MyInteger'
+                          },
+                          bar: {
+                            properties:           {
+                              foo: {
+                                '$ref' => '#/definitions/MyString'
+                              },
+                              baz: {
+                                properties:           {
+                                  foo: {
+                                    '$ref' => '#/definitions/MyInteger'
+                                  }
+                                },
+                                additionalProperties: false,
+                                required:             ['foo'],
+                                type:                 :object
+                              }
+                            },
+                            additionalProperties: false,
+                            type:                 :object
+                          }
+                        },
+                        additionalProperties: false,
+                        type:                 :object
+                      })
         end
       end
 
@@ -99,84 +99,84 @@ module Schemacop
         end
 
         assert_json({
-          definitions: {
-            Address: {
-              properties: {
-                street: {
-                  type: :string
-                },
-                zip_code: {
-                  type: :string
-                },
-                location: {
-                  type: :string
-                },
-                country: {
-                  type: :string
-                }
-              },
-              additionalProperties: false,
-              required: ["street", "zip_code", "location", "country"],
-              type: :object
-            },
-            Person: {
-              properties: {
-                first_name: {
-                  type: :string
-                },
-                last_name: {
-                  type: :string
-                },
-                birthday: {
-                  type: :string,
-                  format: :date
-                }
-              },
-              additionalProperties: false,
-              required: ["first_name", "last_name", "birthday"],
-              type: :object
-            }
-          },
-          properties: {
-            person_info: {
-              '$ref' => '#/definitions/Person'
-            },
-            shipping_address: {
-              '$ref' => '#/definitions/Address'
-            },
-            billing_address: {
-              '$ref' => '#/definitions/Address'
-            }
-          },
-          type: :object,
-          additionalProperties: false,
-          required: [
-            'person_info',
-            'shipping_address',
-            'billing_address'
-          ]
-        })
+                      definitions:          {
+                        Address: {
+                          properties:           {
+                            street:   {
+                              type: :string
+                            },
+                            zip_code: {
+                              type: :string
+                            },
+                            location: {
+                              type: :string
+                            },
+                            country:  {
+                              type: :string
+                            }
+                          },
+                          additionalProperties: false,
+                          required:             %w[street zip_code location country],
+                          type:                 :object
+                        },
+                        Person:  {
+                          properties:           {
+                            first_name: {
+                              type: :string
+                            },
+                            last_name:  {
+                              type: :string
+                            },
+                            birthday:   {
+                              type:   :string,
+                              format: :date
+                            }
+                          },
+                          additionalProperties: false,
+                          required:             %w[first_name last_name birthday],
+                          type:                 :object
+                        }
+                      },
+                      properties:           {
+                        person_info:      {
+                          '$ref' => '#/definitions/Person'
+                        },
+                        shipping_address: {
+                          '$ref' => '#/definitions/Address'
+                        },
+                        billing_address:  {
+                          '$ref' => '#/definitions/Address'
+                        }
+                      },
+                      type:                 :object,
+                      additionalProperties: false,
+                      required:             %w[
+                        person_info
+                        shipping_address
+                        billing_address
+                      ]
+                    })
 
         assert_validation(nil)
         assert_validation({
-          person_info: {
-            first_name: 'Joe',
-            last_name: 'Doe',
-            birthday: '1990-01-01'
-          },
-          billing_address: {
-            street: 'Badenerstrasse 530',
-            zip_code: '8048',
-            location: 'Zürich',
-            country: 'Switzerland'
-          },
-          shipping_address: {
-            street: 'Badenerstrasse 530',
-            zip_code: '8048',
-            location: 'Zürich',
-            country: 'Switzerland'
-          }
-        })
+                            person_info:      {
+                              first_name: 'Joe',
+                              last_name:  'Doe',
+                              birthday:   '1990-01-01'
+                            },
+                            billing_address:  {
+                              street:   'Badenerstrasse 530',
+                              zip_code: '8048',
+                              location: 'Zürich',
+                              country:  'Switzerland'
+                            },
+                            shipping_address: {
+                              street:   'Badenerstrasse 530',
+                              zip_code: '8048',
+                              location: 'Zürich',
+                              country:  'Switzerland'
+                            }
+                          })
 
         assert_validation({}) do
           error '/person_info', 'Value must be given.'
@@ -201,41 +201,41 @@ module Schemacop
         end
 
         assert_json({
-          additionalProperties: false,
-          definitions: {
-            User: {
-              properties: {
-                first_name: {
-                  type: :string
-                },
-                last_name: {
-                  type: :string
-                },
-                groups: {
-                  type: :array,
-                  items: {
-                    "$ref"=> "#/definitions/Group"
-                  },
-                  additionalItems: false
-                }
-              },
-              additionalProperties: false,
-              required: ["first_name", "last_name"],
-              type: :object
-            },
-            Group: {
-              properties: {
-                name: {
-                  type: :string
-                }
-              },
-              additionalProperties: false,
-              required: ["name"],
-              type: :object
-            }
-          },
-          type: :object
-        })
+                      additionalProperties: false,
+                      definitions:          {
+                        User:  {
+                          properties:           {
+                            first_name: {
+                              type: :string
+                            },
+                            last_name:  {
+                              type: :string
+                            },
+                            groups:     {
+                              type:            :array,
+                              items:           {
+                                '$ref' => '#/definitions/Group'
+                              },
+                              additionalItems: false
+                            }
+                          },
+                          additionalProperties: false,
+                          required:             %w[first_name last_name],
+                          type:                 :object
+                        },
+                        Group: {
+                          properties:           {
+                            name: {
+                              type: :string
+                            }
+                          },
+                          additionalProperties: false,
+                          required:             ['name'],
+                          type:                 :object
+                        }
+                      },
+                      type:                 :object
+                    })
       end
 
       def test_in_hash_recursion
