@@ -319,6 +319,61 @@ module Schemacop
 
         assert_cast [{}], [{ name: 'John' }]
       end
+
+      def test_enum_schema
+        schema :array, enum: [1, 2, 'foo', :bar, { qux: 42 }, [1, 2], %w[a b]]
+
+        assert_json({
+                      type: :array,
+                      enum: [1, 2, 'foo', :bar, { qux: 42 }, [1, 2], %w[a b]]
+                    })
+
+        assert_validation(nil)
+        assert_validation([1, 2])
+        assert_validation(%w[a b])
+
+        # Even we put those types in the enum, they need to fail the validations,
+        # as they are not arrays
+        assert_validation('foo') do
+          error '/', 'Invalid type, expected "array".'
+        end
+        assert_validation(1) do
+          error '/', 'Invalid type, expected "array".'
+        end
+        assert_validation(:bar) do
+          error '/', 'Invalid type, expected "array".'
+        end
+        assert_validation({ qux: 42 }) do
+          error '/', 'Invalid type, expected "array".'
+        end
+
+        # These need to fail validation, as they are not in the enum list
+        assert_validation([1, 2, 3]) do
+          error '/', 'Value not included in enum [1, 2, "foo", :bar, {:qux=>42}, [1, 2], ["a", "b"]].'
+        end
+        assert_validation([]) do
+          error '/', 'Value not included in enum [1, 2, "foo", :bar, {:qux=>42}, [1, 2], ["a", "b"]].'
+        end
+      end
+
+      def test_with_generic_keywords
+        schema :array, enum:        [1, 'foo', [1, 2, 3]],
+                       title:       'Array schema',
+                       description: 'Array schema holding generic keywords',
+                       examples:    [
+                         [1, 2, 3]
+                       ]
+
+        assert_json({
+                      type:        :array,
+                      enum:        [1, 'foo', [1, 2, 3]],
+                      title:       'Array schema',
+                      description: 'Array schema holding generic keywords',
+                      examples:    [
+                        [1, 2, 3]
+                      ]
+                    })
+      end
     end
   end
 end
