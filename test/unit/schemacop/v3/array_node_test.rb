@@ -9,6 +9,7 @@ module Schemacop
         schema :array
         assert_json(type: :array)
         assert_validation []
+        assert_validation [nil, nil]
         assert_validation [2234, 'foo', :bar]
       end
 
@@ -22,6 +23,9 @@ module Schemacop
           required:             %i[items],
           additionalProperties: false
         )
+
+        assert_validation items: []
+        assert_validation items: [nil]
         assert_validation items: [2234, 'foo', :bar]
       end
 
