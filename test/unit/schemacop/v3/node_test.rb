@@ -53,14 +53,14 @@ module Schemacop
                                          ]
 
         assert_json({
-          enum: [1, 'foo'],
-          title: 'Empty schema',
-          description: 'Empty schema holding generic keywords',
-          examples: [
-            1,
-            'foo'
-          ]
-        })
+                      enum:        [1, 'foo'],
+                      title:       'Empty schema',
+                      description: 'Empty schema holding generic keywords',
+                      examples:    [
+                        1,
+                        'foo'
+                      ]
+                    })
       end
 
       def test_cast_in_root
