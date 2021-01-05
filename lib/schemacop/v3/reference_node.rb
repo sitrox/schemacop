@@ -11,7 +11,7 @@ module Schemacop
       end
 
       def as_json
-        process_json([], '$ref': "#/components/schemas/#{@path}")
+        process_json([], '$ref': "#/definitions/#{@path}")
       end
 
       def _validate(data, result:)

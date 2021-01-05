@@ -34,6 +34,38 @@ module Schemacop
           assert_validation(bar: { foo: 'String', baz: { foo: '42' } }) do
             error '/bar/baz/foo', 'Invalid type, expected "integer".'
           end
+
+          assert_json({
+            properties: {
+              foo: {
+                '$ref' => "#/definitions/MyString"
+              },
+              int: {
+                '$ref' => "#/definitions/MyInteger"
+              },
+              bar: {
+                properties: {
+                  foo: {
+                    '$ref' => "#/definitions/MyString"
+                  },
+                  baz: {
+                    properties: {
+                      foo: {
+                        "$ref"=>"#/definitions/MyInteger"
+                      }
+                    },
+                    additionalProperties: false,
+                    required: ['foo'],
+                    type: :object
+                  }
+                },
+                additionalProperties: false,
+                type: :object
+              }
+            },
+            additionalProperties: false,
+            type: :object
+          })
         end
       end
 
@@ -44,6 +76,166 @@ module Schemacop
           end
           assert_validation(int: 5)
         end
+      end
+
+      def test_multiple_schemas
+        schema do
+          scm :Address do
+            str! :street
+            str! :zip_code
+            str! :location
+            str! :country
+          end
+
+          scm :Person do
+            str! :first_name
+            str! :last_name
+            str! :birthday, format: :date
+          end
+
+          ref! :person_info, :Person
+          ref! :shipping_address, :Address
+          ref! :billing_address, :Address
+        end
+
+        assert_json({
+          definitions: {
+            Address: {
+              properties: {
+                street: {
+                  type: :string
+                },
+                zip_code: {
+                  type: :string
+                },
+                location: {
+                  type: :string
+                },
+                country: {
+                  type: :string
+                }
+              },
+              additionalProperties: false,
+              required: ["street", "zip_code", "location", "country"],
+              type: :object
+            },
+            Person: {
+              properties: {
+                first_name: {
+                  type: :string
+                },
+                last_name: {
+                  type: :string
+                },
+                birthday: {
+                  type: :string,
+                  format: :date
+                }
+              },
+              additionalProperties: false,
+              required: ["first_name", "last_name", "birthday"],
+              type: :object
+            }
+          },
+          properties: {
+            person_info: {
+              '$ref' => '#/definitions/Person'
+            },
+            shipping_address: {
+              '$ref' => '#/definitions/Address'
+            },
+            billing_address: {
+              '$ref' => '#/definitions/Address'
+            }
+          },
+          type: :object,
+          additionalProperties: false,
+          required: [
+            'person_info',
+            'shipping_address',
+            'billing_address'
+          ]
+        })
+
+        assert_validation(nil)
+        assert_validation({
+          person_info: {
+            first_name: 'Joe',
+            last_name: 'Doe',
+            birthday: '1990-01-01'
+          },
+          billing_address: {
+            street: 'Badenerstrasse 530',
+            zip_code: '8048',
+            location: 'Zürich',
+            country: 'Switzerland'
+          },
+          shipping_address: {
+            street: 'Badenerstrasse 530',
+            zip_code: '8048',
+            location: 'Zürich',
+            country: 'Switzerland'
+          }
+        })
+
+        assert_validation({}) do
+          error '/person_info', 'Value must be given.'
+          error '/shipping_address', 'Value must be given.'
+          error '/billing_address', 'Value must be given.'
+        end
+      end
+
+      def test_nested_schemas
+        schema do
+          scm :User do
+            str! :first_name
+            str! :last_name
+            ary? :groups do
+              ref :Group
+            end
+          end
+
+          scm :Group do
+            str! :name
+          end
+        end
+
+        assert_json({
+          additionalProperties: false,
+          definitions: {
+            User: {
+              properties: {
+                first_name: {
+                  type: :string
+                },
+                last_name: {
+                  type: :string
+                },
+                groups: {
+                  type: :array,
+                  items: {
+                    "$ref"=> "#/definitions/Group"
+                  },
+                  additionalItems: false
+                }
+              },
+              additionalProperties: false,
+              required: ["first_name", "last_name"],
+              type: :object
+            },
+            Group: {
+              properties: {
+                name: {
+                  type: :string
+                }
+              },
+              additionalProperties: false,
+              required: ["name"],
+              type: :object
+            }
+          },
+          type: :object
+        })
       end
 
       def test_in_hash_recursion
