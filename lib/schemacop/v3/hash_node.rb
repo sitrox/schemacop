@@ -53,6 +53,8 @@ module Schemacop
         json[:properties] = Hash[properties.values.map { |p| [p.name, p.as_json] }] if properties.any?
         json[:patternProperties] = Hash[pattern_properties.values.map { |p| [sanitize_exp(p.name), p.as_json] }] if pattern_properties.any?
 
+        # In schemacop, by default, additional properties are not allowed,
+        # the users explicitly need to enable additional properties
         if options[:additional_properties] == true
           json[:additionalProperties] = true
         elsif options[:additional_properties].is_a?(Node)

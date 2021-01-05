@@ -34,14 +34,12 @@ module Schemacop
 
         assert_json(
           type:            :array,
-          items:           [
-            {
-              type:                 :object,
-              properties:           { name: { type: :string } },
-              required:             %i[name],
-              additionalProperties: false
-            }
-          ],
+          items:           {
+            type:                 :object,
+            properties:           { name: { type: :string } },
+            required:             %i[name],
+            additionalProperties: false
+          },
           additionalItems: false
         )
         assert_validation [{ name: 'Foo' }, { name: 'Bar' }]
@@ -164,11 +162,15 @@ module Schemacop
           str
         end
 
-        assert_json(type: :array, items: [{ type: :string }], additionalItems: false)
+        assert_json(type: :array, items: { type: :string }, additionalItems: false)
 
         assert_validation []
         assert_validation %w[foo]
         assert_validation %w[foo bar]
+
+        assert_validation ['foo', :bar] do
+          error '/[1]', 'Invalid type, expected "string".'
+        end
 
         assert_validation %i[foo bar] do
           error '/[0]', 'Invalid type, expected "string".'
@@ -301,15 +303,13 @@ module Schemacop
 
         assert_json(
           type:            :array,
-          items:           [
-            {
-              type:                 :object,
-              properties:           {
-                name: { type: :string, default: 'John' }
-              },
-              additionalProperties: false
-            }
-          ],
+          items:           {
+            type:                 :object,
+            properties:           {
+              name: { type: :string, default: 'John' }
+            },
+            additionalProperties: false
+          },
           additionalItems: false
         )
 

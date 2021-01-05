@@ -37,7 +37,7 @@ module Schemacop
       def test_array
         schema(:array) { sym }
         assert_validation %i[foo bar baz]
-        assert_json(type: :array, items: [{}], additionalItems: false)
+        assert_json(type: :array, items: {}, additionalItems: false)
       end
     end
   end

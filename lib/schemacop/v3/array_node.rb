@@ -34,10 +34,14 @@ module Schemacop
           if options[:contains]
             json[:contains] = @items.first.as_json
           else
-            json[:items] = @items.map(&:as_json)
+            # If only one item given: List validation, every item needs to match the given
+            # schema (e.g. be a boolean). If multiple items are given, it's a tuple validation
+            # and the order of the items matters
+            json[:items] = @items.count == 1 ? @items.first.as_json : @items.map(&:as_json)
           end
         end
 
+        # Only applicable if items > 1, i.e. it's a tuple validation and not a list validation
         if options[:additional_items] == true
           json[:additionalItems] = true
         elsif options[:additional_items].is_a?(Node)

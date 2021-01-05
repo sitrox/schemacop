@@ -34,7 +34,9 @@ module Schemacop
 
         assert_json(
           type:            :array,
-          items:           [type: :integer],
+          items:           {
+            type: :integer
+          },
           additionalItems: false
         )
 

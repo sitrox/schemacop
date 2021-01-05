@@ -32,17 +32,15 @@ module Schemacop
         schema :array do
           num cast_str: true, minimum: 3
         end
-
+        # TODO: Shouldn't string also be minimum 3?
         assert_json(
           type:            :array,
-          items:           [
-            {
-              oneOf: [
-                { type: :number, minimum: 3 },
-                { type: :string, format: :number }
-              ]
-            }
-          ],
+          items:           {
+            oneOf: [
+              { type: :number, minimum: 3 },
+              { type: :string, format: :number }
+            ]
+          },
           additionalItems: false
         )
 
