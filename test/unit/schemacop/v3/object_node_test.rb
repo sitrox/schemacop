@@ -77,6 +77,70 @@ module Schemacop
           error '/myobj', 'Value must be given.'
         end
       end
+
+      def test_enum_schema
+        schema :object, enum: [true, 'foo', :baz, [], { qux: '123' }]
+
+        # Can't represent a Ruby Object as a JSON value
+        assert_json({})
+
+        # As we didn't provide any classes, any object (i.e. everything) will
+        # be validated. However, only those elements we put into the enum list
+        # will be allowed
+        assert_validation(nil)
+        assert_validation(true)
+        assert_validation('foo')
+        assert_validation(:baz)
+        assert_validation([])
+        assert_validation({ qux: '123' })
+
+        # These will fail, as we didn't put them into the enum list
+        assert_validation(1) do
+          error '/', 'Value not included in enum [true, "foo", :baz, [], {:qux=>"123"}].'
+        end
+        assert_validation(:bar) do
+          error '/', 'Value not included in enum [true, "foo", :baz, [], {:qux=>"123"}].'
+        end
+        assert_validation({ qux: 42 }) do
+          error '/', 'Value not included in enum [true, "foo", :baz, [], {:qux=>"123"}].'
+        end
+      end
+
+      def test_enum_schema_with_classes
+        schema :object, classes: [String, Symbol, TrueClass], enum: [true, 'foo', :baz, [], { qux: '123' }, false]
+
+        # Can't represent a Ruby Object as a JSON value
+        assert_json({})
+
+        # Values need to be one of the classed we defined above, as well as in the
+        # enum list for the validation to pass
+        assert_validation(nil)
+        assert_validation(true)
+        assert_validation('foo')
+        assert_validation(:baz)
+
+        # These will fail, as they aren't of one of the classed we defined above
+        assert_validation([]) do
+          error '/', 'Invalid type, expected "String" or "Symbol" or "TrueClass".'
+        end
+        assert_validation({ qux: '123' }) do
+          error '/', 'Invalid type, expected "String" or "Symbol" or "TrueClass".'
+        end
+        assert_validation(false) do
+          error '/', 'Invalid type, expected "String" or "Symbol" or "TrueClass".'
+        end
+      end
+
+      def test_with_generic_keywords
+        schema :object, enum:        [1, 'foo'],
+                        title:       'Object schema',
+                        description: 'Object schema holding generic keywords',
+                        examples:    [
+                          'foo'
+                        ]
+
+        assert_json({})
+      end
     end
   end
 end
