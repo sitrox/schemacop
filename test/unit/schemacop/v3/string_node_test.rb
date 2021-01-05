@@ -255,6 +255,57 @@ module Schemacop
           schema :string, pattern: '(abcde'
         end
       end
+
+      def test_enum_schema
+        schema :string, enum: [1, 2, 'foo', :bar, { qux: 42 }]
+
+        assert_json({
+                      type: :string,
+                      enum: [1, 2, 'foo', :bar, { qux: 42 }]
+                    })
+
+        assert_validation(nil)
+        assert_validation('foo')
+
+        # Even we put those types in the enum, they need to fail the validations,
+        # as they are not strings
+        assert_validation(1) do
+          error '/', 'Invalid type, expected "string".'
+        end
+        assert_validation(:bar) do
+          error '/', 'Invalid type, expected "string".'
+        end
+        assert_validation({ qux: 42 }) do
+          error '/', 'Invalid type, expected "string".'
+        end
+
+        # These need to fail validation, as they are not in the enum list
+        assert_validation('bar') do
+          error '/', 'Value not included in enum [1, 2, "foo", :bar, {:qux=>42}].'
+        end
+        assert_validation('Lorem ipsum') do
+          error '/', 'Value not included in enum [1, 2, "foo", :bar, {:qux=>42}].'
+        end
+      end
+
+      def test_with_generic_keywords
+        schema :string, enum:        [1, 'foo'],
+                        title:       'String schema',
+                        description: 'String schema holding generic keywords',
+                        examples:    [
+                          'foo'
+                        ]
+
+        assert_json({
+                      type:        :string,
+                      enum:        [1, 'foo'],
+                      title:       'String schema',
+                      description: 'String schema holding generic keywords',
+                      examples:    [
+                        'foo'
+                      ]
+                    })
+      end
     end
   end
 end
