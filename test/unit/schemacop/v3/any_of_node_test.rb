@@ -183,6 +183,29 @@ module Schemacop
           foo: { bar: DateTime.new(1990, 1, 13, 10, 0, 0) }
         )
       end
+
+      def test_with_generic_keywords
+        schema :any_of, title:       'anyOf schema',
+                        description: 'anyOf schema holding generic keywords',
+                        examples:    [
+                          'foo'
+                        ] do
+                          str
+                          int
+                        end
+
+        assert_json({
+                      anyOf:       [
+                        { type: :string },
+                        { type: :integer }
+                      ],
+                      title:       'anyOf schema',
+                      description: 'anyOf schema holding generic keywords',
+                      examples:    [
+                        'foo'
+                      ]
+                    })
+      end
     end
   end
 end
