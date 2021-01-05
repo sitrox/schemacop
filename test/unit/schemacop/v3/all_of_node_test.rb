@@ -176,6 +176,23 @@ module Schemacop
                       default: 'foobar'
                     ])
       end
+
+      def test_with_generic_keywords
+        schema :all_of, title:       'allOf schema',
+                        description: 'allOf schema holding generic keywords',
+                        examples:    [
+                          'foo'
+                        ]
+
+        assert_json({
+                      allOf:       [],
+                      title:       'allOf schema',
+                      description: 'allOf schema holding generic keywords',
+                      examples:    [
+                        'foo'
+                      ]
+                    })
+      end
     end
   end
 end
