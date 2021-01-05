@@ -630,6 +630,72 @@ module Schemacop
           required:             %i[foo]
         )
       end
+
+      def test_enum_schema
+        schema :hash do
+          str! :foo, { enum: ['bar', 'qux', 123, :faz] }
+        end
+
+        assert_json({
+                      type:                 :object,
+                      additionalProperties: false,
+                      properties:           {
+                        foo: {
+                          type: :string,
+                          enum: ['bar', 'qux', 123, :faz]
+                        }
+                      },
+                      required:             [:foo]
+                    })
+
+        assert_validation(nil)
+        assert_validation({ foo: 'bar' })
+        assert_validation({ foo: 'qux' })
+
+        # Even we put those types in the enum, they need to fail the validations,
+        # as they are not strings
+        assert_validation({ foo: 123 }) do
+          error '/foo', 'Invalid type, expected "string".'
+        end
+        assert_validation({ foo: :faz }) do
+          error '/foo', 'Invalid type, expected "string".'
+        end
+
+        # These need to fail validation, as they are not in the enum list
+        assert_validation({ foo: 'Lorem ipsum' }) do
+          error '/foo', 'Value not included in enum ["bar", "qux", 123, :faz].'
+        end
+      end
+
+      def test_with_generic_keywords
+        schema :hash, title: 'Hash', description: 'A hash with a description' do
+          str! :foo, {
+            enum:        ['bar', 'qux', 123, :faz],
+            title:       'A string',
+            description: 'A string in the hash',
+            examples:    [
+              'foo'
+            ]
+          }
+        end
+
+        assert_json({
+                      type:                 :object,
+                      additionalProperties: false,
+                      title:                'Hash',
+                      description:          'A hash with a description',
+                      properties:           {
+                        foo: {
+                          type:        :string,
+                          enum:        ['bar', 'qux', 123, :faz],
+                          title:       'A string',
+                          examples:    ['foo'],
+                          description: 'A string in the hash'
+                        }
+                      },
+                      required:             [:foo]
+                    })
+      end
     end
   end
 end
