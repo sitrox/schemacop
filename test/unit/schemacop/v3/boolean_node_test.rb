@@ -72,6 +72,54 @@ module Schemacop
           end
         end
       end
+
+      def test_enum_schema
+        schema :boolean, enum: [1, 2, 'foo', :bar, { qux: 42 }, true]
+
+        assert_json({
+                      type: :boolean,
+                      enum: [1, 2, 'foo', :bar, { qux: 42 }, true]
+                    })
+
+        assert_validation(nil)
+        assert_validation(true)
+
+        # Even we put those types in the enum, they need to fail the validations,
+        # as they are not booleans
+        assert_validation('foo') do
+          error '/', 'Invalid type, expected "boolean".'
+        end
+        assert_validation(:bar) do
+          error '/', 'Invalid type, expected "boolean".'
+        end
+        assert_validation({ qux: 42 }) do
+          error '/', 'Invalid type, expected "boolean".'
+        end
+
+        # These need to fail validation, as they are not in the enum list
+        assert_validation(false) do
+          error '/', 'Value not included in enum [1, 2, "foo", :bar, {:qux=>42}, true].'
+        end
+      end
+
+      def test_with_generic_keywords
+        schema :boolean, enum:        [1, 'foo', true],
+                         title:       'Boolean schema',
+                         description: 'Boolean schema holding generic keywords',
+                         examples:    [
+                           true
+                         ]
+
+        assert_json({
+                      type:        :boolean,
+                      enum:        [1, 'foo', true],
+                      title:       'Boolean schema',
+                      description: 'Boolean schema holding generic keywords',
+                      examples:    [
+                        true
+                      ]
+                    })
+      end
     end
   end
 end
