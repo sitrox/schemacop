@@ -141,6 +141,28 @@ module Schemacop
 
         assert_json({})
       end
+
+      def test_validate_self
+        assert_raises_with_message Exceptions::InvalidSchemaError,
+                                   'Option "strict" must be a "boolean".' do
+          schema :object, strict: 'false'
+        end
+
+        assert_raises_with_message Exceptions::InvalidSchemaError,
+                                   'Option "strict" must be a "boolean".' do
+          schema :object, strict: 123
+        end
+
+        assert_raises_with_message Exceptions::InvalidSchemaError,
+                                   'Option "strict" must be a "boolean".' do
+          schema :object, strict: [1, 2, 3]
+        end
+
+        assert_raises_with_message Exceptions::InvalidSchemaError,
+                                   'Option "strict" must be a "boolean".' do
+          schema :object, strict: :false
+        end
+      end
     end
   end
 end

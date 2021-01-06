@@ -2,7 +2,7 @@ module Schemacop
   module V3
     class ReferenceNode < Node
       def self.allowed_options
-        super + %i[path type]
+        super + %i[path]
       end
 
       def self.create(path, **options, &block)

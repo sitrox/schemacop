@@ -1,7 +1,6 @@
 module Schemacop
   module V3
     class Node
-
       attr_reader :name
       attr_reader :default
       attr_reader :title
