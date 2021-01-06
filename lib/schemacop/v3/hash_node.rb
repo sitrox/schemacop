@@ -7,7 +7,6 @@ module Schemacop
         max_properties
         dependencies
         property_names
-        dependencies
       ].freeze
 
       supports_children(name: true)
