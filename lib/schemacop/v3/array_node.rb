@@ -156,6 +156,24 @@ module Schemacop
           options[:additional_items] = false
         end
       end
+
+      def validate_self
+        unless options[:min_items].nil? || options[:min_items].is_a?(Integer)
+          fail 'Option "min_items" must be an "integer"'
+        end
+
+        unless options[:max_items].nil? || options[:max_items].is_a?(Integer)
+          fail 'Option "max_items" must be an "integer"'
+        end
+
+        unless options[:unique_items].nil? || options[:unique_items].is_a?(TrueClass) || options[:unique_items].is_a?(FalseClass)
+          fail 'Option "unique_items" must be a "boolean".'
+        end
+
+        if options[:min_items] && options[:max_items] && options[:min_items] > options[:max_items]
+          fail 'Option "min_items" can\'t be greater than "max_items".'
+        end
+      end
     end
   end
 end

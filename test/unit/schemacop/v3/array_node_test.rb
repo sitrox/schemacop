@@ -374,6 +374,46 @@ module Schemacop
                       ]
                     })
       end
+
+      # Helper function that checks for the min_items and max_items options if the option is
+      # an integer or something else, in which case it needs to raise
+      def validate_self_should_error(value_to_check)
+        assert_raises_with_message Exceptions::InvalidSchemaError,
+                                   'Option "min_items" must be an "integer"' do
+          schema :array, min_items: value_to_check
+        end
+
+        assert_raises_with_message Exceptions::InvalidSchemaError,
+                                   'Option "max_items" must be an "integer"' do
+          schema :array, max_items: value_to_check
+        end
+      end
+
+      def test_validate_self
+        assert_raises_with_message Exceptions::InvalidSchemaError,
+                                   'Option "min_items" can\'t be greater than "max_items".' do
+          schema :array, min_items: 5, max_items: 4
+        end
+
+        assert_raises_with_message Exceptions::InvalidSchemaError,
+                                   'Option "unique_items" must be a "boolean".' do
+          schema :array, unique_items: 4
+        end
+
+        assert_raises_with_message Exceptions::InvalidSchemaError,
+                                   'Option "unique_items" must be a "boolean".' do
+          schema :array, unique_items: 'false'
+        end
+
+        validate_self_should_error(1.0)
+        validate_self_should_error(4r)
+        validate_self_should_error(true)
+        validate_self_should_error(false)
+        validate_self_should_error(Object.new)
+        validate_self_should_error((4 + 6i))
+        validate_self_should_error('13')
+        validate_self_should_error('Lorem ipsum')
+      end
     end
   end
 end
