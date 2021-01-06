@@ -1,8 +1,45 @@
 # Schemacop schema V3
 
+
+# Table of Contents
+1. [Introcution](#Introcution)
+2. [Generic Keywords](#generic-keywords)
+3. [Nodes](#nodes)
+    1. [String](#string)
+    2. [Integer](#integer)
+    3. [Number](#number)
+    4. [Symbol](#symbol)
+    5. [Boolean](#boolean)
+    6. [Array](#array)
+    7. [Hash](#hash)
+    8. [Object](#object)
+    9. [AllOf](#allOf)
+    10. [AnyOf](#anyOf)
+    11. [OneOf](#oneOf)
+    12. [IsNot](#isNot)
+    13. [Reference](#reference)
+4. [Context](#context)
+5. [External schemas](#external-schemas)
+
+## Introcution
+
+TODO: Write short section about using schemacop V3
+
+## Generic Keywords
+
+* enum
+* title
+* description
+* examples
+
+* cast_str?
+
 ## Nodes
 
-### String (`string`, `str`)
+### String
+
+Type: `:string`\
+DSL: `str`
 
 The string type is used for strings of text and must be a ruby `String` object
 or a subclass. Using the option `format`, strings can be validated against and
@@ -10,11 +47,11 @@ transformed into various types.
 
 #### Options
 
-* `min_length` 
+* `min_length`
   Defines the minimum required string length
-* `max_length` 
+* `max_length`
   Defines the maximum required string length
-* `pattern` 
+* `pattern`
   Defines a (ruby) regex pattern the value will be matched against. Must be a
   string and should generally start with `^` and end with `$` so as to evaluate
   the entire string. It should not be enclosed in `/` characters.
@@ -62,24 +99,132 @@ transformed into various types.
 ```ruby
 # By using a format, string values are casted to that respective format
 schema = Schemacop::Schema3.new(:string, format: :date)
-result = schema.validate('01-13-1980')
-result.data # => Date<"Thu, 26 Nov 2020">
+result = schema.validate('1980-01-13')
+result.data # => Date<"Sun, 13 Jan 1980">
 ```
 
-### Hash (`hash`, `hsh`)
+### Integer
+
+Type: `:integer`\
+DSL: `int`
+
+The integer type is used for whole numbers and must be a ruby `Integer` or a
+subclass. With the various available options, validations on the value of the
+integer can be done.
+
+#### Options
+
+* `minimum`
+  Defines an (inclusive) minimum, i.e. the number has to be equal or larger than the
+  given number
+* `exclusive_minimum`
+  Defines an exclusive minimum, i.e. the number has to larger than the given number
+* `maximum`
+  Defines an (inclusive) maximum, i.e. the number has to be equal or smaller than the
+  given number
+* `exclusive_maximum`
+  Defines an exclusive maximum, i.e. the number has to smaller than the given number
+* `multiple_of`
+  The received number has to be a multiple of the given number for the validation to
+  pass.
+
+#### Examples
+
+```ruby
+# Validates that the input is an even number between 0 and 100 (inclusive)
+schema = Schemacop::Schema3.new(:integer, minimum: 0, maximum: 100, multiple_of: 2)
+schema.validate!(42)            # => 42
+schema.validate!(43)            # => Schemacop::Exceptions::ValidationError: /: Value must be a multiple of 2.
+schema.validate!(-2)            # => Schemacop::Exceptions::ValidationError: /: Value must have a minimum of 0.
+schema.validate!(102)           # => Schemacop::Exceptions::ValidationError: /: Value must have a maximum of 100.
+schema.validate!(42.1)          # => Schemacop::Exceptions::ValidationError: /: Invalid type, expected "integer".
+schema.validate!(4r)            # => Schemacop::Exceptions::ValidationError: /: Invalid type, expected "integer".
+schema.validate!((4 + 0i))      # => Schemacop::Exceptions::ValidationError: /: Invalid type, expected "integer".
+schema.validate!(BigDecimal(5)) # => Schemacop::Exceptions::ValidationError: /: Invalid type, expected "integer".
+```
+
+### Number
+
+Type: `:number`\
+DSL: `num`
+
+The number type is used to validate various number classes. The following ruby classes
+and subclasses are valid:
+
+* `Integer`
+* `Float`
+* `Rational`
+* `BigDecimal`
+
+As some subclasses of `Numeric`, such as `Complex` don't support all required oeprations,
+only the above list is supported. If you need support for additional number classes, please
+contact the Gem maintainers.
+
+With the various available options, validations on the value of the number can be done.
+
+#### Options
+
+* `minimum`
+  Defines an (inclusive) minimum, i.e. the number has to be equal or larger than the
+  given number
+* `exclusive_minimum`
+  Defines an exclusive minimum, i.e. the number has to larger than the given number
+* `maximum`
+  Defines an (inclusive) maximum, i.e. the number has to be equal or smaller than the
+  given number
+* `exclusive_maximum`
+  Defines an exclusive maximum, i.e. the number has to smaller than the given number
+* `multiple_of`
+  The received number has to be a multiple of the given number for the validation to
+  pass.
+
+#### Examples
+
+```ruby
+# Validates that the input is an even number between 0 and 100 (inclusive)
+schema = Schemacop::Schema3.new(:number, minimum: 0.0, maximum: (50r), multiple_of: BigDecimal('0.5'))
+schema.validate!(42)            # => 42
+schema.validate!(42.2)          # => Schemacop::Exceptions::ValidationError: /: Value must be a multiple of 0.5.
+schema.validate!(-2)            # => Schemacop::Exceptions::ValidationError: /: Value must have a minimum of 0.0.
+schema.validate!(51)            # => Schemacop::Exceptions::ValidationError: /: Value must have a maximum of 50/1.
+schema.validate!(42.5)          # => 42.5
+schema.validate!(1.5r)          # => (3/2)
+schema.validate!(BigDecimal(5)) # => 0.5e1
+schema.validate!((4 + 0i))      # => Schemacop::Exceptions::ValidationError: /: Invalid type, expected "big_decimal" or "float" or "integer" or "rational".
+```
+
+### Symbol
+
+Type: `:symbol`\
+DSL: `sym`
+
+### Boolean
+
+Type: `:boolean`\
+DSL: `boo`
+
+### Array
+
+Type: `:array`\
+DSL: `arr`
+
+### Hash
+
+Type: `:hash`\
+DSL: `hsh`
 
 The hash type represents a ruby `Hash` or an `object` in JSON schema language.
 It consists of key-value-pairs that can be validated using arbitrary nodes.
 
 #### Options
 
-* `additional_properties` 
+* `additional_properties`
 
   This option specifies whether additional, unspecified properties are allowed
   (`true`) or not (`false`). By default, this is `true` if no properties are
   specified and `false` if you have specified at least one property.
 
-* `property_names` 
+* `property_names`
 
   This option allows to specify a regexp pattern (as string) which validates the
   keys of any properties that are not specified in the hash. This option only
@@ -275,3 +420,33 @@ Schemacop::Schema3.new(property_names: '^k_.*$') do
   str! /^k_.*$/
 end
 ```
+
+### Object
+
+Type: `:object`\
+DSL: `obj`
+
+### AllOf
+
+Type: `:all_of`\
+DSL: `all_of`
+
+### AnyOf
+
+Type: `:any_of`\
+DSL: `any_of`
+
+### OneOf
+
+Type: `:one_of`\
+DSL: `one_of`
+
+### IsNot
+
+Type: `:is_not`\
+DSL: `is_not`
+
+### Reference
+
+DSL: `ref`
+
