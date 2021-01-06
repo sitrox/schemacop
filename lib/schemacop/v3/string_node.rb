@@ -6,7 +6,6 @@ module Schemacop
         max_length
         pattern
         format
-        enum
       ].freeze
 
       # rubocop:disable Layout/LineLength
