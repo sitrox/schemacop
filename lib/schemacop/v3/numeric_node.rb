@@ -45,12 +45,11 @@ module Schemacop
       def validate_self
         # Check that the options have the correct type
         ATTRIBUTES.each do |attribute|
-            unless options[attribute].nil?
-              if allowed_types.keys.none? { |c| options[attribute].send(type_assertion_method, c) }
-                collection = allowed_types.values.map { |t| "\"#{t}\"" }.uniq.sort.join(' or ')
-                fail "Option \"#{attribute}\" must be a #{collection}"
-              end
-            end
+          next if options[attribute].nil?
+          next unless allowed_types.keys.none? { |c| options[attribute].send(type_assertion_method, c) }
+
+          collection = allowed_types.values.map { |t| "\"#{t}\"" }.uniq.sort.join(' or ')
+          fail "Option \"#{attribute}\" must be a #{collection}"
         end
 
         if options[:minimum] && options[:maximum] && options[:minimum] > options[:maximum]

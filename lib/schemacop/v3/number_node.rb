@@ -7,9 +7,9 @@ module Schemacop
 
       def allowed_types
         {
-          Integer => :integer,
-          Float => :float,
-          Rational => :rational,
+          Integer    => :integer,
+          Float      => :float,
+          Rational   => :rational,
           BigDecimal => :big_decimal
         }
       end

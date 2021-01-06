@@ -182,27 +182,27 @@ module Schemacop
       # an allowed class or something else, in which case it needs to raise
       def validate_self_should_error(value_to_check)
         assert_raises_with_message Exceptions::InvalidSchemaError,
-          'Option "minimum" must be a "big_decimal" or "float" or "integer" or "rational"' do
+                                   'Option "minimum" must be a "big_decimal" or "float" or "integer" or "rational"' do
           schema :number, minimum: value_to_check
         end
 
         assert_raises_with_message Exceptions::InvalidSchemaError,
-        'Option "maximum" must be a "big_decimal" or "float" or "integer" or "rational"' do
+                                   'Option "maximum" must be a "big_decimal" or "float" or "integer" or "rational"' do
           schema :number, maximum: value_to_check
         end
 
         assert_raises_with_message Exceptions::InvalidSchemaError,
-        'Option "exclusive_minimum" must be a "big_decimal" or "float" or "integer" or "rational"' do
+                                   'Option "exclusive_minimum" must be a "big_decimal" or "float" or "integer" or "rational"' do
           schema :number, exclusive_minimum: value_to_check
         end
 
         assert_raises_with_message Exceptions::InvalidSchemaError,
-        'Option "exclusive_maximum" must be a "big_decimal" or "float" or "integer" or "rational"' do
+                                   'Option "exclusive_maximum" must be a "big_decimal" or "float" or "integer" or "rational"' do
           schema :number, exclusive_maximum: value_to_check
         end
 
         assert_raises_with_message Exceptions::InvalidSchemaError,
-        'Option "multiple_of" must be a "big_decimal" or "float" or "integer" or "rational"' do
+                                   'Option "multiple_of" must be a "big_decimal" or "float" or "integer" or "rational"' do
           schema :number, multiple_of: value_to_check
         end
       end
