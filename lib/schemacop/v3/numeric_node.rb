@@ -43,6 +43,16 @@ module Schemacop
       end
 
       def validate_self
+        # Check that the options have the correct type
+        ATTRIBUTES.each do |attribute|
+            unless options[attribute].nil?
+              if allowed_types.keys.none? { |c| options[attribute].send(type_assertion_method, c) }
+                collection = allowed_types.values.map { |t| "\"#{t}\"" }.uniq.sort.join(' or ')
+                fail "Option \"#{attribute}\" must be a #{collection}"
+              end
+            end
+        end
+
         if options[:minimum] && options[:maximum] && options[:minimum] > options[:maximum]
           fail 'Option "minimum" can\'t be greater than "maximum".'
         end

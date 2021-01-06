@@ -80,6 +80,22 @@ module Schemacop
         assert_validation age: '234' do
           error '/age', EXP_INVALID_TYPE
         end
+
+        assert_validation age: 10.0 do
+          error '/age', EXP_INVALID_TYPE
+        end
+
+        assert_validation age: 4r do
+          error '/age', EXP_INVALID_TYPE
+        end
+
+        assert_validation age: (4 + 0i) do
+          error '/age', EXP_INVALID_TYPE
+        end
+
+        assert_validation age: BigDecimal(5) do
+          error '/age', EXP_INVALID_TYPE
+        end
       end
 
       def test_minimum
@@ -186,6 +202,35 @@ module Schemacop
         assert_cast(nil, 5)
       end
 
+      # Helper function that checks for all the options if the option is
+      # an integer or something else, in which case it needs to raise
+      def validate_self_should_error(value_to_check)
+        assert_raises_with_message Exceptions::InvalidSchemaError,
+                                  'Option "minimum" must be a "integer"' do
+          schema :integer, minimum: value_to_check
+        end
+
+        assert_raises_with_message Exceptions::InvalidSchemaError,
+                  'Option "maximum" must be a "integer"' do
+          schema :integer, maximum: value_to_check
+        end
+
+        assert_raises_with_message Exceptions::InvalidSchemaError,
+                                  'Option "exclusive_minimum" must be a "integer"' do
+          schema :integer, exclusive_minimum: value_to_check
+        end
+
+        assert_raises_with_message Exceptions::InvalidSchemaError,
+                  'Option "exclusive_maximum" must be a "integer"' do
+          schema :integer, exclusive_maximum: value_to_check
+        end
+
+        assert_raises_with_message Exceptions::InvalidSchemaError,
+                                  'Option "multiple_of" must be a "integer"' do
+          schema :integer, multiple_of: value_to_check
+        end
+      end
+
       def test_validate_self
         assert_raises_with_message Exceptions::InvalidSchemaError,
                                    'Option "minimum" can\'t be greater than "maximum".' do
@@ -202,6 +247,16 @@ module Schemacop
                                    'Option "multiple_of" can\'t be 0.' do
           schema :integer, multiple_of: 0
         end
+
+        validate_self_should_error(1.0) # Float
+        validate_self_should_error(1r)  # Rational
+        validate_self_should_error(1 + 0i) # Complex
+        validate_self_should_error(BigDecimal(5)) # BigDecimal
+        validate_self_should_error(Object.new)
+        validate_self_should_error(true)
+        validate_self_should_error(false)
+        validate_self_should_error('1')
+        validate_self_should_error('String')
       end
 
       def test_enum_schema
