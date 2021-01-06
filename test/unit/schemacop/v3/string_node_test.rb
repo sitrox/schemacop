@@ -233,6 +233,20 @@ module Schemacop
         assert_cast(nil, 'Hello')
       end
 
+      # Helper function that checks for all the options if the option is
+      # an integer or something else, in which case it needs to raise
+      def validate_self_should_error(value_to_check)
+        assert_raises_with_message Exceptions::InvalidSchemaError,
+                                   'Option "min_length" must be an "integer"' do
+          schema :string, min_length: value_to_check
+        end
+
+        assert_raises_with_message Exceptions::InvalidSchemaError,
+                                   'Option "max_length" must be an "integer"' do
+          schema :string, max_length: value_to_check
+        end
+      end
+
       def test_validate_self
         assert_raises_with_message Exceptions::InvalidSchemaError,
                                    'Format "not-existing" is not supported.' do
@@ -254,6 +268,15 @@ module Schemacop
                                    'with unmatched parenthesis: /(abcde/.' do
           schema :string, pattern: '(abcde'
         end
+
+        validate_self_should_error(1.0)
+        validate_self_should_error(4r)
+        validate_self_should_error(true)
+        validate_self_should_error(false)
+        validate_self_should_error(Object.new)
+        validate_self_should_error((4 + 6i))
+        validate_self_should_error('13')
+        validate_self_should_error('Lorem ipsum')
       end
 
       def test_enum_schema

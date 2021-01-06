@@ -97,6 +97,14 @@ module Schemacop
           fail "Format #{options[:format].to_s.inspect} is not supported."
         end
 
+        unless options[:min_length].nil? || options[:min_length].is_a?(Integer)
+          fail 'Option "min_length" must be an "integer"'
+        end
+
+        unless options[:max_length].nil? || options[:max_length].is_a?(Integer)
+          fail 'Option "max_length" must be an "integer"'
+        end
+
         if options[:min_length] && options[:max_length] && options[:min_length] > options[:max_length]
           fail 'Option "min_length" can\'t be greater than "max_length".'
         end
