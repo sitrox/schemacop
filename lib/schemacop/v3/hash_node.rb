@@ -196,6 +196,14 @@ module Schemacop
       end
 
       def validate_self
+        unless options[:min_properties].nil? || options[:min_properties].is_a?(Integer)
+          fail 'Option "min_properties" must be an "integer"'
+        end
+
+        unless options[:max_properties].nil? || options[:max_properties].is_a?(Integer)
+          fail 'Option "max_properties" must be an "integer"'
+        end
+
         if @properties.values.any? { |p| p.name.is_a?(Regexp) && p.required? }
           fail 'Pattern properties can\'t be required.'
         end
