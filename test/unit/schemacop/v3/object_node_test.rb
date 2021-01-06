@@ -158,10 +158,12 @@ module Schemacop
           schema :object, strict: [1, 2, 3]
         end
 
+        # rubocop:disable Lint/BooleanSymbol
         assert_raises_with_message Exceptions::InvalidSchemaError,
                                    'Option "strict" must be a "boolean".' do
           schema :object, strict: :false
         end
+        # rubocop:enable Lint/BooleanSymbol
       end
     end
   end
