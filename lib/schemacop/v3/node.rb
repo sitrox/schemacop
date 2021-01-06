@@ -1,7 +1,6 @@
 module Schemacop
   module V3
     class Node
-      extend T::Sig
 
       attr_reader :name
       attr_reader :default

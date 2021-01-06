@@ -1,7 +1,6 @@
 # External dependencies
 require 'active_support/all'
 require 'set'
-require 'sorbet-runtime'
 
 # Schemacop module
 module Schemacop

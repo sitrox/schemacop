@@ -18,7 +18,6 @@ task :gemspec do
     # needs access to ActiveSupport::HashWithIndifferentAccess and expects
     # behavior of that as in version 5 of ActiveSupport.
     spec.add_dependency 'activesupport', '>= 4.0'
-    spec.add_dependency 'sorbet-runtime', '0.4.4667'
     spec.add_development_dependency 'bundler'
     spec.add_development_dependency 'rake'
     spec.add_development_dependency 'minitest'
