@@ -38,15 +38,24 @@ module Schemacop
 
         assert_json(
           type:            :array,
-          items:           {
-            type:                 :object,
-            properties:           { name: { type: :string } },
-            required:             %i[name],
-            additionalProperties: false
-          },
+          items:           [
+            {
+              type:                 :object,
+              properties:           { name: { type: :string } },
+              required:             %i[name],
+              additionalProperties: false
+            }
+          ],
           additionalItems: false
         )
-        assert_validation [{ name: 'Foo' }, { name: 'Bar' }]
+
+        assert_validation [{ name: 'Foo' }]
+        assert_validation [{ name: 'Foo' }, { name: 'Bar' }] do
+          error '/', 'Array has 2 items but must have exactly 1.'
+        end
+        assert_validation [123] do
+          error '/[0]', 'Invalid type, expected "object".'
+        end
       end
 
       def test_type
@@ -161,28 +170,37 @@ module Schemacop
         end
       end
 
-      def test_single_item
+      def test_single_item_tuple
         schema :array do
           str
         end
 
-        assert_json(type: :array, items: { type: :string }, additionalItems: false)
+        assert_json(
+          type:            :array,
+          items:           [
+            { type: :string }
+          ],
+          additionalItems: false
+        )
 
-        assert_validation []
+        assert_validation [] do
+          error '/', 'Array has 0 items but must have exactly 1.'
+        end
         assert_validation %w[foo]
-        assert_validation %w[foo bar]
-
-        assert_validation ['foo', :bar] do
-          error '/[1]', 'Invalid type, expected "string".'
+        assert_validation %w[foo bar] do
+          error '/', 'Array has 2 items but must have exactly 1.'
         end
 
-        assert_validation %i[foo bar] do
+        assert_validation ['foo', :bar] do
+          error '/', 'Array has 2 items but must have exactly 1.'
+        end
+
+        assert_validation %i[foo] do
           error '/[0]', 'Invalid type, expected "string".'
-          error '/[1]', 'Invalid type, expected "string".'
         end
       end
 
-      def test_tuple
+      def test_multiple_item_tuple
         schema :array do
           str
           int
@@ -267,6 +285,28 @@ module Schemacop
         assert_cast(['1990-01-01', 42], [Date.new(1990, 1, 1), 42])
         assert_cast(['1990-01-01', 42, '2010-01-01'], [Date.new(1990, 1, 1), 42, '2010-01-01'])
         assert_cast(['1990-01-01', 42, :bar], [Date.new(1990, 1, 1), 42, :bar])
+      end
+
+      def test_additional_items_single
+        schema :array do
+          str
+          add :integer
+        end
+
+        assert_json(
+          type:            :array,
+          items:           [
+            { type: :string }
+          ],
+          additionalItems: { type: :integer }
+        )
+
+        assert_validation(['foo'])
+        assert_validation(['foo', 42])
+        assert_validation(['foo', 42, 42])
+        assert_validation(['foo', :foo]) do
+          error '/[1]', 'Invalid type, expected "integer".'
+        end
       end
 
       def test_additional_items_schema
@@ -421,8 +461,8 @@ module Schemacop
       end
 
       def test_contains
-        schema :array, contains: true do
-          str
+        schema :array do
+          cont :string
         end
 
         assert_json(
@@ -446,17 +486,17 @@ module Schemacop
       end
 
       def test_contains_int
-        schema :array, contains: true do
-          int
+        schema :array do
+          cont :integer
         end
 
         assert_validation(['foo', 1, :bar])
         assert_cast(['foo', 1, :bar], ['foo', 1, :bar])
       end
 
-      def test_contains_need_casting
-        schema :array, contains: true do
-          str format: :date
+      def test_contains_with_casting
+        schema :array do
+          cont :string, format: :date
         end
 
         assert_validation(nil)
@@ -485,13 +525,15 @@ module Schemacop
 
         assert_json(
           type:            :array,
-          items:           {
-            type:                 :object,
-            properties:           {
-              name: { type: :string, default: 'John' }
-            },
-            additionalProperties: false
-          },
+          items:           [
+            {
+              type:                 :object,
+              properties:           {
+                name: { type: :string, default: 'John' }
+              },
+              additionalProperties: false
+            }
+          ],
           additionalItems: false
         )
 
@@ -591,6 +633,172 @@ module Schemacop
         validate_self_should_error((4 + 6i))
         validate_self_should_error('13')
         validate_self_should_error('Lorem ipsum')
+      end
+
+      def test_list
+        assert_raises_with_message Exceptions::InvalidSchemaError,
+                                   'You can only use "list" once.' do
+          schema :array do
+            list :integer
+            list :symbol
+          end
+        end
+
+        assert_raises_with_message Exceptions::InvalidSchemaError,
+                                   'Can\'t use "list" and normal items.' do
+          schema :array do
+            list :integer
+            int
+          end
+        end
+
+        assert_raises_with_message Exceptions::InvalidSchemaError,
+                                   'Can\'t use "list" and additional items.' do
+          schema :array do
+            list :integer
+            add :symbol
+          end
+        end
+
+        schema :array do
+          list :integer
+        end
+
+        assert_validation([])
+        assert_validation([1])
+        assert_validation([1, 2, 3, 4, 5, 6])
+
+        assert_validation([1, :foo, 'bar']) do
+          error '/[1]', 'Invalid type, expected "integer".'
+          error '/[2]', 'Invalid type, expected "integer".'
+        end
+      end
+
+      def test_list_casting
+        schema :array do
+          list :string, format: :date
+        end
+
+        assert_json(
+          type:  :array,
+          items: {
+            type:   :string,
+            format: :date
+          }
+        )
+
+        assert_validation(nil)
+        assert_validation(['1990-01-01'])
+        assert_validation(%w[1990-01-01 2020-01-01])
+        assert_validation(['foo']) do
+          error '/[0]', 'String does not match format "date".'
+        end
+
+        assert_cast(['1990-01-01'], [Date.new(1990, 1, 1)])
+      end
+
+      def test_simple_contains
+        schema :array do
+          cont :integer, minimum: 3
+        end
+
+        assert_json(
+          type:     :array,
+          contains: {
+            type:    :integer,
+            minimum: 3
+          }
+        )
+
+        assert_validation(nil)
+        assert_validation([]) do
+          error '/', 'At least one entry must match schema {"type"=>"integer", "minimum"=>3}.'
+        end
+        assert_validation([1, 2]) do
+          error '/', 'At least one entry must match schema {"type"=>"integer", "minimum"=>3}.'
+        end
+        assert_validation([1, 2, 3])
+      end
+
+      def test_contains_with_list
+        schema :array do
+          list :integer, minimum: 2
+          cont :integer, minimum: 5
+        end
+
+        assert_json(
+          type:     :array,
+          contains: {
+            type:    :integer,
+            minimum: 5
+          },
+          items:    {
+            type:    :integer,
+            minimum: 2
+          }
+        )
+
+        assert_validation(nil)
+        assert_validation([]) do
+          error '/', 'At least one entry must match schema {"type"=>"integer", "minimum"=>5}.'
+        end
+        assert_validation([1]) do
+          error '/', 'At least one entry must match schema {"type"=>"integer", "minimum"=>5}.'
+          error '/[0]', 'Value must have a minimum of 2.'
+        end
+        assert_validation([2]) do
+          error '/', 'At least one entry must match schema {"type"=>"integer", "minimum"=>5}.'
+        end
+
+        assert_validation([2, 3, 5])
+      end
+
+      def test_contains_need_casting
+        schema :array do
+          cont :string, format: :date
+        end
+
+        assert_json(
+          type:     :array,
+          contains: {
+            type:   :string,
+            format: :date
+          }
+        )
+
+        assert_validation(nil)
+        assert_validation(['1990-01-01'])
+        assert_validation(['1990-01-01', 1234])
+
+        assert_cast(['1990-01-01'], [Date.new(1990, 1, 1)])
+        assert_cast(%w[1990-01-01 123], [Date.new(1990, 1, 1), '123'])
+        assert_cast(%w[1990-01-01 123 2010-01-01], [Date.new(1990, 1, 1), '123', Date.new(2010, 1, 1)])
+      end
+
+      def test_contains_with_list_casting
+        schema :array do
+          list :string
+          cont :string, format: :date
+        end
+
+        assert_json(
+          type:     :array,
+          items:    {
+            type: :string
+          },
+          contains: {
+            type:   :string,
+            format: :date
+          }
+        )
+
+        assert_validation(nil)
+        assert_validation(['foo']) do
+          error '/', 'At least one entry must match schema {"type"=>"string", "format"=>"date"}.'
+        end
+        assert_validation(%w[foo 1990-01-01])
+
+        assert_cast(%w[foo 1990-01-01], ['foo', Date.new(1990, 1, 1)])
       end
     end
   end

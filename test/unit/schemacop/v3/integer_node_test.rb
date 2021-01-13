@@ -34,16 +34,20 @@ module Schemacop
 
         assert_json(
           type:            :array,
-          items:           {
-            type: :integer
-          },
+          items:           [
+            {
+              type: :integer
+            }
+          ],
           additionalItems: false
         )
 
         assert_validation [30]
-        assert_validation [30, 42]
+        assert_validation [30, 42] do
+          error '/', 'Array has 2 items but must have exactly 1.'
+        end
         assert_validation [30, '30'] do
-          error '/[1]', EXP_INVALID_TYPE
+          error '/', 'Array has 2 items but must have exactly 1.'
         end
       end
 

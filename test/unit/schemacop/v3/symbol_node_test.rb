@@ -35,9 +35,12 @@ module Schemacop
       end
 
       def test_array
-        schema(:array) { sym }
+        schema(:array) do
+          list :symbol
+        end
+
         assert_validation %i[foo bar baz]
-        assert_json(type: :array, items: {}, additionalItems: false)
+        assert_json(type: :array, items: {})
       end
 
       def test_enum_schema

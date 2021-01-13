@@ -39,12 +39,13 @@ module Schemacop
       end
 
       def test_array
-        schema(:array) { num }
+        schema(:array) do
+          list :number
+        end
 
         assert_json(
-          type:            :array,
-          items:           { type: :number },
-          additionalItems: false
+          type:  :array,
+          items: { type: :number }
         )
 
         assert_validation [30]

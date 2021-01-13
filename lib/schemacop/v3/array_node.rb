@@ -10,14 +10,16 @@ module Schemacop
       supports_children
 
       def self.allowed_options
-        super + ATTRIBUTES + %i[additional_items contains]
+        super + ATTRIBUTES + %i[additional_items]
       end
 
       def self.dsl_methods
-        super + NodeRegistry.dsl_methods(false) + %i[dsl_add]
+        super + NodeRegistry.dsl_methods(false) + %i[dsl_add dsl_list dsl_cont]
       end
 
       attr_reader :items
+      attr_accessor :list_item
+      attr_accessor :cont_item
 
       def dsl_add(type, **options, &block)
         if @options[:additional_items].is_a?(Node)
@@ -27,6 +29,22 @@ module Schemacop
         @options[:additional_items] = create(type, **options, &block)
       end
 
+      def dsl_list(type, **options, &block)
+        if list_item.is_a?(Node)
+          fail Exceptions::InvalidSchemaError, 'You can only use "list" once.'
+        end
+
+        @list_item = create(type, **options, &block)
+      end
+
+      def dsl_cont(type, **options, &block)
+        if cont_item.is_a?(Node)
+          fail Exceptions::InvalidSchemaError, 'You can only use "cont" once.'
+        end
+
+        @cont_item = create(type, **options, &block)
+      end
+
       def add_child(node)
         @items << node
       end
@@ -34,24 +52,23 @@ module Schemacop
       def as_json
         json = { type: :array }
 
-        if @items.any?
-          if options[:contains]
-            json[:contains] = @items.first.as_json
-          else
-            # If only one item given: List validation, every item needs to match the given
-            # schema (e.g. be a boolean). If multiple items are given, it's a tuple validation
-            # and the order of the items matters
-            json[:items] = @items.count == 1 ? @items.first.as_json : @items.map(&:as_json)
-          end
+        fail 'aaaaa' if options[:contains]
+
+        if cont_item
+          json[:contains] = cont_item.as_json
         end
 
-        # Only applicable if items > 1, i.e. it's a tuple validation and not a list validation
-        if options[:additional_items] == true
-          json[:additionalItems] = true
-        elsif options[:additional_items].is_a?(Node)
-          json[:additionalItems] = options[:additional_items].as_json
-        elsif @items.any? && !options[:contains]
-          json[:additionalItems] = false
+        if list?
+          json[:items] = @list_item.as_json
+        elsif @items.any?
+          json[:items] = @items.map(&:as_json)
+          if options[:additional_items] == true
+            json[:additionalItems] = true
+          elsif options[:additional_items].is_a?(Node)
+            json[:additionalItems] = options[:additional_items].as_json
+          else
+            json[:additionalItems] = false
+          end
         end
 
         return process_json(ATTRIBUTES, json)
@@ -76,27 +93,15 @@ module Schemacop
           result.error "Array has #{length} items but needs at most #{options[:max_items]}."
         end
 
-        # Validate contains #
-        if options[:contains]
-          fail 'Array nodes with "contains" must have exactly one item.' unless items.size == 1
-
-          item = items.first
-
-          unless super_data.any? { |obj| item_matches?(item, obj) }
-            result.error "At least one entry must match schema #{item.as_json.inspect}."
-          end
-        # Validate list #
-        elsif items.size == 1
-          node = items.first
-
+        if list?
+          # Validate list
           super_data.each_with_index do |value, index|
             result.in_path :"[#{index}]" do
-              node._validate(value, result: result)
+              list_item._validate(value, result: result)
             end
           end
-
-        # Validate tuple #
-        elsif items.size > 1
+        elsif items.any?
+          # Validate tuple
           if length == items.size || (options[:additional_items] != false && length >= items.size)
             items.each_with_index do |child_node, index|
               value = super_data[index]
@@ -120,6 +125,10 @@ module Schemacop
           end
         end
 
+        if cont_item.present? && super_data.none? { |obj| item_matches?(cont_item, obj) }
+          result.error "At least one entry must match schema #{cont_item.as_json.inspect}."
+        end
+
         # Validate uniqueness #
         if options[:unique_items] && super_data.size != super_data.uniq.size
           result.error 'Array has duplicate items.'
@@ -136,22 +145,23 @@ module Schemacop
         result = []
 
         value.each_with_index do |value_item, index|
-          if options[:contains]
-            item = item_for_data(value_item, force: false)
-            if item
+          if cont_item.present? && item_matches?(cont_item, value_item)
+            result << cont_item.cast(value_item)
+          elsif list?
+            result << list_item.cast(value_item)
+          elsif items.any?
+            if options[:additional_items] != false && index >= items.size
+              if options[:additional_items].is_a?(Node)
+                result << options[:additional_items].cast(value_item)
+              else
+                result << value_item
+              end
+            else
+              item = item_for_data(value_item)
               result << item.cast(value_item)
-            else
-              result << value_item
-            end
-          elsif options[:additional_items] != false && index >= items.size
-            if options[:additional_items].is_a?(Node)
-              result << options[:additional_items].cast(value_item)
-            else
-              result << value_item
             end
           else
-            item = item_for_data(value_item)
-            result << item.cast(value_item)
+            result << value_item
           end
         end
 
@@ -159,6 +169,10 @@ module Schemacop
       end
 
       protected
+
+      def list?
+        list_item.present?
+      end
 
       def item_for_data(data, force: true)
         item = children.find { |c| item_matches?(c, data) }
@@ -178,6 +192,14 @@ module Schemacop
       end
 
       def validate_self
+        if list? && items.any?
+          fail 'Can\'t use "list" and normal items.'
+        end
+
+        if list? && @options[:additional_items].is_a?(Node)
+          fail 'Can\'t use "list" and additional items.'
+        end
+
         unless options[:min_items].nil? || options[:min_items].is_a?(Integer)
           fail 'Option "min_items" must be an "integer"'
         end
@@ -192,10 +214,6 @@ module Schemacop
 
         if options[:min_items] && options[:max_items] && options[:min_items] > options[:max_items]
           fail 'Option "min_items" can\'t be greater than "max_items".'
-        end
-
-        if options[:contains] && items.size != 1
-          fail 'Array nodes with "contains" must have exactly one item.'
         end
       end
     end

@@ -90,18 +90,17 @@ module Schemacop
 
       def test_cast_in_array
         schema :array do
-          num cast_str: true, minimum: 3
+          list :number, cast_str: true, minimum: 3
         end
 
         assert_json(
-          type:            :array,
-          items:           {
+          type:  :array,
+          items: {
             oneOf: [
               { type: :number, minimum: 3 },
               { type: :string, format: :number }
             ]
-          },
-          additionalItems: false
+          }
         )
 
         assert_validation(nil)
@@ -128,12 +127,14 @@ module Schemacop
 
         assert_json(
           type:            :array,
-          items:           {
-            oneOf: [
-              { type: :number, minimum: 3 },
-              { type: :string, format: :number }
-            ]
-          },
+          items:           [
+            {
+              oneOf: [
+                { type: :number, minimum: 3 },
+                { type: :string, format: :number }
+              ]
+            }
+          ],
           additionalItems: false
         )
 
