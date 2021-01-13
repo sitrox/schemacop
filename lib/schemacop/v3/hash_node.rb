@@ -28,6 +28,10 @@ module Schemacop
       end
 
       def dsl_add(type, **options, &block)
+        if @options[:additional_properties].is_a?(Node)
+          fail Exceptions::InvalidSchemaError, 'You can only use "add" once to specify additional properties.'
+        end
+
         @options[:additional_properties] = create(type, **options, &block)
       end
 

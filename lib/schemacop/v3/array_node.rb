@@ -20,6 +20,10 @@ module Schemacop
       attr_reader :items
 
       def dsl_add(type, **options, &block)
+        if @options[:additional_items].is_a?(Node)
+          fail Exceptions::InvalidSchemaError, 'You can only use "add" once to specify additional items.'
+        end
+
         @options[:additional_items] = create(type, **options, &block)
       end
 
@@ -131,9 +135,24 @@ module Schemacop
 
         result = []
 
-        value.each do |value_item|
-          item = item_for_data(value_item)
-          result << item.cast(value_item)
+        value.each_with_index do |value_item, index|
+          if options[:contains]
+            item = item_for_data(value_item, force: false)
+            if item
+              result << item.cast(value_item)
+            else
+              result << value_item
+            end
+          elsif options[:additional_items] != false && index >= items.size
+            if options[:additional_items].is_a?(Node)
+              result << options[:additional_items].cast(value_item)
+            else
+              result << value_item
+            end
+          else
+            item = item_for_data(value_item)
+            result << item.cast(value_item)
+          end
         end
 
         return result
@@ -141,9 +160,10 @@ module Schemacop
 
       protected
 
-      def item_for_data(data)
+      def item_for_data(data, force: true)
         item = children.find { |c| item_matches?(c, data) }
         return item if item
+        return nil unless force
 
         fail "Could not find specification for item #{data.inspect}."
       end
@@ -172,6 +192,10 @@ module Schemacop
 
         if options[:min_items] && options[:max_items] && options[:min_items] > options[:max_items]
           fail 'Option "min_items" can\'t be greater than "max_items".'
+        end
+
+        if options[:contains] && items.size != 1
+          fail 'Array nodes with "contains" must have exactly one item.'
         end
       end
     end

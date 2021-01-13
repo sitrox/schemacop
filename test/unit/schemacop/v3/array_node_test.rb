@@ -239,6 +239,34 @@ module Schemacop
         assert_validation(['foo', 42])
         assert_validation(['foo', 42, 'additional'])
         assert_validation(['foo', 42, 42])
+
+        assert_cast(['Foo', 42], ['Foo', 42])
+        assert_cast(['Foo', 42, 42], ['Foo', 42, 42])
+        assert_cast(['Foo', 42, :bar], ['Foo', 42, :bar])
+      end
+
+      def test_additional_items_true_casting
+        schema :array, additional_items: true do
+          str format: :date
+          int
+        end
+
+        assert_json(
+          type:            :array,
+          items:           [
+            { type: :string, format: :date },
+            { type: :integer }
+          ],
+          additionalItems: true
+        )
+
+        assert_validation(['1990-01-01', 42])
+        assert_validation(['1990-01-01', 42, 'additional'])
+        assert_validation(['1990-01-01', 42, 42])
+
+        assert_cast(['1990-01-01', 42], [Date.new(1990, 1, 1), 42])
+        assert_cast(['1990-01-01', 42, '2010-01-01'], [Date.new(1990, 1, 1), 42, '2010-01-01'])
+        assert_cast(['1990-01-01', 42, :bar], [Date.new(1990, 1, 1), 42, :bar])
       end
 
       def test_additional_items_schema
@@ -261,6 +289,134 @@ module Schemacop
         assert_validation(['foo', 42, 'additional', 'another'])
         assert_validation(['foo', 42, 'additional', 42, 'another']) do
           error '/[3]', 'Invalid type, expected "string".'
+        end
+
+        assert_cast(['foo', 42], ['foo', 42])
+        assert_cast(['foo', 42, 'bar'], ['foo', 42, 'bar'])
+      end
+
+      def test_additional_items_schema_casting
+        schema :array, additional_items: true do
+          str
+          int
+          add :string, format: :date
+        end
+
+        assert_json(
+          type:            :array,
+          items:           [
+            { type: :string },
+            { type: :integer }
+          ],
+          additionalItems: { type: :string, format: :date }
+        )
+
+        assert_validation(['foo', 42])
+        assert_validation(['foo', 42, '1990-01-01'])
+        assert_validation(['foo', 42, '1990-01-01', 42]) do
+          error '/[3]', 'Invalid type, expected "string".'
+        end
+        assert_validation(['foo', 42, '1990-01-01', 'foo']) do
+          error '/[3]', 'String does not match format "date".'
+        end
+
+        assert_cast(['foo', 42], ['foo', 42])
+        assert_cast(['foo', 42, '1990-01-01'], ['foo', 42, Date.new(1990, 1, 1)])
+      end
+
+      def test_additional_items_schema_oneof_casting
+        schema :array, additional_items: true do
+          str
+          int
+          add :one_of do
+            str format: :date
+            str format: :integer
+          end
+        end
+
+        assert_json(
+          type:            :array,
+          items:           [
+            { type: :string },
+            { type: :integer }
+          ],
+          additionalItems: {
+            oneOf: [
+              { type: :string, format: :date },
+              { type: :string, format: :integer }
+            ]
+          }
+        )
+
+        assert_validation(['foo', 42])
+        assert_validation(['foo', 42, '1990-01-01'])
+        assert_validation(['foo', 42, '1990-01-01', 42]) do
+          error '/[3]', 'Matches 0 definitions but should match exactly 1.'
+        end
+        assert_validation(['foo', 42, '1990-01-01', 'foo']) do
+          error '/[3]', 'Matches 0 definitions but should match exactly 1.'
+        end
+
+        assert_cast(['foo', 42], ['foo', 42])
+        assert_cast(['foo', 42, '1990-01-01'], ['foo', 42, Date.new(1990, 1, 1)])
+        assert_cast(['foo', 42, '1337'], ['foo', 42, 1337])
+      end
+
+      def test_additional_items_schema_hash_casting
+        schema :array, additional_items: true do
+          str
+          int
+          add :hash do
+            str! :foo, format: :date
+            sym? :bar
+          end
+        end
+
+        assert_json(
+          type:            :array,
+          items:           [
+            { type: :string },
+            { type: :integer }
+          ],
+          additionalItems: {
+            properties:           {
+              foo: {
+                type:   :string,
+                format: :date
+              },
+              bar: {}
+            },
+            additionalProperties: false,
+            type:                 :object,
+            required:             [
+              :foo
+            ]
+          }
+        )
+
+        assert_validation(['foo', 42])
+        assert_validation(['foo', 42, { foo: '1990-01-01' }])
+        assert_validation(['foo', 42, { foo: '1990-01-01', bar: :baz }])
+
+        assert_validation(['foo', 42, { foo: 1234 }]) do
+          error '/[2]/foo', 'Invalid type, expected "string".'
+        end
+        assert_validation(['foo', 42, { foo: 'String' }]) do
+          error '/[2]/foo', 'String does not match format "date".'
+        end
+
+        assert_cast(['foo', 42], ['foo', 42])
+        assert_cast(['foo', 42, { foo: '1990-01-01' }], ['foo', 42, { foo: Date.new(1990, 1, 1) }])
+        assert_cast(['foo', 42, { foo: '1990-01-01', bar: :baz }], ['foo', 42, { foo: Date.new(1990, 1, 1), bar: :baz }])
+      end
+
+      def test_multiple_add_in_schema
+        assert_raises_with_message Exceptions::InvalidSchemaError,
+                                   'You can only use "add" once to specify additional items.' do
+          schema :array do
+            add :integer
+            add :string
+          end
         end
       end
 
@@ -287,6 +443,28 @@ module Schemacop
         assert_validation([234, :foo]) do
           error '/', 'At least one entry must match schema {"type"=>"string"}.'
         end
+      end
+
+      def test_contains_int
+        schema :array, contains: true do
+          int
+        end
+
+        assert_validation(['foo', 1, :bar])
+        assert_cast(['foo', 1, :bar], ['foo', 1, :bar])
+      end
+
+      def test_contains_need_casting
+        schema :array, contains: true do
+          str format: :date
+        end
+
+        assert_validation(nil)
+        assert_validation(['1990-01-01'])
+
+        assert_cast(['1990-01-01'], [Date.new(1990, 1, 1)])
+        assert_cast(%w[1990-01-01 123], [Date.new(1990, 1, 1), '123'])
+        assert_cast(%w[1990-01-01 123 2010-01-01], [Date.new(1990, 1, 1), '123', Date.new(2010, 1, 1)])
       end
 
       def test_defaults

@@ -520,6 +520,16 @@ module Schemacop
         )
       end
 
+      def test_multiple_add_in_schema
+        assert_raises_with_message Exceptions::InvalidSchemaError,
+                                   'You can only use "add" once to specify additional properties.' do
+          schema :hash do
+            add :integer
+            add :string
+          end
+        end
+      end
+
       def test_cast_with_additional_in_block
         schema :hash do
           str! :foo, format: :integer
