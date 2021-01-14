@@ -1,43 +1,41 @@
+# External dependencies
+require 'active_support/all'
+require 'set'
+
+# Schemacop module
 module Schemacop
-  DEFAULT_CASTERS = {
-    String => {
-      Integer => proc { |s| s.blank? ? nil : Integer(s, 10) },
-      Float => proc { |s| s.blank? ? nil : Float(s) }
-    },
-    Float => {
-      Integer => proc { |f| Integer(f) }
-    },
-    Integer => {
-      Float => proc { |f| Float(f) }
-    }
-  }
+  CONTEXT_THREAD_KEY = :schemacop_schema_context
+
+  mattr_accessor :load_paths
+  self.load_paths = ['app/schemas']
+
+  mattr_accessor :default_schema_version
+  self.default_schema_version = 3
+
+  def self.with_context(context)
+    prev_context = Thread.current[CONTEXT_THREAD_KEY]
+    Thread.current[CONTEXT_THREAD_KEY] = context
+    return yield
+  ensure
+    Thread.current[CONTEXT_THREAD_KEY] = prev_context
+  end
+
+  def self.context
+    Thread.current[CONTEXT_THREAD_KEY] ||= V3::Context.new
+  end
 end
 
-require 'set'
-require 'active_support/core_ext/class/attribute'
-require 'active_support/core_ext/object/blank'
-require 'active_support/hash_with_indifferent_access'
-
+# Load shared
 require 'schemacop/scoped_env'
 require 'schemacop/exceptions'
+require 'schemacop/base_schema'
+require 'schemacop/schema2'
+require 'schemacop/schema3'
 require 'schemacop/schema'
-require 'schemacop/collector'
-require 'schemacop/node_resolver'
-require 'schemacop/node'
-require 'schemacop/node_with_block'
-require 'schemacop/node_supporting_type'
-require 'schemacop/field_node'
-require 'schemacop/root_node'
-require 'schemacop/node_supporting_field'
-require 'schemacop/caster'
-require 'schemacop/dupper'
-require 'schemacop/validator/array_validator'
-require 'schemacop/validator/boolean_validator'
-require 'schemacop/validator/hash_validator'
-require 'schemacop/validator/number_validator'
-require 'schemacop/validator/integer_validator'
-require 'schemacop/validator/float_validator'
-require 'schemacop/validator/symbol_validator'
-require 'schemacop/validator/string_validator'
-require 'schemacop/validator/nil_validator'
-require 'schemacop/validator/object_validator' # Matches any object, must be last validator
+
+# Load individual versions
+require 'schemacop/v2'
+require 'schemacop/v3'
+
+# Load Railtie
+require 'schemacop/railtie' if defined?(Rails)

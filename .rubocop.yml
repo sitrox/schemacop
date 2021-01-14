@@ -1,4 +1,5 @@
 AllCops:
+  NewCops: enable
   Exclude:
     - 'local/**/*'
     - 'vendor/**/*'
@@ -24,6 +25,9 @@ Metrics/ClassLength:
 Metrics/ModuleLength:
   Enabled: false
 
+Metrics/BlockLength:
+  Enabled: false
+
 Metrics/ParameterLists:
   Max: 5
   CountKeywordArgs: false
@@ -37,7 +41,7 @@ Metrics/CyclomaticComplexity:
 Metrics/PerceivedComplexity:
   Enabled: False
 
-Metrics/LineLength:
+Layout/LineLength:
   Max: 160
 
 Metrics/BlockNesting:
@@ -81,4 +85,24 @@ Style/ClassAndModuleChildren:
   # The compact style is only forced, for classes / modules with one child.
 
 Style/FormatString:
+  Enabled: false
+
+# Multiline hashes should be aligned cleanly as a table to improve readability.
+Layout/HashAlignment:
+  EnforcedHashRocketStyle: table
+  EnforcedColonStyle: table
+
+Style/FrozenStringLiteralComment:
+  Enabled: false
+
+Style/AccessorGrouping:
+  Enabled: false
+
+Style/DoubleNegation:
+  Enabled: false
+
+Style/ConditionalAssignment:
+  Enabled: false
+
+Style/CaseLikeIf:
   Enabled: false
