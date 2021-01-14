@@ -10,6 +10,14 @@
 ### Changes
 -->
 
+## 3.0.0.rc0
+
+* Add `Schemacop::Schema3`
+
+* Adapt Readme for Version 2 and 3 of `Schemacop`
+
+* Add `ruby-2.7.1` to travis testing
+
 ## 2.4.7 (2020-07-02)
 
 * Return nil when casting an empty string to an Integer or a Float,
