@@ -16,3 +16,5 @@ tmtags
 /*.gem
 tags
 .byebug_history
+
+/coverage

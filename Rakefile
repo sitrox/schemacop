@@ -26,6 +26,7 @@ task :gemspec do
     spec.add_development_dependency 'rubocop', '0.92.0'
     spec.add_development_dependency 'pry'
     spec.add_development_dependency 'byebug'
+    spec.add_development_dependency 'simplecov', '0.21.2'
   end
 
   File.open('schemacop.gemspec', 'w') { |f| f.write(gemspec.to_ruby.strip) }
