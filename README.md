@@ -18,7 +18,7 @@ schema = Schemacop::Schema3.new :hash do
   str! :name
   int? :age, minimum: 21
   ary! :groups do
-    ref :group
+    list :reference, path: :group
   end
 end
 
