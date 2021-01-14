@@ -1,11 +1,11 @@
 # -*- encoding: utf-8 -*-
-# stub: schemacop 2.4.7 ruby lib
+# stub: schemacop 3.0.0.rc0 ruby lib
 
 Gem::Specification.new do |s|
   s.name = "schemacop".freeze
-  s.version = "2.4.7"
+  s.version = "3.0.0.rc0"
 
-  s.required_rubygems_version = Gem::Requirement.new(">= 0".freeze) if s.respond_to? :required_rubygems_version=
+  s.required_rubygems_version = Gem::Requirement.new("> 1.3.1".freeze) if s.respond_to? :required_rubygems_version=
   s.require_paths = ["lib".freeze]
   s.authors = ["Sitrox".freeze]
   s.date = "2021-01-14"
