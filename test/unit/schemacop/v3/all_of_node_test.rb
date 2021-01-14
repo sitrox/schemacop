@@ -12,7 +12,6 @@ module Schemacop
         assert_validation(nil)
         assert_validation('12')
         assert_validation('1234')
-        assert_validation('1234')
         assert_validation('1') do
           error '/', 'Does not match all allOf conditions.'
         end

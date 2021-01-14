@@ -20,7 +20,7 @@ module Schemacop
 
       def validate_self
         if @items.size < 2
-          fail 'Node one_of makes only sense with at least 2 items.'
+          fail 'Node "one_of" makes only sense with at least 2 items.'
         end
       end
     end

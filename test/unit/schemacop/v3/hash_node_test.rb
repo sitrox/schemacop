@@ -728,6 +728,49 @@ module Schemacop
                       required:             [:foo]
                     })
       end
+
+      def test_hash_with_indifferent_access
+        schema :hash do
+          str! :foo
+          int? :bar
+          add :symbol
+        end
+
+        # Test with symbol notation
+        hash = ActiveSupport::HashWithIndifferentAccess.new
+
+        assert_validation(hash) do
+          error '/foo', 'Value must be given.'
+        end
+        hash[:foo] = 'Foo'
+        assert_validation(hash)
+        hash[:bar] = 123
+        assert_validation(hash)
+        hash[:qux] = :ruby
+        assert_validation(hash)
+
+        # Test with string notation
+        hash = ActiveSupport::HashWithIndifferentAccess.new
+
+        assert_validation(hash) do
+          error '/foo', 'Value must be given.'
+        end
+        hash['foo'] = 'Foo'
+        assert_validation(hash)
+        hash['bar'] = 123
+        assert_validation(hash)
+        hash['qux'] = :ruby
+        assert_validation(hash)
+      end
+
+      def test_invalid_schema
+        assert_raises_with_message Exceptions::InvalidSchemaError,
+                                   'Child nodes must have a name.' do
+          schema :hash do
+            int!
+          end
+        end
+      end
     end
   end
 end

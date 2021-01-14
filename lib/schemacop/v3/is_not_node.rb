@@ -5,14 +5,6 @@ module Schemacop
         :not
       end
 
-      def add_item(node)
-        if @items.any?
-          fail 'Node is_not only allows exactly one item.'
-        end
-
-        @items << node
-      end
-
       def _validate(data, result:)
         super_data = super
         return if super_data.nil?
@@ -27,8 +19,8 @@ module Schemacop
       end
 
       def validate_self
-        if @items.empty?
-          fail 'Node is_not makes only sense with at least 1 item.'
+        if @items.count != 1
+          fail 'Node "is_not" only allows exactly one item.'
         end
       end
 

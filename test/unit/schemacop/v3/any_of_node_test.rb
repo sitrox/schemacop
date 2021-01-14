@@ -206,6 +206,13 @@ module Schemacop
                       ]
                     })
       end
+
+      def test_invalid_schema
+        assert_raises_with_message Exceptions::InvalidSchemaError,
+                                   'Node "any_of" makes only sense with at least 1 item.' do
+          schema :any_of
+        end
+      end
     end
   end
 end

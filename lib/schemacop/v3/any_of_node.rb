@@ -20,7 +20,7 @@ module Schemacop
 
       def validate_self
         if @items.empty?
-          fail 'Node any_of makes only sense with at least 1 item.'
+          fail 'Node "any_of" makes only sense with at least 1 item.'
         end
       end
     end

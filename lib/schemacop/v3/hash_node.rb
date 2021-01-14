@@ -21,7 +21,7 @@ module Schemacop
 
       def add_child(node)
         unless node.name
-          fail 'Child nodes must have a name.'
+          fail Exceptions::InvalidSchemaError, 'Child nodes must have a name.'
         end
 
         @properties[node.name] = node

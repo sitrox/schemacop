@@ -1,3 +1,6 @@
+require 'simplecov'
+SimpleCov.start
+
 # TODO: Move to more sensible location
 def assert_verr(&block)
   assert_raises(Schemacop::V2::Exceptions::ValidationError, &block)
