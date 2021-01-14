@@ -52,8 +52,6 @@ module Schemacop
       def as_json
         json = { type: :array }
 
-        fail 'aaaaa' if options[:contains]
-
         if cont_item
           json[:contains] = cont_item.as_json
         end
@@ -136,7 +134,7 @@ module Schemacop
       end
 
       def children
-        (@items + [@contains]).compact
+        (@items + [@cont_item]).compact
       end
 
       def cast(value)
@@ -184,7 +182,7 @@ module Schemacop
 
       def init
         @items = []
-        @contains = nil
+        @cont_item = nil
 
         if options[:additional_items].nil?
           options[:additional_items] = false
