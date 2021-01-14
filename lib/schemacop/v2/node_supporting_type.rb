@@ -47,8 +47,8 @@ module Schemacop::V2
     # happens in here directly and not in the constructor. This way we can
     # always call 'type', even if we don't have one and the type is auto-guessed
     # as it formerly was the case in the constructor.
-    def type(*args, &block)
-      options = args.last.is_a?(Hash) ? args.pop : {}
+    def type(*args, **kwargs, &block)
+      options = kwargs
       types = [*args.shift]
       subtypes = args
 

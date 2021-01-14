@@ -86,7 +86,7 @@ class V3Test < SchemacopTest
     Schemacop.with_context(context, &block)
   end
 
-  def assert_validation(data, schema: @schema, &block)
+  def assert_validation(data, &block)
     result = @schema.validate(data)
 
     if block_given?
@@ -123,13 +123,13 @@ class V3Test < SchemacopTest
       end
     else
       assert result.errors.empty?,
-             "Expected data #{data.inspect} to match schema #{schema.as_json}, but got errors: #{result.messages}."
+             "Expected data #{data.inspect} to match schema #{@schema.as_json}, but got errors: #{result.messages}."
     end
   end
 
-  def assert_json(expected_json, schema: @schema)
+  def assert_json(expected_json)
     # TODO: Double "as_json" should not be necessary
-    assert_equal expected_json.as_json, schema.as_json.as_json
+    assert_equal expected_json.as_json, @schema.as_json.as_json
   end
 
   def assert_match_any(array, exp)
@@ -137,9 +137,9 @@ class V3Test < SchemacopTest
            "Expected any of #{array.inspect} to match #{exp}."
   end
 
-  def assert_cast(input_data, expected_data, schema: @schema)
+  def assert_cast(input_data, expected_data)
     input_data_was = Marshal.load(Marshal.dump(input_data))
-    result = schema.validate(input_data)
+    result = @schema.validate(input_data)
     assert_empty result.errors
     assert_equal expected_data, result.data, 'Unexpected result data.'
 

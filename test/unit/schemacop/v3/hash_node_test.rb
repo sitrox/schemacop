@@ -665,7 +665,7 @@ module Schemacop
 
       def test_enum_schema
         schema :hash do
-          str! :foo, { enum: ['bar', 'qux', 123, :faz] }
+          str! :foo, enum: ['bar', 'qux', 123, :faz]
         end
 
         assert_json({
@@ -701,14 +701,13 @@ module Schemacop
 
       def test_with_generic_keywords
         schema :hash, title: 'Hash', description: 'A hash with a description' do
-          str! :foo, {
+          str! :foo,
             enum:        ['bar', 'qux', 123, :faz],
             title:       'A string',
             description: 'A string in the hash',
             examples:    [
               'foo'
             ]
-          }
         end
 
         assert_json({
