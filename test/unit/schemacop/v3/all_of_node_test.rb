@@ -171,10 +171,11 @@ module Schemacop
         assert_validation('Hello World')
 
         assert_json({
-          allOf: [
-            type:    :string,
-            default: 'foobar'
-          ]})
+                      allOf: [
+                        type:    :string,
+                        default: 'foobar'
+                      ]
+                    })
       end
 
       def test_with_generic_keywords

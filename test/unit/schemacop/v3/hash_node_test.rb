@@ -702,12 +702,12 @@ module Schemacop
       def test_with_generic_keywords
         schema :hash, title: 'Hash', description: 'A hash with a description' do
           str! :foo,
-            enum:        ['bar', 'qux', 123, :faz],
-            title:       'A string',
-            description: 'A string in the hash',
-            examples:    [
-              'foo'
-            ]
+               enum:        ['bar', 'qux', 123, :faz],
+               title:       'A string',
+               description: 'A string in the hash',
+               examples:    [
+                 'foo'
+               ]
         end
 
         assert_json({
