@@ -117,7 +117,7 @@ module Schemacop
         @schemas[name] = create(type, **options, &block)
       end
 
-      def dsl_node(node)
+      def dsl_node(node, *_args, **_kwargs)
         add_child node
       end
 

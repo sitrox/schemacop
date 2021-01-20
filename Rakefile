@@ -35,7 +35,7 @@ end
 begin
   require 'rake/testtask'
   Rake::TestTask.new do |t|
-    t.pattern = 'test/unit/**/*_test.rb'
+    t.pattern = 'test/unit/schemacop/v3/*_test.rb'
     t.verbose = false
     t.libs << 'test/lib'
   end
