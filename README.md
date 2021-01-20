@@ -8,6 +8,16 @@ against schema definitions described by a simple DSL. It is also able to
 generate [JSON Schema](https://json-schema.org) compliant JSON output, i.e. for
 use in conjunction with [OpenAPI](https://swagger.io/specification/).
 
+## Compatibility
+
+Schemacop is tested with the following ruby versions:
+
+* 2.6.2
+* 2.7.1
+* 3.0.0
+
+For these versions, the automated CI tests are ran on travis. Other ruby versions might work, but stick to these versions for best results.
+
 ## Basic example
 
 ```ruby
@@ -84,11 +94,11 @@ actual JSON string.
 
 Schemacop will throw one of the following checked exceptions:
 
-* {Schemacop::Exceptions::InvalidSchemaError}
+* `Schemacop::Exceptions::InvalidSchemaError`
 
   This exception is thrown when the given schema definition format is invalid.
 
-* {Schemacop::Exceptions::ValidationError}
+* `Schemacop::Exceptions::ValidationError`
 
   This exception is thrown when the given data does not comply with the given
   schema definition.
