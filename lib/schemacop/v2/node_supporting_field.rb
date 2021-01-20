@@ -15,36 +15,50 @@ module Schemacop::V2
       exec_block(&block)
     end
 
-    def req?(*args, &block)
-      field(*args, required: true, allow_nil: true, &block)
+    def req?(*args, **kwargs, &block)
+      kwargs ||= {}
+      kwargs[:required] = true
+      kwargs[:allow_nil] = true
+      field(*args, **kwargs, &block)
     end
 
-    def req!(*args, &block)
-      field(*args, required: true, allow_nil: false, &block)
+    def req!(*args, **kwargs, &block)
+      kwargs ||= {}
+      kwargs[:required] = true
+      kwargs[:allow_nil] = false
+      field(*args, **kwargs, &block)
     end
 
     alias req req!
 
-    def opt?(*args, &block)
-      field(*args, required: false, allow_nil: true, &block)
+    def opt?(*args, **kwargs, &block)
+      kwargs ||= {}
+      kwargs[:required] = false
+      kwargs[:allow_nil] = true
+      field(*args, **kwargs, &block)
     end
 
-    def opt!(*args, &block)
-      field(*args, required: false, allow_nil: false, &block)
+    def opt!(*args, **kwargs, &block)
+      kwargs ||= {}
+      kwargs[:required] = false
+      kwargs[:allow_nil] = false
+      field(*args, **kwargs, &block)
     end
 
     alias opt opt?
 
     protected
 
-    def field(*args, required:, allow_nil:, &block)
+    def field(*args, **kwargs, &block)
       name = args.shift
+      required = kwargs.delete(:required)
+      allow_nil = kwargs.delete(:allow_nil)
 
       if @fields[name]
-        @fields[name].type(*args, &block)
+        @fields[name].type(*args, **kwargs, &block)
       elsif args.any?
         @fields[name] = FieldNode.new(name, required) do
-          type(*args, &block)
+          type(*args, **kwargs, &block)
         end
       else
         @fields[name] = FieldNode.new(name, required, &block)

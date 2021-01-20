@@ -33,7 +33,7 @@ module Schemacop::V2
       super
     rescue NoMethodError
       @types = []
-      type :hash, {}, &block
+      type :hash, &block
     end
 
     # required signature:
@@ -73,7 +73,7 @@ module Schemacop::V2
           end
 
           child = klass.new do
-            self.type(*subtypes, options, &block)
+            self.type(*subtypes, **options, &block)
           end
 
           # child = klass.build(options)
