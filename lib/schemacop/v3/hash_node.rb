@@ -35,7 +35,7 @@ module Schemacop
         @options[:additional_properties] = create(type, **options, &block)
       end
 
-      def dsl_dep(source, *targets)
+      def dsl_dep(source, *targets, **_kwargs)
         @options[:dependencies] ||= {}
         @options[:dependencies][source] = targets
       end

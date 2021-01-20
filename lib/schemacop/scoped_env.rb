@@ -7,14 +7,14 @@ module Schemacop
       @prefix = prefix
     end
 
-    def method_missing(symbol, *args, &block)
+    def method_missing(symbol, *args, **kwargs, &block)
       symbol = :"#{@prefix}#{symbol}" if @prefix
 
       if @methods.include?(symbol)
         if @delegation_object.respond_to?(symbol)
-          @delegation_object.send(symbol, *args, &block)
+          @delegation_object.send(symbol, *args, **kwargs, &block)
         elsif @backup_binding.respond_to?(symbol)
-          @backup_binding.send(symbol, *args, &block)
+          @backup_binding.send(symbol, *args, **kwargs, &block)
         else
           super
         end

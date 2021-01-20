@@ -1,9 +1,9 @@
 module Schemacop
   class Schema2 < BaseSchema
-    def initialize(*args, &block)
+    def initialize(*args, **kwargs, &block)
       super()
       @root = V2::HashValidator.new do
-        req :root, *args, &block
+        req :root, *args, **kwargs, &block
       end
     end
 
