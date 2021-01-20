@@ -307,6 +307,42 @@ It consists of one or multiple values, which can be validated using arbitrary no
   each other, or if there may be duplicate values. By default, this is false,
   i.e. duplicate values are allowed
 
+#### Contains
+
+The `array` node features the contains node, which you can use with the DSL
+method `cont`. With that DSL method, you can specify a schema which at least
+one item in the array needs to validate against.
+
+One usecase for example could be that you want an array of integers, from which
+at least one must be 5 or larger:
+
+```ruby
+schema = Schemacop::Schema3.new :array do
+  list :integer
+  cont :integer, minimum: 5
+end
+
+schema.validate!([])      # => Schemacop::Exceptions::ValidationError: /: At least one entry must match schema {"type"=>"integer", "minimum"=>5}.
+schema.validate!([1, 5])  # => [1, 5]
+schema.validate!(['foo']) # => Schemacop::Exceptions::ValidationError: /[0]: Invalid type, expected "integer". /: At least one entry must match schema {"type"=>"integer", "minimum"=>5}
+```
+
+You can also use it with the tuple validation (see below), e.g. if you want
+an array of 3 integers, from which at least one needs to be 5 or larger:
+
+```ruby
+schema = Schemacop::Schema3.new :array do
+  int
+  int
+  int
+  cont :integer, minimum: 5
+end
+
+schema.validate!([])        # => /: Array has 0 items but must have exactly 3. /: At least one entry must match schema {"type"=>"integer", "minimum"=>5}.
+schema.validate!([1, 2, 3]) # => Schemacop::Exceptions::ValidationError: /: At least one entry must match schema {"type"=>"integer", "minimum"=>5}.
+schema.validate!([1, 3, 5]) # => [1, 3, 5]
+```
+
 #### Specifying properties
 
 Array nodes support a block in which you can specify the required array contents.
@@ -437,11 +473,12 @@ schema = Schemacop::Schema3.new :array do
     str
   end
 end
+
+schema.validate!([])          # => Schemacop::Exceptions::ValidationError: /: Array has 0 items but must have exactly 1.
+schema.validate!([1, 2])      # => [1, 2]
+schema.validate!([1, 'foo'])  # => [1, "foo"]
+schema.validate!([1, :bar])   # => Schemacop::Exceptions::ValidationError: /[1]: Matches 0 definitions but should match exactly 1.
 ```
-
-#### Contains
-
-TODO: Describe `cont` DSL method
 
 ### Hash
 
