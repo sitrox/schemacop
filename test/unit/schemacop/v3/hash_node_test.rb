@@ -61,6 +61,7 @@ module Schemacop
         assert_validation({})
         assert_validation(foo: :bar)
         assert_validation('foo' => 'bar')
+        assert_validation(Foo: :bar)
         assert_validation('_foo39sjfdoi 345893(%' => 'bar', 'foo' => 'bar') do
           error '/', 'Property name "_foo39sjfdoi 345893(%" does not match "^[a-zA-Z0-9]+$".'
         end
@@ -70,6 +71,22 @@ module Schemacop
           additionalProperties: true,
           propertyNames:        '^[a-zA-Z0-9]+$'
         )
+
+        assert_cast({ foo: 123 }, { foo: 123 })
+        assert_cast({ Foo: 123 }, { Foo: 123 })
+
+        # New schema
+        schema :hash, additional_properties: true, property_names: '^[a-z]+$'
+
+        assert_validation({})
+        assert_validation(foo: :bar)
+        assert_validation('foo' => 'bar')
+        assert_validation(Foo: :bar) do
+          error '/', 'Property name :Foo does not match "^[a-z]+$".'
+        end
+        assert_validation('_foo39sjfdoi 345893(%' => 'bar', 'foo' => 'bar') do
+          error '/', 'Property name "_foo39sjfdoi 345893(%" does not match "^[a-z]+$".'
+        end
 
         assert_cast({ foo: 123 }, { foo: 123 })
       end
@@ -452,6 +469,11 @@ module Schemacop
         validate_self_should_error((4 + 6i))
         validate_self_should_error('13')
         validate_self_should_error('Lorem ipsum')
+
+        assert_raises_with_message Exceptions::InvalidSchemaError,
+                                   'Option "additional_properties" must be a boolean value' do
+          schema :hash, additional_properties: :true
+        end
       end
 
       def test_doc_example

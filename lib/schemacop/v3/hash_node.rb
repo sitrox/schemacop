@@ -215,6 +215,9 @@ module Schemacop
       def init
         @properties = {}
         @options[:type] = :object
+        unless @options[:additional_properties].nil? || @options[:additional_properties].is_a?(TrueClass) || @options[:additional_properties].is_a?(FalseClass)
+          fail Schemacop::Exceptions::InvalidSchemaError, 'Option "additional_properties" must be a boolean value'
+        end
       end
 
       def validate_self
