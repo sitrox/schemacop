@@ -5,7 +5,7 @@ Please note that Schemacop v3 is still a work in progress, especially the docume
 Use at your own discretion.
 
 # Table of Contents
-1. [Introcution](#Introcution)
+1. [Introduction](#Introduction)
 2. [Validation](#validation)
 3. [Exceptions](#exceptions)
 4. [Generic Keywords](#generic-keywords)
@@ -26,7 +26,7 @@ Use at your own discretion.
 6. [Context](#context)
 7. [External schemas](#external-schemas)
 
-## Introcution
+## Introduction
 
 TODO: Write short section about using schemacop V3
 
@@ -905,3 +905,68 @@ schema.validate!([])                                      # => []
 schema.validate!([{first_name: 'Joe', last_name: 'Doe'}]) # => [{:first_name=>"Joe", :last_name=>"Doe"}]
 schema.validate!([id: 42, first_name: 'Joe'])             # => Schemacop::Exceptions::ValidationError: /[0]/last_name: Value must be given. /[0]: Obsolete property "id".
 ```
+
+## Context
+
+Schemacop als features the concept of a `Context`. You can define schemas in a
+context, and then reference them in other schemas in that context. This is e.g.
+useful if you need a part of the schema to be different depending on the
+business action.
+
+Examples:
+
+```ruby
+# Define a new context
+context = Schemacop::V3::Context.new
+
+# Define the :Person schema in that context
+context.schema :Person do
+  str! :first_name
+  str! :last_name
+  ref? :info, :PersonInfo
+end
+
+# And also define the :PersonInfo schema in that context
+context.schema :PersonInfo do
+  str! :born_at, format: :date
+end
+
+# Now we can define our general schema, where we reference the :Person schema.
+# Note that at this point, we don't know what's in the :Person sche,a
+schema = Schemacop::Schema3.new :reference, path: :Person
+
+# Validate the data in the context we defined before, where we need the first_name
+# and last_name of a person, as well as an optional info hash with the born_at date
+# of the person.
+Schemacop.with_context context do
+  schema.validate!({first_name: 'Joe', last_name: 'Doe', info: { born_at: '1980-01-01'} })
+  # => {:first_name=>"Joe", :last_name=>"Doe", :info=>{:born_at=>Tue, 01 Jan 1980}}
+end
+
+# Now we might want another context, where the person is more anonymous, and as
+# such, we need another schema
+other_context = Schemacop::V3::Context.new
+
+# Here, we only want the nickname of the person
+other_context.schema :Person do
+  str! :nickname
+end
+
+# Finally, validate the data in the new context. We do not want the real name or
+# birth date of the person, instead only the nickname is allowed
+Schemacop.with_context other_context do
+  schema.validate!({first_name: 'Joe', last_name: 'Doe', info: { born_at: '1980-01-01'} })
+  # => Schemacop::Exceptions::ValidationError: /nickname: Value must be given.
+  #    /: Obsolete property "first_name".
+  #    /: Obsolete property "last_name".
+  #    /: Obsolete property "info".
+
+  schema.validate!({nickname: 'J.'}) # => {:nickname=>"J."}
+end
+```
+
+As one can see, we validated the data against the same schema, but because we
+defined the referenced schemas differently in the two contexts, we were able
+to use other data in the second context than in the first.
+
+## External schemas
