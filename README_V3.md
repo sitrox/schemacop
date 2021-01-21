@@ -490,7 +490,7 @@ It consists of key-value-pairs that can be validated using arbitrary nodes.
 
 #### Options
 
-* `additional_properties` TODO: Check this
+* `additional_properties`
   This option specifies whether additional, unspecified properties are allowed
   (`true`) or not (`false`). By default, this is `true` if no properties are
   specified and `false` if you have specified at least one property.
@@ -498,7 +498,7 @@ It consists of key-value-pairs that can be validated using arbitrary nodes.
 * `property_names`
   This option allows to specify a regexp pattern (as string) which validates the
   keys of any properties that are not specified in the hash. This option only
-  makes sense if `additional_properties` is enabled.
+  makes sense if `additional_properties` is enabled. See below for more informations.
 
 * `min_properties`
   Specifies the (inclusive) minimum number of properties a hash must contain.
@@ -517,28 +517,35 @@ property, which specifies whether a property is required (`!`) or optional
 (`?`).
 
 ```ruby
-str! :my_required_property
-int! :my_optional_property
+schema = Schemacop::Schema3.new :hash do
+  str! :foo # Is a required property
+  int? :bar # Is an optional property
+end
+
+schema.validate!({})                    # => Schemacop::Exceptions::ValidationError: /foo: Value must be given.
+schema.validate!({foo: 'str'})          # => {:foo=>"str"}
+schema.validate!({foo: 'str', bar: 42}) # => {:foo=>"str", :bar=>42}
+schema.validate!({bar: 42})             # => Schemacop::Exceptions::ValidationError: /foo: Value must be given.
 ```
 
 ##### Pattern properties
 
-In addition to symbols, property keys can also be a regular expression:
+In addition to symbols, property keys can also be a regular expression. Here,
+you may only use the optional `?` suffix for the property. This allows any
+property, which matches the type and the name of the property matches the
+regular expression.
 
 ```ruby
-Schemacop::Schema3.new do
-  str! :name
-
+schema = Schemacop::Schema3.new :hash do
   # The following statement allows any number of integer properties of which the
   # name starts with `id_`.
-  int! /^id_.*$/
+  int? /^id_.*$/
 end
-```
 
-For example, the above example would successfully validate the following hash:
-
-```ruby
-{ name: 'John Doe', id_a: 42, id_b: 42 }
+schema.validate!({})                      # => {}
+schema.validate!({id_foo: 1})             # => {:id_foo=>1}
+schema.validate!({id_foo: 1, id_bar: 2})  # => {:id_foo=>1, :id_bar=>2}
+schema.validate!({foo: 3})                # => Schemacop::Exceptions::ValidationError: /: Obsolete property "foo".
 ```
 
 ##### Additional properties & property names
@@ -548,19 +555,32 @@ additional, unspecified properties. By default, this is turned off if you have
 defined at least one standard property.
 
 When it comes to additional properties, you have the choice to either just
-enable all of them by enabling the option `additional_properties`. Using the DSL
-method `add` in the hash-node's body however, you can specify an additional
-schema to which additional properties must adhere:
+enable all of them by enabling the option `additional_properties`:
 
 ```ruby
-Schemacop::Schema3.new do
+# This schema will accept any additional properties
+schema = Schemacop::Schema3.new :hash, additional_properties: true
+
+schema.validate!({}) # => {}
+schema.validate!({foo: :bar, baz: 42}) # => {:foo=>:bar, :baz=>42}
+```
+
+Using the DSL method `add` in the hash-node's body however, you can specify
+an additional schema to which additional properties must adhere:
+
+
+```ruby
+Schemacop::Schema3.new :hash do
   int! :id
 
   # Allow any additional properties besides `id`, but their value must be a
-  # string. Note that using the `add` node, the option `additional_properties`
-  # is automatically enabled.
-  add :str
+  # string.
+  add :string
 end
+
+schema.validate!({id: 1})             # => {:id=>1}
+schema.validate!({id: 1, foo: 'bar'}) # => {:foo=>"bar", :id=>1}
+schema.validate!({id: 1, foo: 42})    # => Schemacop::Exceptions::ValidationError: /foo: Invalid type, expected "string".
 ```
 
 Using the option `property_names`, you can additionaly specify a pattern that
@@ -569,13 +589,23 @@ any additional property **keys** must adhere to:
 ```ruby
 # The following schema allows any number of properties, but all keys must
 # consist of downcase letters from a-z.
-Schemacop::Schema3.new additional_properties: :true, property_names: '^[a-z]+$'
+schema = Schemacop::Schema3.new :hash, additional_properties: :true, property_names: '^[a-z]+$'
+
+
+schema.validate!({})            # => {}
+schema.validate!({foo: 123})    # => {:foo=>123}
+schema.validate!({Foo: 'bar'})  # => Schemacop::Exceptions::ValidationError: /: Property name :Foo does not match "^[a-z]+$".
 
 # The following schema allows any number of properties, but all keys must
 # consist of downcase letters from a-z AND the properties must be arrays.
-Schemacop::Schema3.new additional_properties: :true, property_names: '^[a-z]+$' do
+schema = Schemacop::Schema3.new :hash, additional_properties: true, property_names: '^[a-z]+$' do
   add :array
 end
+
+schema.validate!({})                # => {}
+schema.validate!({foo: [1, 2, 3]})  # => {:foo=>[1, 2, 3]}
+schema.validate!({foo: :bar})       # => Schemacop::Exceptions::ValidationError: /foo: Invalid type, expected "array".
+schema.validate!({Foo: :bar})       # => Schemacop::Exceptions::ValidationError: /: Property name :Foo does not match "^[a-z]+$". /Foo: Invalid type, expected "array".
 ```
 
 ##### Dependencies
@@ -586,7 +616,7 @@ Using the DSL method `dep`, you can specifiy (non-nested) property dependencies:
 # In this example, `billing_address` and `phone_number` are required if
 # `credit_card` is given, and `credit_card` is required if `billing_address` is
 # given.
-Schemacop::Schema3.new do
+schema = Schemacop::Schema3.new :hash do
   str! :name
   str? :credit_card
   str? :billing_address
@@ -595,7 +625,61 @@ Schemacop::Schema3.new do
   dep :credit_card, :billing_address, :phone_number
   dep :billing_address, :credit_card
 end
+
+schema.validate!({}) # => Schemacop::Exceptions::ValidationError: /name: Value must be given.
+schema.validate!({name: 'Joe Doe'}) # => {:name=>"Joe Doe"}
+schema.validate!({
+  name: 'Joe Doe',
+  billing_address: 'Street 42'
+})
+# => Schemacop::Exceptions::ValidationError: /: Missing property "credit_card" because "billing_address" is given.
+
+schema.validate!({
+  name: 'Joe Doe',
+  credit_card: 'XXXX XXXX XXXX XXXX X'
+})
+# => Schemacop::Exceptions::ValidationError: /: Missing property "billing_address" because "credit_card" is given. /: Missing property "phone_number" because "credit_card" is given.
+
+schema.validate!({
+  name: 'Joe Doe',
+  billing_address: 'Street 42',
+  phone_number: '000-000-00-00',
+  credit_card: 'XXXX XXXX XXXX XXXX X'
+})
+# => {:name=>"Joe Doe", :credit_card=>"XXXX XXXX XXXX XXXX X", :billing_address=>"Street 42", :phone_number=>"000-000-00-00"}
 ```
+
+--------------------------------------
+
+### Object
+
+Type: `:object`\
+DSL: `obj`
+
+### AllOf
+
+Type: `:all_of`\
+DSL: `all_of`
+
+### AnyOf
+
+Type: `:any_of`\
+DSL: `any_of`
+
+### OneOf
+
+Type: `:one_of`\
+DSL: `one_of`
+
+### IsNot
+
+Type: `:is_not`\
+DSL: `is_not`
+
+### Reference
+
+DSL: `ref`
+
 
 #### Examples
 ```ruby
@@ -646,75 +730,3 @@ schema.valid?(
   }
 ) # => true
 ```
-
-```ruby
-# The following schema supports exactly the properties defined below, `options`
-# being a nested hash.
-Schemacop::Schema3.new do
-  int? :id         # Optional integer with key 'id'
-  str! :name       # Required string with name 'name'
-  hsh! :options do # Required hash with name `options`
-    boo! :enabled  # Required boolean with name `enabled`
-  end
-end
-
-# Allow any hash with any contents.
-Schemacop::Schema3.new(additional_properties: true)
-
-# Allow a hash where `id` is given, but any additional properties of any name
-# and any type are supported as well.
-Schemacop::Schema3.new(additional_properties: true) do
-  int! :id
-end
-
-# Allow a hash where `id` is given, but any additional properties of which the
-# key starts with `k_` and of any value type are allowed.
-Schemacop::Schema3.new(additional_properties: true, property_names: '^k_.*$') do
-  int! :id
-end
-
-# Allow a hash where `id` is given, but any additional properties of which the
-# key starts with `k_` and the additional value is a string are allowed.
-Schemacop::Schema3.new(additional_properties: true, property_names: '^k_.*$') do
-  int! :id
-  add :string
-end
-
-# Allow a hash where `id` is given, and any additional string properties that start
-# with `k_` are allowed. At least one string with key `k_*` must be given though
-# as this property is required.
-Schemacop::Schema3.new(property_names: '^k_.*$') do
-  int! :id
-  str! /^k_.*$/
-end
-```
-
-### Object
-
-Type: `:object`\
-DSL: `obj`
-
-### AllOf
-
-Type: `:all_of`\
-DSL: `all_of`
-
-### AnyOf
-
-Type: `:any_of`\
-DSL: `any_of`
-
-### OneOf
-
-Type: `:one_of`\
-DSL: `one_of`
-
-### IsNot
-
-Type: `:is_not`\
-DSL: `is_not`
-
-### Reference
-
-DSL: `ref`
-
