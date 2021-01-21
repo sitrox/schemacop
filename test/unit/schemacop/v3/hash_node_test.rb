@@ -70,6 +70,8 @@ module Schemacop
           additionalProperties: true,
           propertyNames:        '^[a-zA-Z0-9]+$'
         )
+
+        assert_cast({ foo: 123 }, { foo: 123 })
       end
 
       def test_required
@@ -252,6 +254,31 @@ module Schemacop
           },
           additionalProperties: { type: :string }
         )
+      end
+
+      def test_pattern_properties_casting
+        schema do
+          int?(/^id_.*$/)
+          int?(/^val.*$/)
+        end
+
+        assert_json({
+                      type:                 :object,
+                      patternProperties:    {
+                        '^id_.*$': { type: :integer },
+                        '^val.*$': { type: :integer }
+                      },
+                      additionalProperties: false
+                    })
+
+        assert_validation({})
+        assert_validation({ id_foo: 1 })
+        assert_validation({ id_foo: 1, id_bar: 2 })
+        assert_validation({ id_foo: 1, id_bar: 2, value: 4 })
+
+        assert_cast({ id_foo: 1 }, { id_foo: 1 })
+        assert_cast({ id_foo: 1, id_bar: 2 }, { id_foo: 1, id_bar: 2 })
+        assert_cast({ id_foo: 1, id_bar: 2, value: 4 }, { id_foo: 1, id_bar: 2, value: 4 })
       end
 
       def test_defaults

@@ -165,12 +165,30 @@ module Schemacop
         data ||= default
         return nil if data.nil?
 
-        # TODO: How to handle regex / etc.?
+        property_patterns = {}
+
         @properties.each_value do |prop|
+          if prop.name.is_a?(Regexp)
+            property_patterns[prop.name] = prop
+            next
+          end
+
           result[prop.name] = prop.cast(data[prop.name])
 
           if result[prop.name].nil? && !data.include?(prop.name)
             result.delete(prop.name)
+          end
+        end
+
+        # Handle regex properties
+        specified_properties = @properties.keys.to_set
+        additional_properties = data.reject { |k, _v| specified_properties.include?(k.to_s.to_sym) }
+
+        if additional_properties.any? && property_patterns.any?
+          additional_properties.each do |name, additional_property|
+            match_key = property_patterns.keys.find { |p| p.match?(name.to_s) }
+            match = property_patterns[match_key]
+            result[name] = match.cast(additional_property)
           end
         end
 
