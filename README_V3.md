@@ -649,84 +649,259 @@ schema.validate!({
 # => {:name=>"Joe Doe", :credit_card=>"XXXX XXXX XXXX XXXX X", :billing_address=>"Street 42", :phone_number=>"000-000-00-00"}
 ```
 
---------------------------------------
-
 ### Object
 
 Type: `:object`\
 DSL: `obj`
+
+The object type represents a ruby `Object`. Please note that the `as_json?  method
+on nodes of this type will just return `{}` (an empty JSON object), as there isn't
+a useful way to represent a ruby object without conflicting with the `Hash` type.
+If you want to represent an JSON object, you should use the `Hash` node.
+
+In the most basic form, this node will accept anything:
+
+```ruby
+schema = Schemacop::Schema3.new :object
+
+schema.validate!(nil)         # => nil
+schema.validate!(true)        # => true
+schema.validate!(false)       # => false
+schema.validate!(Object.new)  # => #<Object:0x0000556ab4f58dd0>
+schema.validate!('foo')       # => "foo"
+```
+
+If you want to limit the allowed classes, you can so so by specifying an array
+of allowed classes:
+
+```ruby
+schema = Schemacop::Schema3.new :object, classes: [String]
+
+schema.validate!(nil)             # => nil
+schema.validate!(true)            # => Schemacop::Exceptions::ValidationError: /: Invalid type, expected "String".
+schema.validate!(Object.new)      # => Schemacop::Exceptions::ValidationError: /: Invalid type, expected "String".
+schema.validate!('foo')           # => "foo"
+schema.validate!('foo'.html_safe) # => Schemacop::Exceptions::ValidationError: /: Invalid type, expected "String".
+```
+
+Here, the node checks if the given value is an instance of any of the given
+classes with `instance_of?`, i.e. the exact class and not a subclass.
+
+If you want to allow subclasses, you can specify this by using the `strict` option:
+
+```ruby
+schema = Schemacop::Schema3.new :object, classes: [String], strict: false
+
+schema.validate!(nil)             # => nil
+schema.validate!(true)            # => Schemacop::Exceptions::ValidationError: /: Invalid type, expected "String".
+schema.validate!(Object.new)      # => Schemacop::Exceptions::ValidationError: /: Invalid type, expected "String".
+schema.validate!('foo')           # => "foo"
+schema.validate!('foo'.html_safe) # => "foo"
+```
+
+If you set the `strict` option to `false`, the check is done using `is_a?` instead of
+`instance_of?`, which also allows subclasses
 
 ### AllOf
 
 Type: `:all_of`\
 DSL: `all_of`
 
+With the AllOf node you can specify multiple schemas, for which the given value
+needs to validate against every one:
+
+```ruby
+schema = Schemacop::Schema3.new :all_of do
+  str min_length: 2
+  str max_length: 4
+end
+
+schema.validate!('foo')   # => "foo"
+schema.validate!('foooo') # => Schemacop::Exceptions::ValidationError: /: Does not match all allOf conditions.
+```
+
+Please note that it's possible to create nonsensical schemas with this node, as
+you can combine multiple schemas which contradict each other:
+
+```ruby
+schema = Schemacop::Schema3.new :all_of do
+  str min_length: 4
+  str max_length: 1
+end
+
+schema.validate!('foo')   # => Schemacop::Exceptions::ValidationError: /: Does not match all allOf conditions.
+schema.validate!('foooo') # => Schemacop::Exceptions::ValidationError: /: Does not match all allOf conditions.
+```
+
 ### AnyOf
 
 Type: `:any_of`\
 DSL: `any_of`
+
+Similar to the AllOf node, you can specify multiple schemas, for which the
+given value needs to validate against at least one of the schemas.
+
+For example, your value needs to be either a string which is at least 2
+characters long, or an integer:
+
+```ruby
+schema = Schemacop::Schema3.new :any_of do
+  str min_length: 2
+  int
+end
+
+schema.validate!('f')   # => Schemacop::Exceptions::ValidationError: /: Does not match any anyOf condition.
+schema.validate!('foo') # => "foo"
+schema.validate!(42)    # => 42
+```
+
+Please note that you need to specify at least one item in the AllOf node:
+
+```ruby
+Schemacop::Schema3.new :any_of # => Schemacop::Exceptions::InvalidSchemaError: Node "any_of" makes only sense with at least 1 item.
+```
 
 ### OneOf
 
 Type: `:one_of`\
 DSL: `one_of`
 
+Similar to the AllOf node, you can specify multiple schemas, for which the
+given value needs to validate against at exaclty one of the schemas. If the
+given value validates against multiple schemas, the value is invalid.
+
+For example, if you want an integer which is either a multiple of 2 or 3,
+but not both (i.e. no multiple of 6), you could do it as follows:
+
+```ruby
+schema = Schemacop::Schema3.new :one_of do
+  int multiple_of: 2
+  int multiple_of: 3
+end
+
+schema.validate!(2) # => 2
+schema.validate!(3) # => 3
+schema.validate!(4) # => 4
+schema.validate!(5) # => Schemacop::Exceptions::ValidationError: /: Matches 0 definitions but should match exactly 1.
+schema.validate!(6) # => Schemacop::Exceptions::ValidationError: /: Matches 2 definitions but should match exactly 1.
+```
+
+Again, as previously with the AllOf node, you're allowed to create schemas
+which will not work for any input, e.g. by specifying the same schema twice:
+
+```ruby
+schema = Schemacop::Schema3.new :one_of do
+  int multiple_of: 2
+  int multiple_of: 2
+end
+
+schema.validate!(2) # => Schemacop::Exceptions::ValidationError: /: Matches 2 definitions but should match exactly 1.
+schema.validate!(3) # => Schemacop::Exceptions::ValidationError: /: Matches 0 definitions but should match exactly 1.
+schema.validate!(4) # => Schemacop::Exceptions::ValidationError: /: Matches 2 definitions but should match exactly 1.
+schema.validate!(5) # => Schemacop::Exceptions::ValidationError: /: Matches 0 definitions but should match exactly 1.
+schema.validate!(6) # => Schemacop::Exceptions::ValidationError: /: Matches 2 definitions but should match exactly 1.
+```
+
 ### IsNot
 
 Type: `:is_not`\
 DSL: `is_not`
 
-### Reference
+With the IsNot node, you can specify a schema which the given value must not
+validate against, i.e. every value which matches the schema will make this node
+invalid.
 
-DSL: `ref`
+For example, you want anything but the numbers between 3 and 5:
 
-
-#### Examples
 ```ruby
-schema = Schemacop::Schema3.new do
-  # Define built-in schema 'address' for re-use
-  scm :address do
-    str! :street
-    int! :number
-    str! :zip
-  end
-
-  int? :id
-  str! :name
-
-  # Reference above defined schema 'address' and use it for key 'address'
-  ref! :address, :address
-
-  # Reference above defined schema 'address' and use it as contents for array
-  # in key `additional_addresses`
-  ary! :additional_addresses, default: [] do
-    ref :address
-  end
-  ary? :comments, :array, default: [] { str }
-
-  # Define a hash with key `jobs` that needs at least one property, and all
-  # properties must be valid integers and their values must be strings.
-  hsh! :jobs, min_properties: 1 do
-    str? /^[0-9]+$/
-  end
+schema = Schemacop::Schema3.new :is_not do
+  int minimum: 3, maximum: 5
 end
 
-schema.valid?(
-  id:      42,
-  name:    'John Doe',
-  address: {
-    street: 'Silver Street',
-    number: 4,
-    zip:    '38234C'
+schema.validate!(nil)   # => nil
+schema.validate!(1)     # => 1
+schema.validate!(2)     # => 2
+schema.validate!(3)     # => Schemacop::Exceptions::ValidationError: /: Must not match schema: {"type"=>"integer", "minimum"=>3, "maximum"=>5}.
+schema.validate!('foo') # => "foo"
+```
+
+Note that a IsNot node needs exactly one item:
+
+```ruby
+schema = Schemacop::Schema3.new :is_not # => Schemacop::Exceptions::InvalidSchemaError: Node "is_not" only allows exactly one item.
+```
+
+### Reference
+
+**Referencing**
+DSL: `ref`\
+Type: `reference`
+
+**Definition**
+DSL: `scm`
+
+Finally, with the Reference node, you can define schemas and then later reference
+them for usage, e.g. when you have a rather long schema which you need at multiple
+places.
+
+#### Examples
+
+For example, let's define an object with an schema called `Address`, which we'll
+reference multiple times:
+
+```ruby
+schema = Schemacop::Schema3.new :hash do
+  scm :Address do
+    str! :street
+    str! :zip_code
+    str! :location
+    str! :country
+  end
+
+  ref! :shipping_address, :Address
+  ref! :billing_address, :Address
+end
+
+schema.validate!({}) # => Schemacop::Exceptions::ValidationError: /shipping_address: Value must be given. /billing_address: Value must be given.
+schema.validate!({
+  shipping_address: 'foo',
+  billing_address: 42
+})
+# => Schemacop::Exceptions::ValidationError: /shipping_address: Invalid type, expected "object". /billing_address: Invalid type, expected "object".
+
+schema.validate!({
+  shipping_address: {
+    street:   'Example Street 42',
+    zip_code: '12345',
+    location: 'London',
+    country:  'United Kingdom'
   },
-  additional_addresses: [
-    { street: 'Example street', number: 42, zip: '8048' }
-  ],
-  comments: [
-    'This is a comment'
-  ],
-  jobs: {
-    2020 => 'Software Engineer'
+  billing_address: {
+    street:   'Main St.',
+    zip_code: '54321',
+    location: 'Washington DC',
+    country:  'USA'
   }
-) # => true
+})
+
+# => {:shipping_address=>{:street=>"Example Street 42", :zip_code=>"12345", :location=>"London", :country=>"United Kingdom"}, :billing_address=>{:street=>"Main St.", :zip_code=>"54321", :location=>"Washington DC", :country=>"USA"}}
+```
+
+Note that if you use the reference node with the long type name `reference`,
+e.g. in an array, you need to specify the "name" of the schema in the
+`path` option:
+
+```ruby
+schema = Schemacop::Schema3.new :array do
+  scm :User do
+    str! :first_name
+    str! :last_name
+  end
+
+  list :reference, path: :User
+end
+
+schema.validate!([])                                      # => []
+schema.validate!([{first_name: 'Joe', last_name: 'Doe'}]) # => [{:first_name=>"Joe", :last_name=>"Doe"}]
+schema.validate!([id: 42, first_name: 'Joe'])             # => Schemacop::Exceptions::ValidationError: /[0]/last_name: Value must be given. /[0]: Obsolete property "id".
 ```
