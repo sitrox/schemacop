@@ -286,66 +286,66 @@ module Schemacop
         end
       end
 
-      # def test_external_schemas
-      #   context = Context.new
+      def test_external_schemas
+        context = Context.new
 
-      #   context.schema :Person do
-      #     str! :first_name
-      #     str! :last_name
-      #     ref? :info, :PersonInfo
-      #   end
+        context.schema :Person do
+          str! :first_name
+          str! :last_name
+          ref? :info, :PersonInfo
+        end
 
-      #   context.schema :PersonInfo do
-      #     str! :born_at, format: :date
-      #   end
+        context.schema :PersonInfo do
+          str! :born_at, format: :date
+        end
 
-      #   schema :reference, path: :Person
+        schema :reference, path: :Person
 
-      #   with_context context do
-      #     assert_validation(first_name: 'John', last_name: 'Doe')
-      #     assert_validation(first_name: 'John', last_name: 42) do
-      #       error '/last_name', 'Invalid type, expected "string".'
-      #     end
-      #   end
+        with_context context do
+          assert_validation(first_name: 'John', last_name: 'Doe')
+          assert_validation(first_name: 'John', last_name: 42) do
+            error '/last_name', 'Invalid type, expected "string".'
+          end
+        end
 
-      #   with_context context do
-      #     schema do
-      #       ref! :person, :Person
-      #     end
+        with_context context do
+          schema do
+            ref! :person, :Person
+          end
 
-      #     assert_validation(person: { first_name: 'John', last_name: 'Doe' })
-      #     assert_validation(person: { first_name: 'John', last_name: 'Doe', info: { born_at: '1990-01-13' } })
-      #     assert_validation(person: { first_name_x: 'John', last_name: 'Doe' }) do
-      #       error '/person', 'Obsolete property "first_name_x".'
-      #       error '/person/first_name', 'Value must be given.'
-      #     end
-      #     assert_validation(person: { first_name: 'John', last_name: 'Doe', info: { born_at: 'never' } }) do
-      #       error '/person/info/born_at', 'String does not match format "date".'
-      #     end
-      #   end
-      # end
+          assert_validation(person: { first_name: 'John', last_name: 'Doe' })
+          assert_validation(person: { first_name: 'John', last_name: 'Doe', info: { born_at: '1990-01-13' } })
+          assert_validation(person: { first_name_x: 'John', last_name: 'Doe' }) do
+            error '/person', 'Obsolete property "first_name_x".'
+            error '/person/first_name', 'Value must be given.'
+          end
+          assert_validation(person: { first_name: 'John', last_name: 'Doe', info: { born_at: 'never' } }) do
+            error '/person/info/born_at', 'String does not match format "date".'
+          end
+        end
+      end
 
-      # def test_defaults
-      #   schema do
-      #     scm :Person do
-      #       str? :foo, default: 'bar'
-      #     end
-      #     ref? :person, :Person, default: {}
-      #   end
+      def test_defaults
+        schema do
+          scm :Person do
+            str? :foo, default: 'bar'
+          end
+          ref? :person, :Person, default: {}
+        end
 
-      #   assert_cast({}, person: { foo: 'bar' })
-      # end
+        assert_cast({}, person: { foo: 'bar' })
+      end
 
-      # def test_casting
-      #   schema do
-      #     scm :Person do
-      #       str! :born_at, format: :date
-      #     end
-      #     ref? :person, :Person, default: {}
-      #   end
+      def test_casting
+        schema do
+          scm :Person do
+            str! :born_at, format: :date
+          end
+          ref? :person, :Person, default: {}
+        end
 
-      #   assert_cast({ person: { born_at: '1990-01-13' } }, person: { born_at: Date.new(1990, 1, 13) })
-      # end
+        assert_cast({ person: { born_at: '1990-01-13' } }, person: { born_at: Date.new(1990, 1, 13) })
+      end
     end
   end
 end
