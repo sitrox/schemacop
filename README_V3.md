@@ -970,3 +970,82 @@ defined the referenced schemas differently in the two contexts, we were able
 to use other data in the second context than in the first.
 
 ## External schemas
+
+Finally, schemacop features the possibilit to specify schemas in seperate files.
+This is especially useful is you have schemas in your application which are used
+multiple times through the application.
+
+For each schema, you define the schema in a single file, and after loading the
+schemas, you can reference them in other schemas.
+
+The default load path is `'app/schemas'`, but this can be configured by setting
+the value of the `load_paths` attribute of the `Schemacop` module.
+
+Please note that the following predescence order is used for the schemas:
+
+```
+local schemas > context schemas > global schemas
+```
+
+Where:
+
+* local schemas: Defined by using the DSL method? `scm`
+* context schemas: Defined in the current context using `context.schema`
+* global schemas: Defined in a ruby file in the load path
+
+### Rails applications
+
+In Rails applications, your schemas are automatically eager-laoded from the load
+path `'app/schemas'` when your application is started.
+
+After starting your application, you can reference them like normally defined
+reference schemas, with the name being relative to the load path.
+
+Example:
+
+You defined the following two schemas in the `'app/schemas'` directory:
+
+```ruby
+# app/schemas/user.rb
+schema :hash do
+  str! :first_name
+  str! :last_name
+  ary? :groups do
+    list :reference, path: 'nested/group'
+  end
+end
+```
+
+```ruby
+# app/schemas/nested/user.rb
+schema :hash do
+  str! :name
+end
+```
+
+To use the schema, you then can simply reference the schema as with normal
+reference schemas:
+
+```ruby
+schema = Schemacop::Schema3.new :hash do
+  ref! :usr, :user
+end
+
+schema.validate!({usr: {first_name: 'Joe', last_name: 'Doe'}})
+  # => {:usr=>{:first_name=>"Joe", :last_name=>"Doe"}}
+
+schema.validate!({usr: {first_name: 'Joe', last_name: 'Doe', groups: []}})
+  # => {:usr=>{:first_name=>"Joe", :last_name=>"Doe", :groups=>[]}}
+
+schema.validate!({usr: {first_name: 'Joe', last_name: 'Doe', groups: [{name: 'foo'}, {name: 'bar'}]}})
+  # => {:usr=>{:first_name=>"Joe", :last_name=>"Doe", :groups=>[{:name=>"foo"}, {:name=>"bar"}]}}
+```
+
+### Non-Rails applications
+
+Usage in non-Rails applications is the same as with usage in Rails applications,
+however you need to eager load the schemas yourself:
+
+```ruby
+Schemacop::V3::GlobalContext.eager_load!
+```
