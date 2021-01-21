@@ -470,10 +470,12 @@ module Schemacop
         validate_self_should_error('13')
         validate_self_should_error('Lorem ipsum')
 
+        # rubocop:disable Lint/BooleanSymbol
         assert_raises_with_message Exceptions::InvalidSchemaError,
                                    'Option "additional_properties" must be a boolean value' do
           schema :hash, additional_properties: :true
         end
+        # rubocop:enable Lint/BooleanSymbol
       end
 
       def test_doc_example
