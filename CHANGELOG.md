@@ -10,6 +10,14 @@
 ### Changes
 -->
 
+## 3.0.0.rc1
+
+* Add support for ruby `3.0.0`
+
+* Add `ruby-3.0.0` to travis testing
+
+* Document all `v3` nodes
+
 ## 3.0.0.rc0
 
 * Add `Schemacop::Schema3`
