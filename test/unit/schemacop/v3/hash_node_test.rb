@@ -54,6 +54,14 @@ module Schemacop
           type:                 :object,
           additionalProperties: { type: :string }
         )
+
+        assert_nothing_raised do
+          @schema.validate!({ foo: 'foo' })
+        end
+
+        assert_raises_with_message Exceptions::ValidationError, '/bar: Invalid type, expected "string".' do
+          @schema.validate!({ foo: 'foo', bar: :baz })
+        end
       end
 
       def test_property_names

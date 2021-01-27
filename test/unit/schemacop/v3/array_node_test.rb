@@ -800,6 +800,16 @@ module Schemacop
 
         assert_cast(%w[foo 1990-01-01], ['foo', Date.new(1990, 1, 1)])
       end
+
+      def test_contains_multiple_should_fail
+        assert_raises_with_message Exceptions::InvalidSchemaError, 'You can only use "cont" once.' do
+          schema :array do
+            list :string
+            cont :string
+            cont :integer
+          end
+        end
+      end
     end
   end
 end

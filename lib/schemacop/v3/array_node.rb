@@ -172,10 +172,9 @@ module Schemacop
         list_item.present?
       end
 
-      def item_for_data(data, force: true)
+      def item_for_data(data)
         item = children.find { |c| item_matches?(c, data) }
         return item if item
-        return nil unless force
 
         fail "Could not find specification for item #{data.inspect}."
       end
