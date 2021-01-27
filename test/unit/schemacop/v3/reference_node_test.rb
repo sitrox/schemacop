@@ -333,7 +333,7 @@ module Schemacop
           ref? :person, :Person, default: {}
         end
 
-        assert_cast({}, person: { foo: 'bar' })
+        assert_cast({}, { person: { foo: 'bar' } }.with_indifferent_access)
       end
 
       def test_casting
@@ -344,7 +344,7 @@ module Schemacop
           ref? :person, :Person, default: {}
         end
 
-        assert_cast({ person: { born_at: '1990-01-13' } }, person: { born_at: Date.new(1990, 1, 13) })
+        assert_cast({ person: { born_at: '1990-01-13' } }, { person: { born_at: Date.new(1990, 1, 13) } }.with_indifferent_access)
       end
     end
   end

@@ -72,8 +72,8 @@ module Schemacop
           propertyNames:        '^[a-zA-Z0-9]+$'
         )
 
-        assert_cast({ foo: 123 }, { foo: 123 })
-        assert_cast({ Foo: 123 }, { Foo: 123 })
+        assert_cast({ foo: 123 }, { foo: 123 }.with_indifferent_access)
+        assert_cast({ Foo: 123 }, { Foo: 123 }.with_indifferent_access)
 
         # New schema
         schema :hash, additional_properties: true, property_names: '^[a-z]+$'
@@ -82,13 +82,13 @@ module Schemacop
         assert_validation(foo: :bar)
         assert_validation('foo' => 'bar')
         assert_validation(Foo: :bar) do
-          error '/', 'Property name :Foo does not match "^[a-z]+$".'
+          error '/', 'Property name "Foo" does not match "^[a-z]+$".'
         end
         assert_validation('_foo39sjfdoi 345893(%' => 'bar', 'foo' => 'bar') do
           error '/', 'Property name "_foo39sjfdoi 345893(%" does not match "^[a-z]+$".'
         end
 
-        assert_cast({ foo: 123 }, { foo: 123 })
+        assert_cast({ foo: 123 }, { foo: 123 }.with_indifferent_access)
       end
 
       def test_required
@@ -293,9 +293,9 @@ module Schemacop
         assert_validation({ id_foo: 1, id_bar: 2 })
         assert_validation({ id_foo: 1, id_bar: 2, value: 4 })
 
-        assert_cast({ id_foo: 1 }, { id_foo: 1 })
-        assert_cast({ id_foo: 1, id_bar: 2 }, { id_foo: 1, id_bar: 2 })
-        assert_cast({ id_foo: 1, id_bar: 2, value: 4 }, { id_foo: 1, id_bar: 2, value: 4 })
+        assert_cast({ id_foo: 1 }, { id_foo: 1 }.with_indifferent_access)
+        assert_cast({ id_foo: 1, id_bar: 2 }, { id_foo: 1, id_bar: 2 }.with_indifferent_access)
+        assert_cast({ id_foo: 1, id_bar: 2, value: 4 }, { id_foo: 1, id_bar: 2, value: 4 }.with_indifferent_access)
       end
 
       def test_defaults
@@ -311,7 +311,9 @@ module Schemacop
         data = { last_name: 'Doeringer', active: 'true' }
         data_was = data.dup
 
-        assert_equal({ first_name: 'John', last_name: 'Doeringer', active: true, address: { street: 'Example 42' } }, @schema.validate(data).data)
+        expected_data = { first_name: 'John', last_name: 'Doeringer', active: true, address: { street: 'Example 42' } }.with_indifferent_access
+
+        assert_equal(expected_data, @schema.validate(data).data)
         assert_equal data_was, data
 
         schema do
@@ -526,7 +528,7 @@ module Schemacop
 
         assert_validation(nil)
         assert_validation(foo: '1')
-        assert_cast({ foo: '1' }, { foo: 1 })
+        assert_cast({ foo: '1' }, { foo: 1 }.with_indifferent_access)
 
         assert_validation(foo: '1', bar: '2') do
           error '/', 'Obsolete property "bar".'
@@ -552,11 +554,11 @@ module Schemacop
 
         assert_validation(nil)
         assert_validation(foo: '1')
-        assert_cast({ foo: '1' }, { foo: 1 })
+        assert_cast({ foo: '1' }, { foo: 1 }.with_indifferent_access)
 
         assert_validation(foo: '1', bar: nil)
         assert_validation(foo: '1', bar: '2')
-        assert_cast({ foo: '1', bar: '2' }, { foo: 1, bar: '2' })
+        assert_cast({ foo: '1', bar: '2' }, { foo: 1, bar: '2' }.with_indifferent_access)
 
         assert_json(
           type:                 'object',
@@ -589,11 +591,11 @@ module Schemacop
 
         assert_validation(nil)
         assert_validation(foo: '1')
-        assert_cast({ foo: '1' }, { foo: 1 })
+        assert_cast({ foo: '1' }, { foo: 1 }.with_indifferent_access)
 
         assert_validation(foo: '1', bar: nil)
         assert_validation(foo: '1', bar: '2')
-        assert_cast({ foo: '1', bar: '2' }, { foo: 1, bar: '2' })
+        assert_cast({ foo: '1', bar: '2' }, { foo: 1, bar: '2' }.with_indifferent_access)
 
         assert_json(
           type:                 'object',
@@ -616,11 +618,11 @@ module Schemacop
 
         assert_validation(nil)
         assert_validation(foo: '1')
-        assert_cast({ foo: '1' }, { foo: 1 })
+        assert_cast({ foo: '1' }, { foo: 1 }.with_indifferent_access)
 
         assert_validation(foo: '1', bar: nil)
         assert_validation(foo: '1', bar: '2')
-        assert_cast({ foo: '1', bar: '2' }, { foo: 1, bar: 2 })
+        assert_cast({ foo: '1', bar: '2' }, { foo: 1, bar: 2 }.with_indifferent_access)
       end
 
       def test_cast_with_additional_any_of
@@ -634,7 +636,7 @@ module Schemacop
 
         assert_validation(nil)
         assert_validation(foo: '1')
-        assert_cast({ foo: '1' }, { foo: 1 })
+        assert_cast({ foo: '1' }, { foo: 1 }.with_indifferent_access)
 
         assert_validation(foo: '1', bar: nil)
         assert_validation(foo: '1', bar: '2')
@@ -643,7 +645,7 @@ module Schemacop
           error '/qux', 'Does not match any anyOf condition.'
         end
 
-        assert_cast({ foo: '1', bar: '2' }, { foo: 1, bar: '2' })
+        assert_cast({ foo: '1', bar: '2' }, { foo: 1, bar: '2' }.with_indifferent_access)
 
         assert_json(
           type:                 'object',
@@ -675,7 +677,7 @@ module Schemacop
 
         assert_validation(nil)
         assert_validation(foo: '1')
-        assert_cast({ foo: '1' }, { foo: 1 })
+        assert_cast({ foo: '1' }, { foo: 1 }.with_indifferent_access)
 
         assert_validation(foo: '1', bar: nil)
         assert_validation(foo: '1', bar: '2')
@@ -684,8 +686,8 @@ module Schemacop
           error '/qux', 'Does not match any anyOf condition.'
         end
 
-        assert_cast({ foo: '1', bar: '2' }, { foo: 1, bar: 2 })
-        assert_cast({ foo: '1', bar: '2', qux: '2020-01-13', asd: 1 }, { foo: 1, bar: 2, qux: Date.new(2020, 1, 13), asd: 1 })
+        assert_cast({ foo: '1', bar: '2' }, { foo: 1, bar: 2 }.with_indifferent_access)
+        assert_cast({ foo: '1', bar: '2', qux: '2020-01-13', asd: 1 }, { foo: 1, bar: 2, qux: Date.new(2020, 1, 13), asd: 1 }.with_indifferent_access)
 
         assert_json(
           type:                 'object',
@@ -821,6 +823,54 @@ module Schemacop
           end
         end
       end
+
+      def test_schema_with_string_keys
+        schema :hash do
+          int! 'foo'
+        end
+
+        assert_validation(nil)
+        assert_validation({ 'foo' => 42 })
+        assert_validation({ foo: 42 })
+
+        assert_cast({ 'foo' => 42 }, { 'foo' => 42 })
+        assert_cast({ foo: 42 }, { foo: 42 }.with_indifferent_access)
+
+        assert_validation({}) do
+          error '/foo', 'Value must be given.'
+        end
+
+        assert_validation({ :foo => 42, 'foo' => 43 }) do
+          error '/', 'Has 1 ambiguous properties: [:foo].'
+        end
+      end
+
+      def test_schema_with_string_keys_in_data
+        schema :hash do
+          int! :foo
+        end
+
+        assert_validation(nil)
+        assert_validation({ 'foo' => 42 })
+        assert_validation({ foo: 42 })
+
+        assert_cast({ 'foo' => 42 }, { 'foo' => 42 })
+        assert_cast({ foo: 42 }, { foo: 42 }.with_indifferent_access)
+
+        assert_validation({}) do
+          error '/foo', 'Value must be given.'
+        end
+
+        assert_validation({ :foo => 42, 'foo' => 43 }) do
+          error '/', 'Has 1 ambiguous properties: [:foo].'
+        end
+      end
+
+      # def test_invalid_key_names
+      #   schema :hash do
+      #     int!
+      #   end
+      # end
     end
   end
 end

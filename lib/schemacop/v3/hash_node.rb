@@ -91,14 +91,23 @@ module Schemacop
         super_data = super
         return if super_data.nil?
 
+        original_data_hash = super_data.dup
+        data_hash = super_data.with_indifferent_access
+
+        if original_data_hash.size != data_hash.size
+          ambiguous_properties = original_data_hash.keys - data_hash.keys
+
+          result.error "Has #{ambiguous_properties.size} ambiguous properties: #{ambiguous_properties}."
+        end
+
         # Validate min_properties #
-        if options[:min_properties] && super_data.size < options[:min_properties]
-          result.error "Has #{super_data.size} properties but needs at least #{options[:min_properties]}."
+        if options[:min_properties] && data_hash.size < options[:min_properties]
+          result.error "Has #{data_hash.size} properties but needs at least #{options[:min_properties]}."
         end
 
         # Validate max_properties #
-        if options[:max_properties] && super_data.size > options[:max_properties]
-          result.error "Has #{super_data.size} properties but needs at most #{options[:max_properties]}."
+        if options[:max_properties] && data_hash.size > options[:max_properties]
+          result.error "Has #{data_hash.size} properties but needs at most #{options[:max_properties]}."
         end
 
         # Validate specified properties #
@@ -106,13 +115,13 @@ module Schemacop
           result.in_path(node.name) do
             next if node.name.is_a?(Regexp)
 
-            node._validate(super_data[node.name], result: result)
+            node._validate(data_hash[node.name], result: result)
           end
         end
 
         # Validate additional properties #
         specified_properties = @properties.keys.to_set
-        additional_properties = super_data.reject { |k, _v| specified_properties.include?(k.to_s.to_sym) }
+        additional_properties = data_hash.reject { |k, _v| specified_properties.include?(k.to_s) }
 
         property_patterns = {}
 
@@ -149,7 +158,7 @@ module Schemacop
         # Validate dependencies #
         options[:dependencies]&.each do |source, targets|
           targets.each do |target|
-            if super_data[source].present? && super_data[target].blank?
+            if data_hash[source].present? && data_hash[target].blank?
               result.error "Missing property #{target.to_s.inspect} because #{source.to_s.inspect} is given."
             end
           end
@@ -161,9 +170,18 @@ module Schemacop
       end
 
       def cast(data)
-        result = {}
+        result = {}.with_indifferent_access
         data ||= default
         return nil if data.nil?
+
+        original_data_hash = data.dup
+        data_hash = data.with_indifferent_access
+
+        if original_data_hash.size != data_hash.size
+          ambiguous_properties = original_data_hash.keys - data_hash.keys
+
+          result.error "Has #{ambiguous_properties.size} ambiguous properties: #{ambiguous_properties}."
+        end
 
         property_patterns = {}
 
@@ -173,16 +191,16 @@ module Schemacop
             next
           end
 
-          result[prop.name] = prop.cast(data[prop.name])
+          result[prop.name] = prop.cast(data_hash[prop.name])
 
-          if result[prop.name].nil? && !data.include?(prop.name)
+          if result[prop.name].nil? && !data_hash.include?(prop.name)
             result.delete(prop.name)
           end
         end
 
         # Handle regex properties
         specified_properties = @properties.keys.to_set
-        additional_properties = data.reject { |k, _v| specified_properties.include?(k.to_s.to_sym) }
+        additional_properties = data_hash.reject { |k, _v| specified_properties.include?(k.to_s.to_sym) }
 
         if additional_properties.any? && property_patterns.any?
           additional_properties.each do |name, additional_property|
@@ -194,10 +212,10 @@ module Schemacop
 
         # Handle additional properties
         if options[:additional_properties] == true
-          result = data.merge(result)
+          result = data_hash.merge(result)
         elsif options[:additional_properties].is_a?(Node)
           specified_properties = @properties.keys.to_set
-          additional_properties = data.reject { |k, _v| specified_properties.include?(k.to_s.to_sym) }
+          additional_properties = data_hash.reject { |k, _v| specified_properties.include?(k.to_s.to_sym) }
           if additional_properties.any?
             additional_properties_result = {}
             additional_properties.each do |key, value|

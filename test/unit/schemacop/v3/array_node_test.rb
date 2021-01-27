@@ -446,8 +446,8 @@ module Schemacop
         end
 
         assert_cast(['foo', 42], ['foo', 42])
-        assert_cast(['foo', 42, { foo: '1990-01-01' }], ['foo', 42, { foo: Date.new(1990, 1, 1) }])
-        assert_cast(['foo', 42, { foo: '1990-01-01', bar: :baz }], ['foo', 42, { foo: Date.new(1990, 1, 1), bar: :baz }])
+        assert_cast(['foo', 42, { foo: '1990-01-01' }], ['foo', 42, { foo: Date.new(1990, 1, 1) }.with_indifferent_access])
+        assert_cast(['foo', 42, { foo: '1990-01-01', bar: :baz }], ['foo', 42, { foo: Date.new(1990, 1, 1), bar: :baz }.with_indifferent_access])
       end
 
       def test_multiple_add_in_schema
@@ -537,7 +537,7 @@ module Schemacop
           additionalItems: false
         )
 
-        assert_cast [{}], [{ name: 'John' }]
+        assert_cast [{}], [{ name: 'John' }.with_indifferent_access]
       end
 
       def test_enum_schema

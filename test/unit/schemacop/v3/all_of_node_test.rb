@@ -142,8 +142,7 @@ module Schemacop
 
         assert_cast(
           { foo: '42', bar: '2020-01-15' },
-          foo: 42,
-          bar: Date.new(2020, 1, 15)
+          { foo: 42, bar: Date.new(2020, 1, 15) }.with_indifferent_access
         )
       end
 

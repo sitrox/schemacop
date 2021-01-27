@@ -102,11 +102,11 @@ module Schemacop
 
         assert_cast(
           { created_at: '2020-01-01' },
-          created_at: Date.new(2020, 1, 1)
+          { created_at: Date.new(2020, 1, 1) }.with_indifferent_access
         )
         assert_cast(
           { created_at: '2020-01-01T17:38:20' },
-          created_at: DateTime.new(2020, 1, 1, 17, 38, 20)
+          { created_at: DateTime.new(2020, 1, 1, 17, 38, 20) }.with_indifferent_access
         )
       end
 
@@ -127,12 +127,12 @@ module Schemacop
 
         assert_cast(
           { foo: { bar: nil } },
-          foo: { bar: nil }
+          { foo: { bar: nil } }.with_indifferent_access
         )
 
         assert_cast(
           { foo: { baz: nil } },
-          foo: { baz: 'Baz' }
+          { foo: { baz: 'Baz' } }.with_indifferent_access
         )
 
         schema do
@@ -144,12 +144,12 @@ module Schemacop
 
         assert_cast(
           { foo: { bar: '1990-01-13' } },
-          foo: { bar: Date.new(1990, 1, 13) }
+          { foo: { bar: Date.new(1990, 1, 13) } }.with_indifferent_access
         )
 
         assert_cast(
           { foo: { bar: '1990-01-13T10:00:00Z' } },
-          foo: { bar: DateTime.new(1990, 1, 13, 10, 0, 0) }
+          { foo: { bar: DateTime.new(1990, 1, 13, 10, 0, 0) } }.with_indifferent_access
         )
       end
 
