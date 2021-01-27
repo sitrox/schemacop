@@ -10,6 +10,12 @@
 ### Changes
 -->
 
+## 3.0.0.r2
+
+* Represent node names as strings internally
+
+* Update documentation
+
 ## 3.0.0.rc1
 
 * Add support for ruby `3.0.0`
