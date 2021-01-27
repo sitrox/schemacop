@@ -1,15 +1,11 @@
 # Schemacop schema V3
 
-Please note that Schemacop v3 is still a work in progress, especially the documentation.
+## Table of Contents
 
-Use at your own discretion.
-
-# Table of Contents
-1. [Introduction](#Introduction)
-2. [Validation](#validation)
-3. [Exceptions](#exceptions)
-4. [Generic Keywords](#generic-keywords)
-5. [Nodes](#nodes)
+1. [Validation](#validation)
+2. [Exceptions](#exceptions)
+3. [Generic Keywords](#generic-keywords)
+4. [Nodes](#nodes)
     1. [String](#string)
     2. [Integer](#integer)
     3. [Number](#number)
@@ -23,12 +19,8 @@ Use at your own discretion.
     11. [OneOf](#oneOf)
     12. [IsNot](#isNot)
     13. [Reference](#reference)
-6. [Context](#context)
-7. [External schemas](#external-schemas)
-
-## Introduction
-
-TODO: Write short section about using schemacop V3
+5. [Context](#context)
+6. [External schemas](#external-schemas)
 
 ## Validation
 
@@ -74,19 +66,121 @@ schema.validate!('Foo')         # => Schemacop::Exceptions::ValidationError: /: 
 
 ## Exceptions
 
-TODO: Describe the exceptions raised by schemacop
+Schemacop can raise the following exceptions:
 
-`Schemacop::Exceptions::ValidationError`
-`Schemacop::Exceptions::InvalidSchemaError`
+* `Schemacop::Exceptions::ValidationError`: This exception is raised when the `validate!`
+  method is used, and the data that was passed in is invalid. The exception message contains
+  additional informations why the validation failed.
+
+  Example:
+
+  ```ruby
+  schema = Schemacop::Schema3.new :hash do
+    int! :foo
+  end
+
+  schema.validate!(foo: 'bar')
+  # => Schemacop::Exceptions::ValidationError: /foo: Invalid type, expected "integer".
+  ```
+
+* `Schemacop::Exceptions::InvalidSchemaError`: This exception is raised when the schema
+  itself is not valid. The exception message contains additional informations why the
+  validation failed.
+
+  Example:
+
+ ```ruby
+  Schemacop::Schema3.new :hash do
+    int!
+  end
+
+  # => Schemacop::Exceptions::InvalidSchemaError: Child nodes must have a name.
+  ```
 
 ## Generic Keywords
 
-TODO: Complete this
+The nodes in Schemacop v3 also support generic keywords, similar to JSON schema:
 
-* enum
-* title
-* description
-* examples
+* `title`: Short string, should be self-explanatory
+* `description`: Description of the schema
+* `examples`: Here, you can provide examples which will be valid for the schema
+* `enum`: Here, you may enumerate values which will be valid, if the provided
+  value is not in the array, the validation will fail
+* `default`: You may provide a default value for items that will be set if the
+  value is not given
+
+
+The three keywords `title`, `description` and `examples` aren't used for validation,
+but can be used to document the schema. They will be included in the JSON output
+when you use the `as_json` method:
+
+```ruby
+schema = Schemacop::Schema3.new :hash do
+  str! :name, title: 'Name', description: 'Holds the name of the user', examples: ['Joe', 'Anna']
+end
+
+schema.as_json
+
+# => {"properties"=>{"name"=>{"type"=>"string", "title"=>"Name", "examples"=>["Joe", "Anna"], "description"=>"Holds the name of the user"}}, "additionalProperties"=>false, "required"=>["name"], "type"=>"object"}
+```
+
+The `enum` keyword can be used to only allow a subset of values:
+
+```ruby
+schema = Schemacop::Schema3.new :string, enum: ['foo', 'bar']
+
+schema.validate!('foo') # => "foo"
+schema.validate!('bar') # => "bar"
+schema.validate!('baz') # => Schemacop::Exceptions::ValidationError: /: Value not included in enum ["foo", "bar"].
+```
+
+Please note, that you can also specify values in the enum that are not valid for
+the schema. This means that the validation will still fail:
+
+```ruby
+schema = Schemacop::Schema3.new :string, enum: ['foo', 'bar', 42]
+
+schema.validate!('foo') # => "foo"
+schema.validate!('bar') # => "bar"
+schema.validate!(42)    # => Schemacop::Exceptions::ValidationError: /: Invalid type, expected "string".
+```
+
+The enum will also be provided in the json output:
+
+```ruby
+schema = Schemacop::Schema3.new :string, enum: ['foo', 'bar']
+
+schema.as_json
+# => {"type"=>"string", "enum"=>["foo", "bar", 42]}
+```
+
+And finally, the `default` keyword lets you set a default value to use when no
+value is provided:
+
+```ruby
+schema = Schemacop::Schema3.new :string, default: 'Schemacop'
+
+schema.validate!('foo') # => "foo"
+schema.validate!(nil)   # => "Schemacop"
+```
+
+The default value will also be provided in the json output:
+
+```ruby
+schema = Schemacop::Schema3.new :string, default: 'Schemacop'
+
+schema.as_json
+# => {"type"=>"string", "default"=>"Schemacop"}
+```
+
+Note that the default value you use is also validated against the schema:
+
+```ruby
+schema = Schemacop::Schema3.new :string, default: 42
+
+schema.validate!('foo') # => "foo"
+schema.validate!(nil)   # => Schemacop::Exceptions::ValidationError: /: Invalid type, expected "string".
+```
 
 ## Nodes
 
@@ -704,7 +798,7 @@ schema.validate!({
 Type: `:object`\
 DSL: `obj`
 
-The object type represents a ruby `Object`. Please note that the `as_json?  method
+The object type represents a ruby `Object`. Please note that the `as_json`  method
 on nodes of this type will just return `{}` (an empty JSON object), as there isn't
 a useful way to represent a ruby object without conflicting with the `Hash` type.
 If you want to represent an JSON object, you should use the `Hash` node.

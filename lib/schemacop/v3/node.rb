@@ -72,7 +72,6 @@ module Schemacop
           fail "Options #{disallowed_options.inspect} are not allowed for this node."
         end
 
-        # TODO: check that name is a symbol, string or regex
         # Assign attributes #
         @name = options.delete(:name)
         @name = @name.to_s unless @name.nil? || @name.is_a?(Regexp)
