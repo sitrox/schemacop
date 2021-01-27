@@ -523,9 +523,59 @@ schema = Schemacop::Schema3.new :hash do
 end
 
 schema.validate!({})                    # => Schemacop::Exceptions::ValidationError: /foo: Value must be given.
-schema.validate!({foo: 'str'})          # => {:foo=>"str"}
-schema.validate!({foo: 'str', bar: 42}) # => {:foo=>"str", :bar=>42}
+schema.validate!({foo: 'str'})          # => {"foo"=>"str"}
+schema.validate!({foo: 'str', bar: 42}) # => {"foo"=>"str", "bar"=>42}
 schema.validate!({bar: 42})             # => Schemacop::Exceptions::ValidationError: /foo: Value must be given.
+```
+
+The name of the properties may either be a string or a symbol, and you can pass
+in the property either identified by a symbol or a string:
+
+The following two schemas are equal:
+
+```ruby
+schema = Schemacop::Schema3.new :hash do
+  int! :foo
+end
+
+schema.validate!(foo: 42)     # => {"foo"=>42}
+schema.validate!('foo' => 42) # => {"foo"=>42}
+
+schema = Schemacop::Schema3.new :hash do
+  int! 'foo'
+end
+
+schema.validate!(foo: 42)     # => {"foo"=>42}
+schema.validate!('foo' => 42) # => {"foo"=>42}
+```
+
+The result in both cases will be a
+[HashWithIndifferentAccess](https://api.rubyonrails.org/classes/ActiveSupport/HashWithIndifferentAccess.html),
+which means that you can access the data in the hash with the symbol as well
+as the string representation:
+
+```ruby
+schema = Schemacop::Schema3.new :hash do
+  int! :foo
+end
+
+result = schema.validate!(foo: 42)
+
+result.class  # => ActiveSupport::HashWithIndifferentAccess
+result[:foo]  # => 42
+result['foo'] # 42
+```
+
+Please note, that if you specify the value twice in the data you want to validate,
+once with the key being a symbol and once being a string, Schemacop will raise an
+error:
+
+```ruby
+schema = Schemacop::Schema3.new :hash do
+  int! :foo
+end
+
+schema.validate!(foo: 42, 'foo' => 43) # => Schemacop::Exceptions::ValidationError: /: Has 1 ambiguous properties: [:foo].
 ```
 
 ##### Pattern properties
@@ -543,8 +593,8 @@ schema = Schemacop::Schema3.new :hash do
 end
 
 schema.validate!({})                      # => {}
-schema.validate!({id_foo: 1})             # => {:id_foo=>1}
-schema.validate!({id_foo: 1, id_bar: 2})  # => {:id_foo=>1, :id_bar=>2}
+schema.validate!({id_foo: 1})             # => {"id_foo"=>1}
+schema.validate!({id_foo: 1, id_bar: 2})  # => {"id_foo"=>1, "id_bar"=>2}
 schema.validate!({foo: 3})                # => Schemacop::Exceptions::ValidationError: /: Obsolete property "foo".
 ```
 
@@ -562,7 +612,7 @@ enable all of them by enabling the option `additional_properties`:
 schema = Schemacop::Schema3.new :hash, additional_properties: true
 
 schema.validate!({}) # => {}
-schema.validate!({foo: :bar, baz: 42}) # => {:foo=>:bar, :baz=>42}
+schema.validate!({foo: :bar, baz: 42}) # => {"foo"=>:bar, "baz"=>42}
 ```
 
 Using the DSL method `add` in the hash-node's body however, you can specify
@@ -578,8 +628,8 @@ Schemacop::Schema3.new :hash do
   add :string
 end
 
-schema.validate!({id: 1})             # => {:id=>1}
-schema.validate!({id: 1, foo: 'bar'}) # => {:foo=>"bar", :id=>1}
+schema.validate!({id: 1})             # => {"id"=>1}
+schema.validate!({id: 1, foo: 'bar'}) # => {"id"=>1, "foo"=>"bar"}
 schema.validate!({id: 1, foo: 42})    # => Schemacop::Exceptions::ValidationError: /foo: Invalid type, expected "string".
 ```
 
@@ -589,12 +639,12 @@ any additional property **keys** must adhere to:
 ```ruby
 # The following schema allows any number of properties, but all keys must
 # consist of downcase letters from a-z.
-schema = Schemacop::Schema3.new :hash, additional_properties: :true, property_names: '^[a-z]+$'
+schema = Schemacop::Schema3.new :hash, additional_properties: true, property_names: '^[a-z]+$'
 
 
 schema.validate!({})            # => {}
-schema.validate!({foo: 123})    # => {:foo=>123}
-schema.validate!({Foo: 'bar'})  # => Schemacop::Exceptions::ValidationError: /: Property name :Foo does not match "^[a-z]+$".
+schema.validate!({foo: 123})    # => {"foo"=>123}
+schema.validate!({Foo: 'bar'})  # => Schemacop::Exceptions::ValidationError: /: Property name "Foo" does not match "^[a-z]+$".
 
 # The following schema allows any number of properties, but all keys must
 # consist of downcase letters from a-z AND the properties must be arrays.
@@ -603,7 +653,7 @@ schema = Schemacop::Schema3.new :hash, additional_properties: true, property_nam
 end
 
 schema.validate!({})                # => {}
-schema.validate!({foo: [1, 2, 3]})  # => {:foo=>[1, 2, 3]}
+schema.validate!({foo: [1, 2, 3]})  # => {"foo"=>[1, 2, 3]}
 schema.validate!({foo: :bar})       # => Schemacop::Exceptions::ValidationError: /foo: Invalid type, expected "array".
 schema.validate!({Foo: :bar})       # => Schemacop::Exceptions::ValidationError: /: Property name :Foo does not match "^[a-z]+$". /Foo: Invalid type, expected "array".
 ```
@@ -627,7 +677,7 @@ schema = Schemacop::Schema3.new :hash do
 end
 
 schema.validate!({}) # => Schemacop::Exceptions::ValidationError: /name: Value must be given.
-schema.validate!({name: 'Joe Doe'}) # => {:name=>"Joe Doe"}
+schema.validate!({name: 'Joe Doe'}) # => {"name"=>"Joe Doe"}
 schema.validate!({
   name: 'Joe Doe',
   billing_address: 'Street 42'
@@ -646,7 +696,7 @@ schema.validate!({
   phone_number: '000-000-00-00',
   credit_card: 'XXXX XXXX XXXX XXXX X'
 })
-# => {:name=>"Joe Doe", :credit_card=>"XXXX XXXX XXXX XXXX X", :billing_address=>"Street 42", :phone_number=>"000-000-00-00"}
+# => {"name"=>"Joe Doe", "credit_card"=>"XXXX XXXX XXXX XXXX X", "billing_address"=>"Street 42", "phone_number"=>"000-000-00-00"}
 ```
 
 ### Object
@@ -884,7 +934,7 @@ schema.validate!({
   }
 })
 
-# => {:shipping_address=>{:street=>"Example Street 42", :zip_code=>"12345", :location=>"London", :country=>"United Kingdom"}, :billing_address=>{:street=>"Main St.", :zip_code=>"54321", :location=>"Washington DC", :country=>"USA"}}
+# => {"shipping_address"=>{"street"=>"Example Street 42", "zip_code"=>"12345", "location"=>"London", "country"=>"United Kingdom"}, "billing_address"=>{"street"=>"Main St.", "zip_code"=>"54321", "location"=>"Washington DC", "country"=>"USA"}}
 ```
 
 Note that if you use the reference node with the long type name `reference`,
@@ -902,7 +952,7 @@ schema = Schemacop::Schema3.new :array do
 end
 
 schema.validate!([])                                      # => []
-schema.validate!([{first_name: 'Joe', last_name: 'Doe'}]) # => [{:first_name=>"Joe", :last_name=>"Doe"}]
+schema.validate!([{first_name: 'Joe', last_name: 'Doe'}]) # => [{"first_name"=>"Joe", "last_name"=>"Doe"}]
 schema.validate!([id: 42, first_name: 'Joe'])             # => Schemacop::Exceptions::ValidationError: /[0]/last_name: Value must be given. /[0]: Obsolete property "id".
 ```
 
@@ -940,7 +990,7 @@ schema = Schemacop::Schema3.new :reference, path: :Person
 # of the person.
 Schemacop.with_context context do
   schema.validate!({first_name: 'Joe', last_name: 'Doe', info: { born_at: '1980-01-01'} })
-  # => {:first_name=>"Joe", :last_name=>"Doe", :info=>{:born_at=>Tue, 01 Jan 1980}}
+  # => {"first_name"=>"Joe", "last_name"=>"Doe", "info"=>{"born_at"=>Tue, 01 Jan 1980}}
 end
 
 # Now we might want another context, where the person is more anonymous, and as
@@ -961,7 +1011,7 @@ Schemacop.with_context other_context do
   #    /: Obsolete property "last_name".
   #    /: Obsolete property "info".
 
-  schema.validate!({nickname: 'J.'}) # => {:nickname=>"J."}
+  schema.validate!({nickname: 'J.'}) # => {"nickname"=>"J."}
 end
 ```
 
@@ -1032,13 +1082,13 @@ schema = Schemacop::Schema3.new :hash do
 end
 
 schema.validate!({usr: {first_name: 'Joe', last_name: 'Doe'}})
-  # => {:usr=>{:first_name=>"Joe", :last_name=>"Doe"}}
+  # => {"usr"=>{"first_name"=>"Joe", "last_name"=>"Doe"}}
 
 schema.validate!({usr: {first_name: 'Joe', last_name: 'Doe', groups: []}})
-  # => {:usr=>{:first_name=>"Joe", :last_name=>"Doe", :groups=>[]}}
+  # => {"usr"=>{"first_name"=>"Joe", "last_name"=>"Doe", "groups"=>[]}}
 
 schema.validate!({usr: {first_name: 'Joe', last_name: 'Doe', groups: [{name: 'foo'}, {name: 'bar'}]}})
-  # => {:usr=>{:first_name=>"Joe", :last_name=>"Doe", :groups=>[{:name=>"foo"}, {:name=>"bar"}]}}
+  # => {"usr"=>{"first_name"=>"Joe", "last_name"=>"Doe", "groups"=>[{"name"=>"foo"}, {"name"=>"bar"}]}}
 ```
 
 ### Non-Rails applications
