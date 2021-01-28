@@ -11,6 +11,8 @@ module Schemacop
 
       supports_children(name: true)
 
+      attr_reader :properties
+
       def self.allowed_options
         super + ATTRIBUTES - %i[dependencies] + %i[additional_properties]
       end
