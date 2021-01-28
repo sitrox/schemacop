@@ -36,6 +36,7 @@ module Schemacop
             required:    options.delete(:required),
             name:        options.delete(:name),
             as:          options.delete(:as),
+            description: options.delete(:description)
           }
           node = create(:one_of, **one_of_options) do
             self.node node
