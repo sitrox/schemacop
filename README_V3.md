@@ -24,7 +24,7 @@
 
 ## Validation
 
-Using schemacop, you can either choose to validate the data either using the
+Using Schemacop, you can either choose to validate your data either using the
 graceful `validate` method, or the bang variant, `validate!`.
 
 The `validate` method on a schema with some supplied data will return a
@@ -68,14 +68,14 @@ schema.validate!('Foo')         # => Schemacop::Exceptions::ValidationError: /: 
 
 Schemacop can raise the following exceptions:
 
-* `Schemacop::Exceptions::ValidationError`: This exception is raised when the `validate!`
-  method is used, and the data that was passed in is invalid. The exception message contains
-  additional informations why the validation failed.
+* `Schemacop::Exceptions::ValidationError`: This exception is raised when the
+  `validate!` method is used, and the data that was passed in is invalid. The
+  exception message contains additional information why the validation failed.
 
   Example:
 
   ```ruby
-  schema = Schemacop::Schema3.new :hash do
+  schema = Schemacop::Schema3.new do
     int! :foo
   end
 
@@ -83,14 +83,14 @@ Schemacop can raise the following exceptions:
   # => Schemacop::Exceptions::ValidationError: /foo: Invalid type, expected "integer".
   ```
 
-* `Schemacop::Exceptions::InvalidSchemaError`: This exception is raised when the schema
-  itself is not valid. The exception message contains additional informations why the
-  validation failed.
+* `Schemacop::Exceptions::InvalidSchemaError`: This exception is raised when the
+  schema itself is not valid. The exception message contains additional
+  information why the validation failed.
 
   Example:
 
- ```ruby
-  Schemacop::Schema3.new :hash do
+  ```ruby
+  Schemacop::Schema3.new do
     int!
   end
 
@@ -108,7 +108,6 @@ The nodes in Schemacop v3 also support generic keywords, similar to JSON schema:
   value is not in the array, the validation will fail
 * `default`: You may provide a default value for items that will be set if the
   value is not given
-
 
 The three keywords `title`, `description` and `examples` aren't used for validation,
 but can be used to document the schema. They will be included in the JSON output
@@ -134,7 +133,7 @@ schema.validate!('bar') # => "bar"
 schema.validate!('baz') # => Schemacop::Exceptions::ValidationError: /: Value not included in enum ["foo", "bar"].
 ```
 
-Please note, that you can also specify values in the enum that are not valid for
+Please note that you can also specify values in the enum that are not valid for
 the schema. This means that the validation will still fail:
 
 ```ruby
@@ -196,9 +195,9 @@ transformed into various types.
 #### Options
 
 * `min_length`
-  Defines the minimum required string length
+  Defines the (inclusive) minimum required string length
 * `max_length`
-  Defines the maximum required string length
+  Defines the (inclusive) maximum required string length
 * `pattern`
   Defines a (ruby) regex pattern the value will be matched against. Must be a
   string and should generally start with `^` and end with `$` so as to evaluate
@@ -230,7 +229,7 @@ transformed into various types.
 
 * `boolean`
   The string must be either `true` or `false`. This value will be casted to
-  ruby's `TrueClass` or `FalseClass`.
+  Ruby's `TrueClass` or `FalseClass`.
 
 * `binary`
   The string is expected to contain binary contents. No casting or additional
@@ -403,11 +402,11 @@ It consists of one or multiple values, which can be validated using arbitrary no
 
 #### Contains
 
-The `array` node features the contains node, which you can use with the DSL
-method `cont`. With that DSL method, you can specify a schema which at least
-one item in the array needs to validate against.
+The `array` node features the *contains* node, which you can use with the DSL
+method `cont`. With that DSL method, you can specify a schema which at least one
+item in the array needs to validate against.
 
-One usecase for example could be that you want an array of integers, from which
+One use case for example could be that you want an array of integers, from which
 at least one must be 5 or larger:
 
 ```ruby
@@ -447,9 +446,10 @@ how you specify your array contents.
 
 List validation validates a sequence of arbitrary length where each item matches
 the same schema. Unless you specify a `min_items` count on the array node, an
-empty array will also validate. To specify a list validation, use the `list`
-DSL method, and specify the type you want to validate against. Here, you need
-to specify the type of the element using the long `type` name (e.g. `integer` and not `int`).
+empty array will also suffice. To specify a list validation, use the `list` DSL
+method, and specify the type you want to validate against. Here, you need to
+specify the type of the element using the long `type` name (e.g. `integer` and
+not `int`).
 
 For example, you can specify that you want an array with only integers between 1 and 5:
 
@@ -542,8 +542,8 @@ schema.validate!([1, 'foo', 'bar']) # => Schemacop::Exceptions::ValidationError:
 schema.validate!([1, 'foo', 2, 3])  # => [1, "foo", 2, 3]
 ```
 
-Please note, that you cannot use multiple `add` in the same array schema, this will result in
-an exception:
+Please note that you cannot use multiple `add` in the same array schema, this
+will result in an exception:
 
 ```ruby
 schema = Schemacop::Schema3.new :array do
@@ -555,9 +555,10 @@ end
 # => Schemacop::Exceptions::InvalidSchemaError: You can only use "add" once to specify additional items.
 ```
 
-If you want to specify that your schema accept multiple additional types, use the `one_of`
-type (see below for more infos). The correct way to specify that you want to allow additional
-items, which may be an integer or a string is as follows:
+If you want to specify that your schema accept multiple additional types, use
+the `one_of` type (see below for more infos). The correct way to specify that
+you want to allow additional items, which may be an integer or a string is as
+follows:
 
 ```ruby
 schema = Schemacop::Schema3.new :array do
@@ -592,7 +593,7 @@ It consists of key-value-pairs that can be validated using arbitrary nodes.
 * `property_names`
   This option allows to specify a regexp pattern (as string) which validates the
   keys of any properties that are not specified in the hash. This option only
-  makes sense if `additional_properties` is enabled. See below for more informations.
+  makes sense if `additional_properties` is enabled. See below for more information.
 
 * `min_properties`
   Specifies the (inclusive) minimum number of properties a hash must contain.
@@ -645,8 +646,8 @@ schema.validate!('foo' => 42) # => {"foo"=>42}
 
 The result in both cases will be a
 [HashWithIndifferentAccess](https://api.rubyonrails.org/classes/ActiveSupport/HashWithIndifferentAccess.html),
-which means that you can access the data in the hash with the symbol as well
-as the string representation:
+which means that you can access the data in the hash with the symbol as well as
+the string representation:
 
 ```ruby
 schema = Schemacop::Schema3.new :hash do
@@ -660,9 +661,9 @@ result[:foo]  # => 42
 result['foo'] # 42
 ```
 
-Please note, that if you specify the value twice in the data you want to validate,
-once with the key being a symbol and once being a string, Schemacop will raise an
-error:
+Please note that if you specify the value twice in the data you want to
+validate, once with the key being a symbol and once being a string, Schemacop
+will raise an error:
 
 ```ruby
 schema = Schemacop::Schema3.new :hash do
@@ -798,10 +799,11 @@ schema.validate!({
 Type: `:object`\
 DSL: `obj`
 
-The object type represents a ruby `Object`. Please note that the `as_json`  method
-on nodes of this type will just return `{}` (an empty JSON object), as there isn't
-a useful way to represent a ruby object without conflicting with the `Hash` type.
-If you want to represent an JSON object, you should use the `Hash` node.
+The object type represents a Ruby `Object`. Please note that the `as_json`
+method on nodes of this type will just return `{}` (an empty JSON object), as
+there isn't a useful way to represent a Ruby object without conflicting with the
+`Hash` type. If you want to represent a JSON object, you should use the `Hash`
+node.
 
 In the most basic form, this node will accept anything:
 
@@ -882,7 +884,7 @@ schema.validate!('foooo') # => Schemacop::Exceptions::ValidationError: /: Does n
 Type: `:any_of`\
 DSL: `any_of`
 
-Similar to the AllOf node, you can specify multiple schemas, for which the
+Similar to the `all_of` node, you can specify multiple schemas, for which the
 given value needs to validate against at least one of the schemas.
 
 For example, your value needs to be either a string which is at least 2
@@ -899,7 +901,7 @@ schema.validate!('foo') # => "foo"
 schema.validate!(42)    # => 42
 ```
 
-Please note that you need to specify at least one item in the AllOf node:
+Please note that you need to specify at least one item in the `any_of` node:
 
 ```ruby
 Schemacop::Schema3.new :any_of # => Schemacop::Exceptions::InvalidSchemaError: Node "any_of" makes only sense with at least 1 item.
@@ -910,9 +912,9 @@ Schemacop::Schema3.new :any_of # => Schemacop::Exceptions::InvalidSchemaError: N
 Type: `:one_of`\
 DSL: `one_of`
 
-Similar to the AllOf node, you can specify multiple schemas, for which the
-given value needs to validate against at exaclty one of the schemas. If the
-given value validates against multiple schemas, the value is invalid.
+Similar to the `all_of` node, you can specify multiple schemas, for which the
+given value needs to validate against exaclty one of the schemas. If the given
+value validates against multiple schemas, the value is invalid.
 
 For example, if you want an integer which is either a multiple of 2 or 3,
 but not both (i.e. no multiple of 6), you could do it as follows:
@@ -951,7 +953,7 @@ schema.validate!(6) # => Schemacop::Exceptions::ValidationError: /: Matches 2 de
 Type: `:is_not`\
 DSL: `is_not`
 
-With the IsNot node, you can specify a schema which the given value must not
+With the `is_not` node, you can specify a schema which the given value must not
 validate against, i.e. every value which matches the schema will make this node
 invalid.
 
@@ -969,7 +971,7 @@ schema.validate!(3)     # => Schemacop::Exceptions::ValidationError: /: Must not
 schema.validate!('foo') # => "foo"
 ```
 
-Note that a IsNot node needs exactly one item:
+Note that a `is_not` node needs exactly one item:
 
 ```ruby
 schema = Schemacop::Schema3.new :is_not # => Schemacop::Exceptions::InvalidSchemaError: Node "is_not" only allows exactly one item.
@@ -984,7 +986,7 @@ Type: `reference`
 **Definition**
 DSL: `scm`
 
-Finally, with the Reference node, you can define schemas and then later reference
+Finally, with the *Reference* node, you can define schemas and then later reference
 them for usage, e.g. when you have a rather long schema which you need at multiple
 places.
 
@@ -1052,7 +1054,7 @@ schema.validate!([id: 42, first_name: 'Joe'])             # => Schemacop::Except
 
 ## Context
 
-Schemacop als features the concept of a `Context`. You can define schemas in a
+Schemacop also features the concept of a `Context`. You can define schemas in a
 context, and then reference them in other schemas in that context. This is e.g.
 useful if you need a part of the schema to be different depending on the
 business action.
@@ -1076,7 +1078,7 @@ context.schema :PersonInfo do
 end
 
 # Now we can define our general schema, where we reference the :Person schema.
-# Note that at this point, we don't know what's in the :Person sche,a
+# Note that at this point, we don't know what's in the :Person schema.
 schema = Schemacop::Schema3.new :reference, path: :Person
 
 # Validate the data in the context we defined before, where we need the first_name
@@ -1097,7 +1099,7 @@ other_context.schema :Person do
 end
 
 # Finally, validate the data in the new context. We do not want the real name or
-# birth date of the person, instead only the nickname is allowed
+# birth date of the person, instead only the nickname is allowed.
 Schemacop.with_context other_context do
   schema.validate!({first_name: 'Joe', last_name: 'Doe', info: { born_at: '1980-01-01'} })
   # => Schemacop::Exceptions::ValidationError: /nickname: Value must be given.
@@ -1115,11 +1117,11 @@ to use other data in the second context than in the first.
 
 ## External schemas
 
-Finally, schemacop features the possibilit to specify schemas in seperate files.
-This is especially useful is you have schemas in your application which are used
-multiple times through the application.
+Finally, Schemacop features the possibility to specify schemas in seperate
+files.  This is especially useful is you have schemas in your application which
+are used multiple times throughout the application.
 
-For each schema, you define the schema in a single file, and after loading the
+For each schema, you define the schema in a separate file, and after loading the
 schemas, you can reference them in other schemas.
 
 The default load path is `'app/schemas'`, but this can be configured by setting

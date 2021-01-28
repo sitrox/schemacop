@@ -10,7 +10,13 @@
 ### Changes
 -->
 
-## 3.0.0.r2
+## 3.0.0.rc3
+
+* Add minor improvements to the documentation
+
+* Internal restructuring, no changes in API
+
+## 3.0.0.rc2
 
 * Represent node names as strings internally
 
