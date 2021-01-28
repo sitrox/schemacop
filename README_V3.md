@@ -90,7 +90,7 @@ Schemacop can raise the following exceptions:
   Example:
 
   ```ruby
-  Schemacop::Schema3.new do
+  Schemacop::Schema3.new :hash do
     int!
   end
 
