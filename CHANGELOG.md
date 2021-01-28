@@ -10,19 +10,19 @@
 ### Changes
 -->
 
-## 3.0.0.rc3
+## 3.0.0.rc3 (2020-01-28)
 
 * Add minor improvements to the documentation
 
 * Internal restructuring, no changes in API
 
-## 3.0.0.rc2
+## 3.0.0.rc2 (2020-01-28)
 
 * Represent node names as strings internally
 
 * Update documentation
 
-## 3.0.0.rc1
+## 3.0.0.rc1 (2020-01-22)
 
 * Add support for ruby `3.0.0`
 
@@ -30,7 +30,7 @@
 
 * Document all `v3` nodes
 
-## 3.0.0.rc0
+## 3.0.0.rc0 (2020-01-14)
 
 * Add `Schemacop::Schema3`
 
