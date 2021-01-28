@@ -193,10 +193,10 @@ module Schemacop
             next
           end
 
-          result[prop.name] = prop.cast(data_hash[prop.name])
+          result[prop.as || prop.name] = prop.cast(data_hash[prop.name])
 
-          if result[prop.name].nil? && !data_hash.include?(prop.name)
-            result.delete(prop.name)
+          if result[prop.as || prop.name].nil? && !data_hash.include?(prop.name)
+            result.delete(prop.as || prop.name)
           end
         end
 

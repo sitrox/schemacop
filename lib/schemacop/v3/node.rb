@@ -2,6 +2,7 @@ module Schemacop
   module V3
     class Node
       attr_reader :name
+      attr_reader :as
       attr_reader :default
       attr_reader :title
       attr_reader :description
@@ -32,8 +33,9 @@ module Schemacop
         if options.delete(:cast_str)
           format = NodeRegistry.name(klass)
           one_of_options = {
-            required: options.delete(:required),
-            name:     options.delete(:name)
+            required:    options.delete(:required),
+            name:        options.delete(:name),
+            as:          options.delete(:as),
           }
           node = create(:one_of, **one_of_options) do
             self.node node
@@ -45,7 +47,7 @@ module Schemacop
       end
 
       def self.allowed_options
-        %i[name required default description examples enum parent options cast_str title]
+        %i[name required default description examples enum parent options cast_str title as]
       end
 
       def self.dsl_methods
@@ -75,6 +77,7 @@ module Schemacop
         # Assign attributes #
         @name = options.delete(:name)
         @name = @name.to_s unless @name.nil? || @name.is_a?(Regexp)
+        @as = options.delete(:as)
         @required = !!options.delete(:required)
         @default = options.delete(:default)
         @title = options.delete(:title)
