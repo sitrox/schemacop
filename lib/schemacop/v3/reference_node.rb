@@ -36,7 +36,13 @@ module Schemacop
       end
 
       def used_external_schemas
-        schemas.include?(@path) ? [] : [@path]
+        target_children_schema = target.used_external_schemas
+
+        if schemas.include?(@path)
+          return target_children_schema
+        else
+          return [@path] + target_children_schema
+        end
       end
 
       protected

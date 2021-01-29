@@ -143,6 +143,20 @@ module Schemacop
           error '/[0]', 'Value must be given.'
         end
       end
+
+      def test_not_support_block
+        assert_raises_with_message Schemacop::Exceptions::InvalidSchemaError, "Node Schemacop::V3::IntegerNode does not support blocks." do
+          schema :integer do
+            int :foo
+          end
+        end
+      end
+
+      def test_node_no_children
+        @schema = Schemacop::Schema3.new
+
+        assert_equal(@schema.root.children, [])
+      end
     end
   end
 end

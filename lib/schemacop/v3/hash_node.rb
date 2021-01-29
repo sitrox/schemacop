@@ -176,14 +176,7 @@ module Schemacop
         data ||= default
         return nil if data.nil?
 
-        original_data_hash = data.dup
-        data_hash = data.with_indifferent_access
-
-        if original_data_hash.size != data_hash.size
-          ambiguous_properties = original_data_hash.keys - data_hash.keys
-
-          result.error "Has #{ambiguous_properties.size} ambiguous properties: #{ambiguous_properties}."
-        end
+        data_hash = data.dup.with_indifferent_access
 
         property_patterns = {}
 

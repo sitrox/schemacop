@@ -249,6 +249,8 @@ module Schemacop
           ref? :node, :Node
         end
 
+        assert_equal(@schema.root.used_external_schemas, [])
+
         assert_validation({})
         assert_validation(node: { name: '1', children: [{ name: '1' }, { name: '2' }] })
         assert_validation(
@@ -313,6 +315,8 @@ module Schemacop
             ref! :person, :Person
           end
 
+          assert_equal(@schema.root.used_external_schemas, %i[Person PersonInfo])
+
           assert_validation(person: { first_name: 'John', last_name: 'Doe' })
           assert_validation(person: { first_name: 'John', last_name: 'Doe', info: { born_at: '1990-01-13' } })
           assert_validation(person: { first_name_x: 'John', last_name: 'Doe' }) do
@@ -322,6 +326,18 @@ module Schemacop
           assert_validation(person: { first_name: 'John', last_name: 'Doe', info: { born_at: 'never' } }) do
             error '/person/info/born_at', 'String does not match format "date".'
           end
+        end
+
+        with_context context do
+          schema do
+            scm :PersonNode do
+              ref! :person, :Person
+            end
+
+            ref! :personNode, :PersonNode
+          end
+
+          assert_equal(@schema.root.used_external_schemas, %i[Person PersonInfo])
         end
       end
 

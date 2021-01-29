@@ -90,6 +90,17 @@ module Schemacop
         assert_verr { s.validate!(o: true) }
         assert_verr { s.validate!(r: nil, r_nil: false, o: true) }
       end
+
+      def test_invalid_hash
+        s = Schema.new do
+          type :hash do
+            req :foo
+          end
+        end
+
+        assert_verr { s.validate!({foo: 42, 'foo' => 42}) }
+        assert_nothing_raised { s.validate!({foo: 42}.with_indifferent_access) }
+      end
     end
   end
 end

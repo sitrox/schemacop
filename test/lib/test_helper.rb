@@ -1,5 +1,12 @@
 require 'simplecov'
-SimpleCov.start
+SimpleCov.start do
+    add_group 'v3', 'lib/schemacop/v3'
+    add_group 'v2', 'lib/schemacop/v2'
+
+    # We don't care about the test coverage for the
+    # tests themselves
+    add_filter 'test'
+end
 
 # TODO: Move to more sensible location
 def assert_verr(&block)

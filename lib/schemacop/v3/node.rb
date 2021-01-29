@@ -72,7 +72,7 @@ module Schemacop
         disallowed_options = options.keys - self.class.allowed_options
 
         if disallowed_options.any?
-          fail "Options #{disallowed_options.inspect} are not allowed for this node."
+          fail Schemacop::Exceptions::InvalidSchemaError, "Options #{disallowed_options.inspect} are not allowed for this node."
         end
 
         # Assign attributes #
@@ -95,7 +95,7 @@ module Schemacop
         # Run DSL block #
         if block_given?
           unless self.class.supports_children_options
-            fail "Node #{self.class} does not support blocks."
+            fail Schemacop::Exceptions::InvalidSchemaError, "Node #{self.class} does not support blocks."
           end
 
           scope = DslScope.new(self)

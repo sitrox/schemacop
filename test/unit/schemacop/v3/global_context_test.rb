@@ -25,8 +25,10 @@ module Schemacop
 
       def test_schemas
         assert_equal({}, GlobalContext.instance.schemas)
+        assert_equal({}, GlobalContext.schemas)
         GlobalContext.instance.eager_load!
         assert_equal(%i[nested/group user], GlobalContext.instance.schemas.keys)
+        assert_equal(%i[nested/group user], GlobalContext.schemas.keys)
         assert_is_a Node, GlobalContext.instance.schemas.values.first
       end
 

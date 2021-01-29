@@ -40,10 +40,6 @@ module Schemacop
       def self.name(klass)
         @by_class[klass][:name]
       end
-
-      def self.short_name(klass)
-        @by_class[klass][:short_name]
-      end
     end
   end
 end

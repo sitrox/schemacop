@@ -115,6 +115,43 @@ module Schemacop
         assert_equal expected_float, s.validate!(float_field: '')
         assert_equal expected_float, s.validate!(float_field: '     ')
       end
+
+      def test_float_to_integer
+        s = Schema.new do
+          req :foo, :integer, cast: [Float]
+        end
+
+        assert_equal({foo: 42}, s.validate!(foo: 42.0))
+        assert_equal({foo: 42}, s.validate!(foo: Float(42)))
+      end
+
+      def test_integer_to_float
+        s = Schema.new do
+          req :foo, :float, cast: [Integer]
+        end
+
+        assert_equal({foo: 42.0}, s.validate!(foo: 42))
+        assert_equal({foo: 42.0}, s.validate!(foo: Integer(42)))
+      end
+
+      def test_invalid_cast_option
+        s = Schema.new do
+          req :foo, :integer, cast: true
+        end
+
+        assert_raises Schemacop::Exceptions::InvalidSchemaError do
+          s.validate!({foo: '42'})
+        end
+      end
+
+      def test_impossible_cast
+        s = Schema.new do
+          req :foo, :integer, cast: [String]
+        end
+
+        assert_equal({foo: 42}, s.validate!(foo: '42'))
+        assert_verr {s.validate!(foo: 'foo') }
+      end
     end
   end
 end
