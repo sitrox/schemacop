@@ -875,7 +875,7 @@ module Schemacop
       end
 
       def test_invalid_options
-        assert_raises_with_message Schemacop::Exceptions::InvalidSchemaError, "Options [:foo] are not allowed for this node." do
+        assert_raises_with_message Schemacop::Exceptions::InvalidSchemaError, 'Options [:foo] are not allowed for this node.' do
           schema :hash, foo: 'bar' do
             int! :id
           end

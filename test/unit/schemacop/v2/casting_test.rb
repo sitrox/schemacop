@@ -121,8 +121,8 @@ module Schemacop
           req :foo, :integer, cast: [Float]
         end
 
-        assert_equal({foo: 42}, s.validate!(foo: 42.0))
-        assert_equal({foo: 42}, s.validate!(foo: Float(42)))
+        assert_equal({ foo: 42 }, s.validate!(foo: 42.0))
+        assert_equal({ foo: 42 }, s.validate!(foo: Float(42)))
       end
 
       def test_integer_to_float
@@ -130,8 +130,8 @@ module Schemacop
           req :foo, :float, cast: [Integer]
         end
 
-        assert_equal({foo: 42.0}, s.validate!(foo: 42))
-        assert_equal({foo: 42.0}, s.validate!(foo: Integer(42)))
+        assert_equal({ foo: 42.0 }, s.validate!(foo: 42))
+        assert_equal({ foo: 42.0 }, s.validate!(foo: Integer(42)))
       end
 
       def test_invalid_cast_option
@@ -140,7 +140,7 @@ module Schemacop
         end
 
         assert_raises Schemacop::Exceptions::InvalidSchemaError do
-          s.validate!({foo: '42'})
+          s.validate!({ foo: '42' })
         end
       end
 
@@ -149,8 +149,8 @@ module Schemacop
           req :foo, :integer, cast: [String]
         end
 
-        assert_equal({foo: 42}, s.validate!(foo: '42'))
-        assert_verr {s.validate!(foo: 'foo') }
+        assert_equal({ foo: 42 }, s.validate!(foo: '42'))
+        assert_verr { s.validate!(foo: 'foo') }
       end
     end
   end

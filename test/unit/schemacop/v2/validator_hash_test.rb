@@ -98,8 +98,8 @@ module Schemacop
           end
         end
 
-        assert_verr { s.validate!({foo: 42, 'foo' => 42}) }
-        assert_nothing_raised { s.validate!({foo: 42}.with_indifferent_access) }
+        assert_verr { s.validate!({ foo: 42, 'foo' => 42 }) }
+        assert_nothing_raised { s.validate!({ foo: 42 }.with_indifferent_access) }
       end
     end
   end

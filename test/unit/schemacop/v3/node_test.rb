@@ -145,7 +145,7 @@ module Schemacop
       end
 
       def test_not_support_block
-        assert_raises_with_message Schemacop::Exceptions::InvalidSchemaError, "Node Schemacop::V3::IntegerNode does not support blocks." do
+        assert_raises_with_message Schemacop::Exceptions::InvalidSchemaError, 'Node Schemacop::V3::IntegerNode does not support blocks.' do
           schema :integer do
             int :foo
           end
