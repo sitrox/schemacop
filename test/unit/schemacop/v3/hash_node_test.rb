@@ -16,8 +16,19 @@ module Schemacop
         assert_json(type: :object, additionalProperties: false)
       end
 
-      def test_additional_properties_false
+      def test_additional_properties_false_by_default
         schema
+        assert_validation({})
+        assert_validation(foo: :bar, bar: :baz) do
+          error '/', 'Obsolete property "foo".'
+          error '/', 'Obsolete property "bar".'
+        end
+        assert_json(type: :object, additionalProperties: false)
+      end
+
+      def test_additional_properties_false
+        schema :hash, additional_properties: false
+
         assert_validation({})
         assert_validation(foo: :bar, bar: :baz) do
           error '/', 'Obsolete property "foo".'

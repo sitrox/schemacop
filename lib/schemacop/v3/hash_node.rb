@@ -68,7 +68,7 @@ module Schemacop
 
         # In schemacop, by default, additional properties are not allowed,
         # the users explicitly need to enable additional properties
-        if options[:additional_properties] == true
+        if options[:additional_properties].is_a?(TrueClass)
           json[:additionalProperties] = true
         elsif options[:additional_properties].is_a?(Node)
           json[:additionalProperties] = options[:additional_properties].as_json
@@ -141,7 +141,9 @@ module Schemacop
             result.error "Property name #{name.inspect} does not match #{options[:property_names].inspect}."
           end
 
-          if options[:additional_properties].blank?
+          if options[:additional_properties].is_a?(TrueClass)
+            next
+          elsif options[:additional_properties].is_a?(FalseClass) || options[:additional_properties].blank?
             match = property_patterns.keys.find { |p| p.match?(name.to_s) }
             if match
               result.in_path(name) do
@@ -206,7 +208,7 @@ module Schemacop
         end
 
         # Handle additional properties
-        if options[:additional_properties] == true
+        if options[:additional_properties].is_a?(TrueClass)
           result = data_hash.merge(result)
         elsif options[:additional_properties].is_a?(Node)
           specified_properties = @properties.keys.to_set
@@ -230,6 +232,11 @@ module Schemacop
         @options[:type] = :object
         unless @options[:additional_properties].nil? || @options[:additional_properties].is_a?(TrueClass) || @options[:additional_properties].is_a?(FalseClass)
           fail Schemacop::Exceptions::InvalidSchemaError, 'Option "additional_properties" must be a boolean value'
+        end
+
+        # Default the additional_properties option to false if it's not given
+        if @options[:additional_properties].nil?
+          @options[:additional_properties] = false
         end
       end
 
