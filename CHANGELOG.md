@@ -10,6 +10,15 @@
 ### Changes
 -->
 
+## 3.0.0.rc4 (2020-02-02)
+
+* Fix some minor bugs
+
+* Improve documentation
+
+* `used_external_schemas` for the `ReferenceNode` is now applied
+  recursively
+
 ## 3.0.0.rc3 (2020-01-28)
 
 * Add minor improvements to the documentation
