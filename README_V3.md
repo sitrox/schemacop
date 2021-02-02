@@ -380,7 +380,7 @@ schema.validate!(1234)    # => Schemacop::Exceptions::ValidationError: /: Invali
 ### Array
 
 Type: `:array`\
-DSL: `arr`
+DSL: `ary`
 
 The array type represents a ruby `Array`.
 It consists of one or multiple values, which can be validated using arbitrary nodes.
@@ -587,8 +587,9 @@ It consists of key-value-pairs that can be validated using arbitrary nodes.
 
 * `additional_properties`
   This option specifies whether additional, unspecified properties are allowed
-  (`true`) or not (`false`). By default, this is `true` if no properties are
-  specified and `false` if you have specified at least one property.
+  (`true`) or not (`false`). By default, this is `false`, i.e. you need to
+  explicitly set it to `true` if you want to allow arbitrary additional properties,
+  or use the `add` DSL method (see below) to specify additional properties.
 
 * `property_names`
   This option allows to specify a regexp pattern (as string) which validates the
