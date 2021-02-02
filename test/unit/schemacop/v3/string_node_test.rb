@@ -111,6 +111,9 @@ module Schemacop
         assert_validation 'foo 2020-01-29 bar' do
           error '/', 'String does not match format "date".'
         end
+
+        assert_cast(nil, nil)
+        assert_cast('2020-01-13', Date.new(2020, 1, 13))
       end
 
       def test_format_date_time
@@ -132,6 +135,9 @@ module Schemacop
         assert_validation '2018-11-13T20:20:39Y' do
           error '/', 'String does not match format "date-time".'
         end
+
+        assert_cast(nil, nil)
+        assert_cast('2018-11-13T20:20:39+00:00', DateTime.new(2018, 11, 13, 20, 20, 39))
       end
 
       def test_format_email
@@ -154,6 +160,9 @@ module Schemacop
         assert_validation '@john@example.com' do
           error '/', 'String does not match format "email".'
         end
+
+        assert_cast(nil, nil)
+        assert_cast('john.doe@example.com', 'john.doe@example.com')
       end
 
       def test_enum
@@ -187,18 +196,24 @@ module Schemacop
 
         assert_cast 'true', true
         assert_cast 'false', false
+
+        assert_cast nil, nil
       end
 
       def test_time_casting
         schema :string, format: :time
         assert_json(type: :string, format: :time)
         assert_cast '20:30:39+00:00', Time.strptime('20:30:39+00:00', '%H:%M:%S%z')
+
+        assert_cast nil, nil
       end
 
       def test_date_casting
         schema :string, format: :date
         assert_json(type: :string, format: :date)
         assert_cast '2018-11-13', Date.new(2018, 11, 13)
+
+        assert_cast nil, nil
       end
 
       def test_date_time_casting
@@ -207,12 +222,16 @@ module Schemacop
         assert_cast '2018-11-13T20:20:39+00:00', DateTime.new(2018, 11, 13, 20, 20, 39)
         assert_cast '2018-11-13T20:20:39Z', DateTime.new(2018, 11, 13, 20, 20, 39)
         assert_cast '2018-11-13T20:20:39+01:00', DateTime.new(2018, 11, 13, 20, 20, 39, '+1')
+
+        assert_cast nil, nil
       end
 
       def test_email_casting
         schema :string, format: :email
         assert_json(type: :string, format: :email)
         assert_cast 'support@example.com', 'support@example.com'
+
+        assert_cast nil, nil
       end
 
       def test_default
@@ -231,6 +250,25 @@ module Schemacop
 
         assert_cast('Foo', 'Foo')
         assert_cast(nil, 'Hello')
+      end
+
+      def test_default_casting
+        schema :string, format: :integer, default: '42'
+
+        assert_json(
+          type:    :string,
+          format:  :integer,
+          default: '42'
+        )
+
+        assert_validation(nil)
+        assert_validation('123')
+        assert_validation(5) do
+          error '/', 'Invalid type, expected "string".'
+        end
+
+        assert_cast('123', 123)
+        assert_cast(nil, 42)
       end
 
       # Helper function that checks for all the options if the option is

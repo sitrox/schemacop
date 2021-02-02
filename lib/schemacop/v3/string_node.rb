@@ -66,21 +66,29 @@ module Schemacop
       end
 
       def cast(value)
+        if value.present?
+          to_cast = value
+        elsif default.present?
+          to_cast = default
+        else
+          return nil
+        end
+
         case options[:format]
         when :boolean
-          return value == 'true'
+          return to_cast == 'true'
         when :date
-          return Date.parse(value)
+          return Date.parse(to_cast)
         when :'date-time'
-          return DateTime.parse(value)
+          return DateTime.parse(to_cast)
         when :time
-          Time.parse(value)
+          Time.parse(to_cast)
         when :integer
-          return Integer(value)
+          return Integer(to_cast)
         when :number
-          return Float(value)
+          return Float(to_cast)
         else
-          return value || default
+          return to_cast
         end
       end
 

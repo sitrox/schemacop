@@ -882,11 +882,17 @@ module Schemacop
         end
       end
 
-      # def test_invalid_key_names
-      #   schema :hash do
-      #     int!
-      #   end
-      # end
+      def test_casting_optional
+        schema :hash do
+          str? :foo, format: :integer
+        end
+
+        assert_validation(nil)
+        assert_validation({})
+
+        assert_cast(nil, nil)
+        assert_cast({}, {}.with_indifferent_access)
+      end
     end
   end
 end
