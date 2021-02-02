@@ -18,6 +18,7 @@ module Schemacop::V2
       @data = data
       @target_type = target_type
       @caster = nil
+      @value = nil
 
       if casts.is_a?(Array)
         from_types = casts

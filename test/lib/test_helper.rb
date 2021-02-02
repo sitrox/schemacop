@@ -151,7 +151,12 @@ class V3Test < SchemacopTest
     input_data_was = Marshal.load(Marshal.dump(input_data))
     result = @schema.validate(input_data)
     assert_empty result.errors
-    assert_equal expected_data, result.data, 'Unexpected result data.'
+
+    if expected_data.nil?
+      assert_nil result.data, 'Unexpected result data.'
+    else
+      assert_equal expected_data, result.data, 'Unexpected result data.'
+    end
 
     if input_data.nil?
       assert_nil input_data_was, 'Expected input_data to stay the same.'
