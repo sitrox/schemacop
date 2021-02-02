@@ -674,6 +674,61 @@ end
 schema.validate!(foo: 42, 'foo' => 43) # => Schemacop::Exceptions::ValidationError: /: Has 1 ambiguous properties: [:foo].
 ```
 
+In addition to the normal node options (which vary from type to type, check
+the respective nodes for details), properties also support the `as` option.
+
+With this, you can "rename" properties in the output:
+
+```ruby
+schema = Schemacop::Schema3.new :hash do
+  int! :foo, as: :bar
+end
+
+schema.validate!({foo: 42}) # => {"bar"=>42}
+```
+
+Please note that if you specify a node with the same property name multiple
+times, or use the `as` option to rename a node to the same name of another
+node, the last specified node will be used:
+
+```ruby
+schema = Schemacop::Schema3.new :hash do
+  int? :foo
+  str? :foo
+end
+
+schema.validate!({foo: 1})      # => Schemacop::Exceptions::ValidationError: /foo: Invalid type, expected "string".
+schema.validate!({foo: 'bar'})  # => {"foo"=>"bar"}
+```
+
+As well as:
+
+```ruby
+schema = Schemacop::Schema3.new :hash do
+  int? :foo
+  int? :bar, as: :foo
+end
+
+schema.validate!({foo: 1})          # => {"foo"=>1}
+schema.validate!({foo: 1, bar: 2})  # => {"foo"=>2}
+schema.validate!({bar: 2})          # => {"foo"=>2}
+```
+
+If you want to specify a node which may be one of multiple types, use the `one_of`
+node (see further down for more details):
+
+```ruby
+schema = Schemacop::Schema3.new :hash do
+  one_of! :foo do
+    int
+    str
+  end
+end
+
+schema.validate!({foo: 1})      # => {"foo"=>1}
+schema.validate!({foo: 'bar'})  # => {"foo"=>"bar"}
+```
+
 ##### Pattern properties
 
 In addition to symbols, property keys can also be a regular expression. Here,

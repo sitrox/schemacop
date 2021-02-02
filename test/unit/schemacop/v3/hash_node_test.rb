@@ -904,6 +904,69 @@ module Schemacop
         assert_cast(nil, nil)
         assert_cast({}, {}.with_indifferent_access)
       end
+
+      def test_as_option
+        schema :hash do
+          int! :foo, as: :bar
+        end
+
+        assert_validation(nil)
+        assert_validation({foo: 42})
+        assert_validation({bar: 13}) do
+          error '/', 'Obsolete property "bar".'
+          error '/foo', 'Value must be given.'
+        end
+
+        assert_validation({foo: '13'}) do
+          error '/foo', 'Invalid type, expected "integer".'
+        end
+
+        assert_cast(nil, nil)
+        assert_cast({foo: 42}, {bar: 42}.with_indifferent_access)
+      end
+
+      def test_as_option_overriding
+        schema :hash do
+          int? :foo, as: :bar
+          int? :bar
+        end
+
+        assert_validation(nil)
+        assert_validation({})
+        assert_validation({foo: 42})
+        assert_validation({foo: 42, bar: 13})
+
+        assert_validation({foo: '13'}) do
+          error '/foo', 'Invalid type, expected "integer".'
+        end
+
+        # assert_cast(nil, nil)
+        assert_cast({foo: 42}, {bar: 42}.with_indifferent_access)
+        assert_cast({foo: 42, bar: 13}, {bar: 13}.with_indifferent_access)
+        assert_cast({bar: 13, foo: 42}, {bar: 13}.with_indifferent_access)
+
+        # Swap order
+        schema :hash do
+          int? :bar
+          int! :foo, as: :bar
+        end
+
+        assert_validation(nil)
+        assert_validation({foo: 42})
+        assert_validation({foo: 42, bar: 13})
+        assert_validation({bar: 13}) do
+          error '/foo', 'Value must be given.'
+        end
+
+        assert_validation({foo: '13'}) do
+          error '/foo', 'Invalid type, expected "integer".'
+        end
+
+        assert_cast(nil, nil)
+        assert_cast({foo: 42}, {bar: 42}.with_indifferent_access)
+        assert_cast({foo: 42, bar: 13}, {bar: 42}.with_indifferent_access)
+        assert_cast({bar: 13, foo: 42}, {bar: 42}.with_indifferent_access)
+      end
     end
   end
 end

@@ -181,6 +181,7 @@ module Schemacop
         data_hash = data.dup.with_indifferent_access
 
         property_patterns = {}
+        as_names = []
 
         @properties.each_value do |prop|
           if prop.name.is_a?(Regexp)
@@ -188,10 +189,18 @@ module Schemacop
             next
           end
 
-          result[prop.as || prop.name] = prop.cast(data_hash[prop.name])
+          as_names << prop.as&.to_s if prop.as.present?
 
-          if result[prop.as || prop.name].nil? && !data_hash.include?(prop.name)
-            result.delete(prop.as || prop.name)
+          prop_name = prop.as&.to_s || prop.name
+
+          casted_data = prop.cast(data_hash[prop.name])
+
+          if casted_data.present? || data_hash.include?(prop.name)
+            result[prop_name] = casted_data
+          end
+
+          if result[prop_name].nil? && !data_hash.include?(prop.name) && !as_names.include?(prop.name)
+            result.delete(prop_name)
           end
         end
 
