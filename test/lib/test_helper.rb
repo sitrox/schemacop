@@ -6,6 +6,9 @@ SimpleCov.start do
   # We don't care about the test coverage for the
   # tests themselves
   add_filter 'test'
+
+  # Also enable branch coverage reporting
+  enable_coverage :branch
 end
 
 # TODO: Move to more sensible location
