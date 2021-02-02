@@ -911,18 +911,18 @@ module Schemacop
         end
 
         assert_validation(nil)
-        assert_validation({foo: 42})
-        assert_validation({bar: 13}) do
+        assert_validation({ foo: 42 })
+        assert_validation({ bar: 13 }) do
           error '/', 'Obsolete property "bar".'
           error '/foo', 'Value must be given.'
         end
 
-        assert_validation({foo: '13'}) do
+        assert_validation({ foo: '13' }) do
           error '/foo', 'Invalid type, expected "integer".'
         end
 
         assert_cast(nil, nil)
-        assert_cast({foo: 42}, {bar: 42}.with_indifferent_access)
+        assert_cast({ foo: 42 }, { bar: 42 }.with_indifferent_access)
       end
 
       def test_as_option_overriding
@@ -933,17 +933,17 @@ module Schemacop
 
         assert_validation(nil)
         assert_validation({})
-        assert_validation({foo: 42})
-        assert_validation({foo: 42, bar: 13})
+        assert_validation({ foo: 42 })
+        assert_validation({ foo: 42, bar: 13 })
 
-        assert_validation({foo: '13'}) do
+        assert_validation({ foo: '13' }) do
           error '/foo', 'Invalid type, expected "integer".'
         end
 
         # assert_cast(nil, nil)
-        assert_cast({foo: 42}, {bar: 42}.with_indifferent_access)
-        assert_cast({foo: 42, bar: 13}, {bar: 13}.with_indifferent_access)
-        assert_cast({bar: 13, foo: 42}, {bar: 13}.with_indifferent_access)
+        assert_cast({ foo: 42 }, { bar: 42 }.with_indifferent_access)
+        assert_cast({ foo: 42, bar: 13 }, { bar: 13 }.with_indifferent_access)
+        assert_cast({ bar: 13, foo: 42 }, { bar: 13 }.with_indifferent_access)
 
         # Swap order
         schema :hash do
@@ -952,20 +952,20 @@ module Schemacop
         end
 
         assert_validation(nil)
-        assert_validation({foo: 42})
-        assert_validation({foo: 42, bar: 13})
-        assert_validation({bar: 13}) do
+        assert_validation({ foo: 42 })
+        assert_validation({ foo: 42, bar: 13 })
+        assert_validation({ bar: 13 }) do
           error '/foo', 'Value must be given.'
         end
 
-        assert_validation({foo: '13'}) do
+        assert_validation({ foo: '13' }) do
           error '/foo', 'Invalid type, expected "integer".'
         end
 
         assert_cast(nil, nil)
-        assert_cast({foo: 42}, {bar: 42}.with_indifferent_access)
-        assert_cast({foo: 42, bar: 13}, {bar: 42}.with_indifferent_access)
-        assert_cast({bar: 13, foo: 42}, {bar: 42}.with_indifferent_access)
+        assert_cast({ foo: 42 }, { bar: 42 }.with_indifferent_access)
+        assert_cast({ foo: 42, bar: 13 }, { bar: 42 }.with_indifferent_access)
+        assert_cast({ bar: 13, foo: 42 }, { bar: 42 }.with_indifferent_access)
       end
     end
   end
