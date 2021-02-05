@@ -10,7 +10,7 @@
 ### Changes
 -->
 
-## 3.0.0.rc4 (2020-02-02)
+## 3.0.0.rc4 (2021-02-02)
 
 * Fix some minor bugs
 
@@ -19,19 +19,19 @@
 * `used_external_schemas` for the `ReferenceNode` is now applied
   recursively
 
-## 3.0.0.rc3 (2020-01-28)
+## 3.0.0.rc3 (2021-01-28)
 
 * Add minor improvements to the documentation
 
 * Internal restructuring, no changes in API
 
-## 3.0.0.rc2 (2020-01-28)
+## 3.0.0.rc2 (2021-01-28)
 
 * Represent node names as strings internally
 
 * Update documentation
 
-## 3.0.0.rc1 (2020-01-22)
+## 3.0.0.rc1 (2021-01-22)
 
 * Add support for ruby `3.0.0`
 
@@ -39,7 +39,7 @@
 
 * Document all `v3` nodes
 
-## 3.0.0.rc0 (2020-01-14)
+## 3.0.0.rc0 (2021-01-14)
 
 * Add `Schemacop::Schema3`
 
