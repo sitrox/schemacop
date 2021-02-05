@@ -10,6 +10,10 @@
 ### Changes
 -->
 
+## 3.0.0.rc5 (2021-02-05)
+
+* Use `ruby2_keywords` for compatibility with ruby `2.6.2`
+
 ## 3.0.0.rc4 (2021-02-02)
 
 * Fix some minor bugs
