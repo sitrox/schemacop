@@ -1191,14 +1191,17 @@ local schemas > context schemas > global schemas
 
 Where:
 
-* local schemas: Defined by using the DSL method? `scm`
+* local schemas: Defined by using the DSL method `scm`
 * context schemas: Defined in the current context using `context.schema`
 * global schemas: Defined in a ruby file in the load path
 
 ### Rails applications
 
-In Rails applications, your schemas are automatically eager-laoded from the load
-path `'app/schemas'` when your application is started.
+In Rails applications, your schemas are automatically eager-loaded from the load
+path `'app/schemas'` when your application is started, unless your application
+is running in the `DEVELOPMENT` environment. In the `DEVELOPMENT` environment,
+schemas are loaded each time when they are used, and as such you can make changes
+to your external schemas without having to restart the server each time.
 
 After starting your application, you can reference them like normally defined
 reference schemas, with the name being relative to the load path.
@@ -1246,8 +1249,12 @@ schema.validate!({usr: {first_name: 'Joe', last_name: 'Doe', groups: [{name: 'fo
 ### Non-Rails applications
 
 Usage in non-Rails applications is the same as with usage in Rails applications,
-however you need to eager load the schemas yourself:
+however you might need to eager load the schemas yourself:
 
 ```ruby
 Schemacop::V3::GlobalContext.eager_load!
 ```
+
+As mentioned before, you can also use the external schemas without having to
+eager-load them, but if you use the schemas multiple times, it might be better
+to eager-load them on start of your application / script.
