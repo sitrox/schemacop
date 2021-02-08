@@ -5,6 +5,13 @@ module Schemacop
       unless Rails.env.development?
         V3::GlobalContext.eager_load!
       end
+
+      # Tell Zeitwerk to ignore the files in our load path
+      if defined?(Rails) && defined?(Zeitwerk)
+        Schemacop.load_paths.each do |load_path|
+          Rails.autoloaders.main.ignore(Rails.root.join(load_path))
+        end
+      end
     end
   end
 end
