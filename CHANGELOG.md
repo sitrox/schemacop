@@ -10,6 +10,13 @@
 ### Changes
 -->
 
+## 3.0.0 (2021-02-08)
+
+* Setup Zeitwerk ignores for Rails applications
+
+* Read previous `3.0.0.rcX` entries for all changes included
+  in this stable release
+
 ## 3.0.0.rc5 (2021-02-05)
 
 * Use `ruby2_keywords` for compatibility with ruby `2.6.2`
