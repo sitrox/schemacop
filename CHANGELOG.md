@@ -10,6 +10,10 @@
 ### Changes
 -->
 
+## 3.0.1 (2021-02-11)
+
+* Add format `symbol` to strings
+
 ## 3.0.0 (2021-02-08)
 
 * Setup Zeitwerk ignores for Rails applications

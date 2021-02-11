@@ -165,6 +165,23 @@ module Schemacop
         assert_cast('john.doe@example.com', 'john.doe@example.com')
       end
 
+      def test_format_symbol
+        schema :string, format: :symbol
+
+        assert_json(type: :string, format: :symbol)
+
+        assert_validation 'foobar'
+        assert_validation ''
+
+        assert_validation 234 do
+          error '/', 'Invalid type, expected "string".'
+        end
+
+        assert_cast(nil, nil)
+        assert_cast('foobar', :foobar)
+        assert_cast('039n23$g- sfk3/', :'039n23$g- sfk3/')
+      end
+
       def test_enum
         schema :string, enum: ['foo', 'some string', 'some other string', 42]
 

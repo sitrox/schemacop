@@ -241,6 +241,9 @@ transformed into various types.
 * `number`
   The string must be a number and will be casted to a ruby `Float` object.
 
+* `symbol`
+  The string can be anything and will be casted to a ruby `Symbol` object.
+
 #### Examples
 
 ```ruby

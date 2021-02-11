@@ -16,6 +16,7 @@ module Schemacop
         email:       URI::MailTo::EMAIL_REGEXP,
         boolean:     /^(true|false)$/,
         binary:      nil,
+        symbol:      nil,
         integer:     /^-?[0-9]+$/,
         number:      /^-?[0-9]+(\.[0-9]+)?$/
       }.freeze
@@ -87,6 +88,8 @@ module Schemacop
           return Integer(to_cast)
         when :number
           return Float(to_cast)
+        when :symbol
+          return to_cast.to_sym
         else
           return to_cast
         end
