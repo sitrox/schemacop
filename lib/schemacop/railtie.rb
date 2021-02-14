@@ -7,7 +7,7 @@ module Schemacop
       end
 
       # Tell Zeitwerk to ignore the files in our load path
-      if defined?(Rails) && defined?(Zeitwerk)
+      if defined?(Rails) && defined?(Zeitwerk) && Rails.autoloaders.zeitwerk_enabled?
         Schemacop.load_paths.each do |load_path|
           Rails.autoloaders.main.ignore(Rails.root.join(load_path))
         end

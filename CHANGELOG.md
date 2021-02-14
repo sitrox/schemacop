@@ -10,6 +10,10 @@
 ### Changes
 -->
 
+## 3.0.2 (2021-02-14)
+
+* Fix #15 Code to ignore Zeitwerk fails when Zeitwerk is disabled
+
 ## 3.0.1 (2021-02-11)
 
 * Add format `symbol` to strings
