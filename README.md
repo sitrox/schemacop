@@ -16,7 +16,7 @@ Schemacop is tested with the following ruby versions:
 * 2.7.1
 * 3.0.0
 
-For these versions, the automated CI tests are ran on travis. Other ruby versions might work, but stick to these versions for best results.
+Other ruby versions might work but are not covered by our Travis tests.
 
 ## Basic example
 
