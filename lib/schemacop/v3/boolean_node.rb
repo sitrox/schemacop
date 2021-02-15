@@ -11,6 +11,14 @@ module Schemacop
           FalseClass => :boolean
         }
       end
+
+      def cast(value)
+        if value.is_a?(TrueClass) || value.is_a?(FalseClass)
+          value
+        else
+          default
+        end
+      end
     end
   end
 end
