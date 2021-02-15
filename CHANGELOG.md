@@ -10,6 +10,11 @@
 ### Changes
 -->
 
+## 3.0.3 (2021-02-13)
+
+* Add `examples_keyword` to context which allows to customize the name of the
+  `examples` attribute in JSON output
+
 ## 3.0.2 (2021-02-14)
 
 * Fix #15 Code to ignore Zeitwerk fails when Zeitwerk is disabled

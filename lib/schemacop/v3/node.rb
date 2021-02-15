@@ -170,7 +170,7 @@ module Schemacop
         end
 
         json[:title] = @title if @title
-        json[:examples] = @examples if @examples
+        json[Schemacop.context.examples_keyword] = @examples if @examples
         json[:description] = @description if @description
         json[:default] = @default if @default
         json[:enum] = @enum.to_a if @enum
