@@ -10,6 +10,10 @@
 ### Changes
 -->
 
+## 3.0.3 (2021-02-15)
+
+* Fix boolean node casting
+
 ## 3.0.2 (2021-02-14)
 
 * Fix #15 Code to ignore Zeitwerk fails when Zeitwerk is disabled
