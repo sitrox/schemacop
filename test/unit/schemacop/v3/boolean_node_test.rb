@@ -120,6 +120,22 @@ module Schemacop
                       ]
                     })
       end
+
+      def test_cast
+        schema :boolean
+
+        assert_cast(true, true)
+        assert_cast(false, false)
+        assert_cast(nil, nil)
+      end
+
+      def test_cast_default
+        schema :boolean, default: true
+
+        assert_cast(true, true)
+        assert_cast(false, false)
+        assert_cast(nil, true)
+      end
     end
   end
 end

@@ -10,10 +10,14 @@
 ### Changes
 -->
 
-## 3.0.3 (2021-02-13)
+## 3.0.4 (2021-02-15)
 
 * Add `examples_keyword` to context which allows to customize the name of the
   `examples` attribute in JSON output
+
+## 3.0.3 (2021-02-15)
+
+* Fix boolean node casting
 
 ## 3.0.2 (2021-02-14)
 
