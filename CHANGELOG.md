@@ -1,14 +1,14 @@
 # Change log
 
-<!--
-## master (unreleased)
+## 3.0.6 (2021-02-14)
 
-### New features
+* Remove option `json_format` from {Schemacop::Schema3.as_json as_json} again.
+  If you need to use the swagger format, use
+  {Schemacop::V3::Context.with_json_format} instead.
 
-### Bug fixes
-
-### Changes
--->
+* Rename `Schemacop::V3::Context.spawn_with` to
+  {Schemacop::V3::Context.with_json_format} and make keyword argument
+  `json_format` a positional argument.
 
 ## 3.0.5 (2021-02-14)
 

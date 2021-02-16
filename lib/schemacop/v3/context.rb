@@ -17,7 +17,7 @@ module Schemacop
         ).freeze
       end
 
-      def spawn_with(json_format: @json_format)
+      def with_json_format(json_format)
         prev_json_format = @json_format
         @json_format = json_format
         return yield
