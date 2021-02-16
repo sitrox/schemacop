@@ -63,6 +63,20 @@ module Schemacop
                     })
       end
 
+      def test_swagger_example
+        schema :string, examples: ['Foo', 'Foo bar']
+
+        assert_json(
+          type:     :string,
+          examples: ['Foo', 'Foo bar']
+        )
+
+        assert_swagger_json(
+          type:    :string,
+          example: ['Foo', 'Foo bar']
+        )
+      end
+
       def test_cast_in_root
         schema :integer, cast_str: true, required: true
 

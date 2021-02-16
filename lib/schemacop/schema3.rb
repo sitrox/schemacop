@@ -14,8 +14,8 @@ module Schemacop
       root.validate(data)
     end
 
-    def as_json
-      root.as_json
+    def as_json(json_format: V3::Context::DEFAULT_JSON_FORMAT)
+      Schemacop.context.spawn_with(json_format: json_format) { root.as_json }
     end
   end
 end

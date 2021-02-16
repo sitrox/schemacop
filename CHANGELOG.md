@@ -14,6 +14,13 @@
 
 * Allow option `pattern` to be a `Regexp` for `string` (`str`) nodes
 
+* Remove `examples_keyword` from context again
+
+* Add option `json_format` to {Schemacop::Schema3.as_json as_json}. This allows
+  generating a JSON schema that is [specific to
+  swagger](https://swagger.io/docs/specification/data-models/keywords/) by
+  passing `:swagger` to it.
+
 ## 3.0.4 (2021-02-15)
 
 * Add `examples_keyword` to context which allows to customize the name of the

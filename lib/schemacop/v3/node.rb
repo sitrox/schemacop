@@ -150,6 +150,10 @@ module Schemacop
 
       protected
 
+      def context
+        Schemacop.context
+      end
+
       def item_matches?(item, data)
         item_result = Result.new(self)
         item._validate(data, result: item_result)
@@ -170,7 +174,7 @@ module Schemacop
         end
 
         json[:title] = @title if @title
-        json[Schemacop.context.examples_keyword] = @examples if @examples
+        json[context.swagger_json? ? :example : :examples] = @examples if @examples
         json[:description] = @description if @description
         json[:default] = @default if @default
         json[:enum] = @enum.to_a if @enum

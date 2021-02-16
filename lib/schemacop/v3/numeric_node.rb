@@ -4,14 +4,32 @@ module Schemacop
     class NumericNode < Node
       ATTRIBUTES = %i[
         minimum
-        exclusive_minimum
         maximum
-        exclusive_maximum
         multiple_of
+        exclusive_minimum
+        exclusive_maximum
       ].freeze
 
       def self.allowed_options
         super + ATTRIBUTES
+      end
+
+      def process_json(attrs, json)
+        if context.swagger_json?
+          if options[:exclusive_minimum]
+            json[:minimum] = options[:exclusive_minimum]
+            json[:exclusiveMinimum] = true
+          end
+
+          if options[:exclusive_maximum]
+            json[:maximum] = options[:exclusive_maximum]
+            json[:exclusiveMaximum] = true
+          end
+
+          attrs -= %i[exclusive_minimum exclusive_maximum]
+        end
+
+        super attrs, json
       end
 
       def _validate(data, result:)

@@ -125,6 +125,12 @@ module Schemacop
           exclusiveMinimum: 0
         )
 
+        assert_swagger_json(
+          type:             :integer,
+          minimum:          0,
+          exclusiveMinimum: true
+        )
+
         assert_validation 5
         assert_validation 1
         assert_validation(0) do
@@ -156,6 +162,12 @@ module Schemacop
         assert_json(
           type:             :integer,
           exclusiveMaximum: 5
+        )
+
+        assert_swagger_json(
+          type:             :integer,
+          maximum:          5,
+          exclusiveMaximum: true
         )
 
         assert_validation 4
