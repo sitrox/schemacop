@@ -144,7 +144,9 @@ class V3Test < SchemacopTest
 
   def assert_swagger_json(expected_json)
     # TODO: Double "as_json" should not be necessary
-    assert_equal expected_json.as_json, @schema.as_json(json_format: :swagger).as_json
+    Schemacop.context.with_json_format(:swagger) do
+      assert_equal expected_json.as_json, @schema.as_json.as_json
+    end
   end
 
   def assert_match_any(array, exp)
