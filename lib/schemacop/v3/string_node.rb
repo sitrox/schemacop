@@ -4,7 +4,6 @@ module Schemacop
       ATTRIBUTES = %i[
         min_length
         max_length
-        pattern
         format
       ].freeze
 
@@ -23,7 +22,7 @@ module Schemacop
       # rubocop:enable Layout/LineLength
 
       def self.allowed_options
-        super + ATTRIBUTES - %i[cast_str] + %i[format_options]
+        super + ATTRIBUTES - %i[cast_str] + %i[format_options pattern]
       end
 
       def allowed_types
@@ -31,7 +30,11 @@ module Schemacop
       end
 
       def as_json
-        process_json(ATTRIBUTES, type: :string)
+        json = { type: :string }
+        if options[:pattern]
+          json[:pattern] = V3.sanitize_exp(Regexp.compile(options[:pattern]))
+        end
+        process_json(ATTRIBUTES, json)
       end
 
       def _validate(data, result:)
@@ -50,8 +53,14 @@ module Schemacop
         end
 
         # Validate pattern #
-        if options[:pattern] && !super_data.match?(Regexp.compile(options[:pattern]))
-          result.error "String does not match pattern #{options[:pattern].inspect}."
+        if (pattern = options[:pattern])
+          unless options[:pattern].is_a?(Regexp)
+            pattern = Regexp.compile(pattern)
+          end
+
+          unless super_data.match?(pattern)
+            result.error "String does not match pattern #{V3.sanitize_exp(pattern).inspect}."
+          end
         end
 
         # Validate format #
@@ -121,7 +130,9 @@ module Schemacop
         end
 
         if options[:pattern]
-          fail 'Option "pattern" must be a string.' unless options[:pattern].is_a?(String)
+          unless options[:pattern].is_a?(String) || options[:pattern].is_a?(Regexp)
+            fail 'Option "pattern" must be a string or Regexp.'
+          end
 
           begin
             Regexp.compile(options[:pattern])

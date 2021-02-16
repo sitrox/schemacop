@@ -3,6 +3,24 @@ module Schemacop
     def self.register(*args)
       NodeRegistry.register(*args)
     end
+
+    # @private
+    def self.sanitize_exp(exp)
+      return exp if exp.is_a?(String)
+
+      _start_slash, caret, exp, dollar, _end_slash, flags = exp.inspect.match(%r{^(/?)(\^)?(.*?)(\$)?(/?)([ixm]*)?$}).captures
+      flags = flags.split('')
+
+      if flags.delete('i')
+        exp = "(?i)(#{exp})"
+      end
+
+      if flags.any?
+        fail "Flags #{flags.inspect} are not supported by Schemacop."
+      end
+
+      return "#{caret}#{exp}#{dollar}"
+    end
   end
 end
 

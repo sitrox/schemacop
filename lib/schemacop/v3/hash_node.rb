@@ -21,14 +21,6 @@ module Schemacop
         super + NodeRegistry.dsl_methods(true) + %i[dsl_dep dsl_add]
       end
 
-      def self.sanitize_exp(exp)
-        exp = exp.to_s
-        if exp.start_with?('(?-mix:')
-          exp = exp.to_s.gsub(/^\(\?-mix:/, '').gsub(/\)$/, '')
-        end
-        return exp
-      end
-
       def add_child(node)
         unless node.name
           fail Exceptions::InvalidSchemaError, 'Child nodes must have a name.'
@@ -64,7 +56,7 @@ module Schemacop
 
         json = {}
         json[:properties] = Hash[properties.values.map { |p| [p.name, p.as_json] }] if properties.any?
-        json[:patternProperties] = Hash[pattern_properties.values.map { |p| [self.class.sanitize_exp(p.name), p.as_json] }] if pattern_properties.any?
+        json[:patternProperties] = Hash[pattern_properties.values.map { |p| [V3.sanitize_exp(p.name), p.as_json] }] if pattern_properties.any?
 
         # In schemacop, by default, additional properties are not allowed,
         # the users explicitly need to enable additional properties

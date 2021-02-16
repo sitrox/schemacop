@@ -10,6 +10,10 @@
 ### Changes
 -->
 
+## 3.0.5 (2021-02-14)
+
+* Allow option `pattern` to be a `Regexp` for `string` (`str`) nodes
+
 ## 3.0.4 (2021-02-15)
 
 * Add `examples_keyword` to context which allows to customize the name of the

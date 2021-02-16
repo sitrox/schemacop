@@ -80,7 +80,7 @@ module Schemacop
         end
       end
 
-      def test_pattern
+      def test_pattern_as_string
         schema :string, pattern: '^a_.*_z$'
 
         assert_json(type: :string, pattern: '^a_.*_z$')
@@ -92,6 +92,22 @@ module Schemacop
         end
         assert_validation 'a_ _zfoo' do
           error '/', 'String does not match pattern "^a_.*_z$".'
+        end
+      end
+
+      def test_pattern_as_regexp
+        schema :string, pattern: /^a_.*_z$/i
+
+        assert_json(type: :string, pattern: '^(?i)(a_.*_z)$')
+
+        assert_validation 'a__z'
+        assert_validation 'a__Z'
+        assert_validation 'a_ foo bar _Z'
+        assert_validation '' do
+          error '/', 'String does not match pattern "^(?i)(a_.*_z)$".'
+        end
+        assert_validation 'a_ _zfoo' do
+          error '/', 'String does not match pattern "^(?i)(a_.*_z)$".'
         end
       end
 
@@ -314,8 +330,8 @@ module Schemacop
         end
 
         assert_raises_with_message Exceptions::InvalidSchemaError,
-                                   'Option "pattern" must be a string.' do
-          schema :string, pattern: //
+                                   'Option "pattern" must be a string or Regexp.' do
+          schema :string, pattern: 42
         end
 
         assert_raises_with_message Exceptions::InvalidSchemaError,
