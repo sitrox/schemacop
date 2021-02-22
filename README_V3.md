@@ -199,9 +199,10 @@ transformed into various types.
 * `max_length`
   Defines the (inclusive) maximum required string length
 * `pattern`
-  Defines a (ruby) regex pattern the value will be matched against. Must be a
-  string and should generally start with `^` and end with `$` so as to evaluate
-  the entire string. It should not be enclosed in `/` characters.
+  Defines a (ruby) regex pattern the value will be matched against. Must be either
+  a string which should not be enclosed in `/` characters, or a Ruby Regexp.
+  The pattern should generally start with `^` and end with `$` so as to evaluate
+  the entire string.
 * `format`
   The `format` option allows for basic semantic validation on certain kinds of
   string values that are commonly used. See section *formats* for more
