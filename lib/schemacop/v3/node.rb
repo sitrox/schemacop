@@ -161,12 +161,13 @@ module Schemacop
       end
 
       def process_json(attrs, json)
-        if @schemas.any?
+        if !context.swagger_json? && @schemas.any?
           json[:definitions] = {}
           @schemas.each do |name, subschema|
             json[:definitions][name] = subschema.as_json
           end
         end
+
         attrs.each do |attr|
           if options.include?(attr)
             json[attr.to_s.camelize(:lower).to_sym] = options[attr]

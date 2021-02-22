@@ -11,7 +11,11 @@ module Schemacop
       end
 
       def as_json
-        process_json([], '$ref': "#/definitions/#{@path}")
+        if context.swagger_json?
+          process_json([], '$ref': "#/components/schemas/#{@path}")
+        else
+          process_json([], '$ref': "#/definitions/#{@path}")
+        end
       end
 
       def _validate(data, result:)

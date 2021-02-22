@@ -1,5 +1,9 @@
 # Change log
 
+## 3.0.7 (2021-02-22)
+
+* Adapt schema definitions handling when using Swagger-standard JSON
+
 ## 3.0.6 (2021-02-14)
 
 * Remove option `json_format` from {Schemacop::Schema3.as_json as_json} again.
