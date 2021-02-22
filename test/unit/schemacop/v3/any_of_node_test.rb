@@ -73,8 +73,8 @@ module Schemacop
             hsh { str! :foo }
           end
           any_of do
-            obj(Date)
-            obj(Time)
+            obj classes: Date
+            obj classes: Time
           end
           ary
           boo

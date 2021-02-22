@@ -5,11 +5,6 @@ module Schemacop
         super + %i[classes strict]
       end
 
-      def self.create(classes, **options, &block)
-        options[:classes] = classes
-        super(**options, &block)
-      end
-
       def as_json
         {} # Not supported by Json Schema
       end

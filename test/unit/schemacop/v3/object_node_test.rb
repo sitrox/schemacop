@@ -59,7 +59,10 @@ module Schemacop
       end
 
       def test_hash
-        schema { obj! :myobj, String }
+        schema do
+          obj! :myobj, classes: String
+        end
+
         assert_json(
           type:                 :object,
           properties:           {
@@ -76,6 +79,16 @@ module Schemacop
         assert_validation({}) do
           error '/myobj', 'Value must be given.'
         end
+      end
+
+      def test_hash_no_class
+        schema do
+          obj! :myobj
+        end
+
+        assert_validation(myobj: 'str')
+        assert_validation(myobj: 123)
+        assert_validation(myobj: Object.new)
       end
 
       def test_enum_schema
