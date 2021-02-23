@@ -1,5 +1,11 @@
 # Change log
 
+## 3.0.8 (2021-02-23)
+
+* Fix `object` nodes in hashes with no classes
+
+* Document `cast_str` option
+
 ## 3.0.7 (2021-02-22)
 
 * Adapt schema definitions handling when using Swagger-standard JSON
