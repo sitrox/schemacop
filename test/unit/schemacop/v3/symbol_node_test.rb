@@ -71,6 +71,7 @@ module Schemacop
         end
       end
 
+      # rubocop:disable Lint/BooleanSymbol
       def test_cast_str
         schema :symbol, cast_str: true
 
@@ -82,6 +83,7 @@ module Schemacop
         assert_cast(:foo, :foo)
         assert_cast(:'1', :'1')
       end
+      # rubocop:enable Lint/BooleanSymbol
     end
   end
 end

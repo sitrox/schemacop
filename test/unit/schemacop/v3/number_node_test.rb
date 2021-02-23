@@ -301,7 +301,7 @@ module Schemacop
       end
 
       def test_cast_str
-        schema :number, cast_str: true, minimum: 0.0, maximum: (50r), multiple_of: BigDecimal('0.5')
+        schema :number, cast_str: true, minimum: 0.0, maximum: 50r, multiple_of: BigDecimal('0.5')
 
         assert_cast('1', 1)
         assert_cast(1, 1)
