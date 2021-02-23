@@ -330,6 +330,17 @@ module Schemacop
                       ]
                     })
       end
+
+      def test_cast_str
+        schema :integer, cast_str: true
+
+        assert_cast('1', 1)
+        assert_cast(1, 1)
+
+        assert_validation('true') do
+          error '/', 'Matches 0 definitions but should match exactly 1.'
+        end
+      end
     end
   end
 end

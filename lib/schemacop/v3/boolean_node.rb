@@ -19,6 +19,10 @@ module Schemacop
           default
         end
       end
+
+      def self.allowed_options
+        super + %i[cast_str]
+      end
     end
   end
 end

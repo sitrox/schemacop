@@ -8,6 +8,10 @@ module Schemacop
       def allowed_types
         { Symbol => 'Symbol' }
       end
+
+      def self.allowed_options
+        super + %i[cast_str]
+      end
     end
   end
 end

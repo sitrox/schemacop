@@ -278,6 +278,10 @@ integer can be done.
 * `multiple_of`
   The received number has to be a multiple of the given number for the validation to
   pass.
+* `cast_str`
+  When set to `true`, this node also accepts strings that can be casted to an integer, e.g.
+  the values `'-5'` or `'42'`. Please note that you can only validate numbers which
+  are in the `Integer` format.
 
 #### Examples
 
@@ -292,6 +296,20 @@ schema.validate!(42.1)          # => Schemacop::Exceptions::ValidationError: /: 
 schema.validate!(4r)            # => Schemacop::Exceptions::ValidationError: /: Invalid type, expected "integer".
 schema.validate!((4 + 0i))      # => Schemacop::Exceptions::ValidationError: /: Invalid type, expected "integer".
 schema.validate!(BigDecimal(5)) # => Schemacop::Exceptions::ValidationError: /: Invalid type, expected "integer".
+```
+
+With `cast_str` enabled:
+
+```ruby
+# Validates that the input is an even number between 0 and 100 (inclusive)
+schema = Schemacop::Schema3.new(:integer, minimum: 0, maximum: 100, multiple_of: 2, cast_str: true)
+schema.validate!('42')            # => 42
+schema.validate!('43')            # => Schemacop::Exceptions::ValidationError: /: Matches 0 definitions but should match exactly 1.
+schema.validate!('-2')            # => Schemacop::Exceptions::ValidationError: /: Matches 0 definitions but should match exactly 1.
+schema.validate!('102')           # => Schemacop::Exceptions::ValidationError: /: Matches 0 definitions but should match exactly 1.
+schema.validate!('42.1')          # => Schemacop::Exceptions::ValidationError: /: Matches 0 definitions but should match exactly 1.
+schema.validate!('4r')            # => Schemacop::Exceptions::ValidationError: /: Matches 0 definitions but should match exactly 1.
+schema.validate!('(4 + 0i)')      # => Schemacop::Exceptions::ValidationError: /: Matches 0 definitions but should match exactly 1.
 ```
 
 ### Number
@@ -328,6 +346,11 @@ With the various available options, validations on the value of the number can b
 * `multiple_of`
   The received number has to be a multiple of the given number for the validation to
   pass.
+* `cast_str`
+  When set to `true`, this node also accepts strings that can be casted to a number, e.g.
+  the values `'0.1'` or `'3.1415'`. Please note that you can only validate numbers which
+  are in the `Integer` or `Float` format, i.e. values like `'1.5r'` or `'(4 + 0i)'` will
+  not work.
 
 #### Examples
 
@@ -344,6 +367,19 @@ schema.validate!(BigDecimal(5)) # => 0.5e1
 schema.validate!((4 + 0i))      # => Schemacop::Exceptions::ValidationError: /: Invalid type, expected "big_decimal" or "float" or "integer" or "rational".
 ```
 
+With `cast_str` enabled:
+
+```ruby
+schema = Schemacop::Schema3.new(:number, cast_str: true, minimum: 0.0, maximum: (50r), multiple_of: BigDecimal('0.5'))
+schema.validate!('42')        # => 42
+schema.validate!('42.2')      # => Schemacop::Exceptions::ValidationError: /: Matches 0 definitions but should match exactly 1.
+schema.validate!('-2')        # => Schemacop::Exceptions::ValidationError: /: Matches 0 definitions but should match exactly 1.
+schema.validate!('51')        # => Schemacop::Exceptions::ValidationError: /: Matches 0 definitions but should match exactly 1.
+schema.validate!('42.5')      # => 42.5
+schema.validate!('1.5r')      # => Schemacop::Exceptions::ValidationError: /: Matches 0 definitions but should match exactly 1.
+schema.validate!('(4 + 0i)')  # => Schemacop::Exceptions::ValidationError: /: Matches 0 definitions but should match exactly 1.
+```
+
 ### Symbol
 
 Type: `:symbol`\
@@ -351,15 +387,33 @@ DSL: `sym`
 
 The symbol type is used to validate elements for the Ruby `Symbol` class.
 
+#### Options
+
+* `cast_str`
+  When set to `true`, this node also accepts strings that can be casted to a symbol.
+
 #### Examples
 
 ```ruby
 # Validates that the input is a symbol
 schema = Schemacop::Schema3.new(:symbol)
-schema.validate!(:foo)  # => :foo
-schema.validate!('foo') # => Schemacop::Exceptions::ValidationError: /: Invalid type, expected "Symbol".
-schema.validate!(123)   # => Schemacop::Exceptions::ValidationError: /: Invalid type, expected "Symbol".
-schema.validate!(false) # => Schemacop::Exceptions::ValidationError: /: Invalid type, expected "Symbol".
+schema.validate!(:foo)   # => :foo
+schema.validate!('foo')  # => Schemacop::Exceptions::ValidationError: /: Invalid type, expected "Symbol".
+schema.validate!(123)    # => Schemacop::Exceptions::ValidationError: /: Invalid type, expected "Symbol".
+schema.validate!(false)  # => Schemacop::Exceptions::ValidationError: /: Invalid type, expected "Symbol".
+schema.validate!(:false) # => :false
+```
+
+With `cast_str` enabled:
+
+```ruby
+# Validates that the input is a symbol
+schema = Schemacop::Schema3.new(:symbol, cast_str: true)
+schema.validate!(':foo')   # => :":foo"
+schema.validate!('foo')    # => :foo
+schema.validate!('123')    # => :"123"
+schema.validate!('false')  # => :false
+schema.validate!(':false') # => :":false"
 ```
 
 ### Boolean
@@ -368,6 +422,12 @@ Type: `:boolean`\
 DSL: `boo`
 
 The boolean type is used to validate Ruby booleans, i.e. the `TrueClass` and `FalseClass`
+
+#### Options
+
+* `cast_str`
+  When set to `true`, this node also accepts strings that can be casted to a boolean, i.e.
+  the values `'true'` and `'false'`
 
 #### Examples
 
@@ -379,6 +439,17 @@ schema.validate!(false)   # => false
 schema.validate!(:false)  # => Schemacop::Exceptions::ValidationError: /: Invalid type, expected "boolean".
 schema.validate!('false') # => Schemacop::Exceptions::ValidationError: /: Invalid type, expected "boolean".
 schema.validate!(1234)    # => Schemacop::Exceptions::ValidationError: /: Invalid type, expected "boolean".
+```
+
+With `cast_str` enabled:
+
+```ruby
+schema = Schemacop::Schema3.new(:boolean, cast_str: true)
+schema.validate!(true)    # => true
+schema.validate!(false)   # => false
+schema.validate!(:false)  # => Schemacop::Exceptions::ValidationError: /: Matches 0 definitions but should match exactly 1.
+schema.validate!('false') # => false
+schema.validate!(1234)    # => Schemacop::Exceptions::ValidationError: /: Matches 0 definitions but should match exactly 1.
 ```
 
 ### Array

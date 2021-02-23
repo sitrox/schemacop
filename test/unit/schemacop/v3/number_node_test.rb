@@ -299,6 +299,35 @@ module Schemacop
                       ]
                     })
       end
+
+      def test_cast_str
+        schema :number, cast_str: true, minimum: 0.0, maximum: (50r), multiple_of: BigDecimal('0.5')
+
+        assert_cast('1', 1)
+        assert_cast(1, 1)
+
+        assert_cast('1.0', 1.0)
+        assert_cast(1.0, 1.0)
+
+        assert_validation('42')
+        assert_validation('0.5')
+
+        assert_validation('true') do
+          error '/', 'Matches 0 definitions but should match exactly 1.'
+        end
+
+        assert_validation('51') do
+          error '/', 'Matches 0 definitions but should match exactly 1.'
+        end
+
+        assert_validation('-2') do
+          error '/', 'Matches 0 definitions but should match exactly 1.'
+        end
+
+        assert_validation('3.1415') do
+          error '/', 'Matches 0 definitions but should match exactly 1.'
+        end
+      end
     end
   end
 end

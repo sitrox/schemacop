@@ -48,7 +48,7 @@ module Schemacop
       end
 
       def self.allowed_options
-        %i[name required default description examples enum parent options cast_str title as]
+        %i[name required default description examples enum parent options title as]
       end
 
       def self.dsl_methods

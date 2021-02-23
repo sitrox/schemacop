@@ -70,6 +70,18 @@ module Schemacop
           error '/', 'Value not included in enum [1, 2, "foo", :bar, {:qux=>42}].'
         end
       end
+
+      def test_cast_str
+        schema :symbol, cast_str: true
+
+        assert_cast('true', :true)
+        assert_cast('foo', :foo)
+        assert_cast('1', :'1')
+
+        assert_cast(:true, :true)
+        assert_cast(:foo, :foo)
+        assert_cast(:'1', :'1')
+      end
     end
   end
 end

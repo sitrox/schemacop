@@ -136,6 +136,20 @@ module Schemacop
         assert_cast(false, false)
         assert_cast(nil, true)
       end
+
+      def test_cast_str
+        schema :boolean, cast_str: true
+
+        assert_cast('true', true)
+        assert_cast('false', false)
+
+        assert_cast(true, true)
+        assert_cast(false, false)
+
+        assert_validation('1') do
+          error '/', 'Matches 0 definitions but should match exactly 1.'
+        end
+      end
     end
   end
 end

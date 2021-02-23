@@ -22,7 +22,7 @@ module Schemacop
       # rubocop:enable Layout/LineLength
 
       def self.allowed_options
-        super + ATTRIBUTES - %i[cast_str] + %i[format_options pattern]
+        super + ATTRIBUTES + %i[format_options pattern]
       end
 
       def allowed_types

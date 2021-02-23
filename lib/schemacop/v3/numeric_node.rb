@@ -11,7 +11,7 @@ module Schemacop
       ].freeze
 
       def self.allowed_options
-        super + ATTRIBUTES
+        super + ATTRIBUTES + %i[cast_str]
       end
 
       def process_json(attrs, json)
