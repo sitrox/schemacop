@@ -1,5 +1,11 @@
 # Change log
 
+## 3.0.9 (2021-02-26)
+
+* Fix casting of blank strings
+
+* Add `allow_blank` option to `String` nodes
+
 ## 3.0.8 (2021-02-23)
 
 * Fix `object` nodes in hashes with no classes
