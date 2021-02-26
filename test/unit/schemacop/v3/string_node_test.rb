@@ -400,6 +400,53 @@ module Schemacop
                       ]
                     })
       end
+
+      def test_cast_empty_or_whitespace_string
+        schema :string
+
+        assert_cast(nil, nil)
+        assert_cast('', '')
+        assert_cast('    ', '    ')
+        assert_cast("\n", "\n")
+        assert_cast("\t", "\t")
+      end
+
+      def test_cast_empty_or_whitespace_string_required
+        schema :string, required: true
+
+        assert_validation(nil) do
+          error '/', 'Value must be given.'
+        end
+
+        assert_cast('', '')
+        assert_cast('    ', '    ')
+        assert_cast("\n", "\n")
+        assert_cast("\t", "\t")
+      end
+
+      def test_empty_or_whitespace_string_blank_not_allowed
+        schema :string, allow_blank: false
+
+        assert_validation(nil) do
+          error '/', 'String is blank but must not be blank!'
+        end
+
+        assert_validation('') do
+          error '/', 'String is blank but must not be blank!'
+        end
+
+        assert_validation('   ') do
+          error '/', 'String is blank but must not be blank!'
+        end
+
+        assert_validation("\n") do
+          error '/', 'String is blank but must not be blank!'
+        end
+
+        assert_validation("\t") do
+          error '/', 'String is blank but must not be blank!'
+        end
+      end
     end
   end
 end

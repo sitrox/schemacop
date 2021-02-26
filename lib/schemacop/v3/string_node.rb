@@ -22,7 +22,7 @@ module Schemacop
       # rubocop:enable Layout/LineLength
 
       def self.allowed_options
-        super + ATTRIBUTES + %i[format_options pattern]
+        super + ATTRIBUTES + %i[format_options pattern allow_blank]
       end
 
       def allowed_types
@@ -39,6 +39,12 @@ module Schemacop
 
       def _validate(data, result:)
         super_data = super
+
+        # Validate blank #
+        if options[:allow_blank].is_a?(FalseClass) && super_data.blank?
+          result.error 'String is blank but must not be blank!'
+        end
+
         return if super_data.nil?
 
         # Validate length #
@@ -76,7 +82,7 @@ module Schemacop
       end
 
       def cast(value)
-        if value.present?
+        if !value.nil?
           to_cast = value
         elsif default.present?
           to_cast = default

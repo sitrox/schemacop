@@ -208,6 +208,10 @@ transformed into various types.
   string values that are commonly used. See section *formats* for more
   information on the available formats. Note that strings with a format are also
   **casted** into that format.
+* `allow_blank`
+  By default, blank strings are allowed and left as they are when casted (e.g.
+  the string `''` is valid). If you want to disallow blank strings, set this
+  option to `false`.
 
 #### Formats
 
@@ -246,6 +250,38 @@ transformed into various types.
   The string can be anything and will be casted to a ruby `Symbol` object.
 
 #### Examples
+
+```ruby
+# Basic example
+schema = Schemacop::Schema3.new :string
+schema.validate!(nil)   # => nil
+schema.validate!('')    # => ""
+schema.validate!('foo') # => "foo"
+schema.validate!("\n")  # => "\n"
+```
+
+With the `required` option:
+
+```ruby
+# Basic example
+schema = Schemacop::Schema3.new :string, required: true
+schema.validate!(nil)   # => Schemacop::Exceptions::ValidationError: /: Value must be given.
+schema.validate!('')    # => ""
+schema.validate!('foo') # => "foo"
+schema.validate!("\n")  # => "\n"
+```
+
+With the `allow_blank` option:
+
+```ruby
+# Basic example
+schema = Schemacop::Schema3.new :string, allow_blank: false
+schema.validate!(nil)   # => Schemacop::Exceptions::ValidationError: /: String is blank but must not be blank!
+schema.validate!('')    # => Schemacop::Exceptions::ValidationError: /: String is blank but must not be blank!
+schema.validate!('foo') # => "foo"
+schema.validate!("\n")  # => Schemacop::Exceptions::ValidationError: /: String is blank but must not be blank!
+```
+Example of using a `format` option:
 
 ```ruby
 # By using a format, string values are casted to that respective format
