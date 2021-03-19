@@ -3,7 +3,10 @@ require 'test_helper'
 module Schemacop
   module V3
     class SymbolNodeTest < V3Test
-      EXP_INVALID_TYPE = 'Invalid type, expected "Symbol".'.freeze
+      def self.invalid_type_error(type)
+        type = type.class unless (type.class == Class)
+        "Invalid type, got type \"#{type}\", expected \"Symbol\"."
+      end
 
       def test_basic
         schema :symbol
@@ -11,10 +14,10 @@ module Schemacop
         assert_validation :foo
         assert_validation :'n0238n)Q(hqr3hrw3'
         assert_validation 42 do
-          error '/', EXP_INVALID_TYPE
+          error '/', SymbolNodeTest.invalid_type_error(Integer)
         end
         assert_validation '42' do
-          error '/', EXP_INVALID_TYPE
+          error '/', SymbolNodeTest.invalid_type_error(String)
         end
         assert_json({})
       end
@@ -56,13 +59,13 @@ module Schemacop
         # Even we put those types in the enum, they need to fail the validations,
         # as they are not symbols
         assert_validation('foo') do
-          error '/', 'Invalid type, expected "Symbol".'
+          error '/', SymbolNodeTest.invalid_type_error(String)
         end
         assert_validation(1) do
-          error '/', 'Invalid type, expected "Symbol".'
+          error '/', SymbolNodeTest.invalid_type_error(Integer)
         end
         assert_validation({ qux: 42 }) do
-          error '/', 'Invalid type, expected "Symbol".'
+          error '/', SymbolNodeTest.invalid_type_error(Hash)
         end
 
         # These need to fail validation, as they are not in the enum list

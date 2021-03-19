@@ -3,7 +3,9 @@ require 'test_helper'
 module Schemacop
   module V3
     class ArrayNodeTest < V3Test
-      EXP_INVALID_TYPE = 'Invalid type, expected "array".'.freeze
+      def self.invalid_type_error(type)
+        "Invalid type, got type \"#{type}\", expected \"array\"."
+      end
 
       def test_basic
         schema :array
@@ -54,7 +56,7 @@ module Schemacop
           error '/', 'Array has 2 items but must have exactly 1.'
         end
         assert_validation [123] do
-          error '/[0]', 'Invalid type, expected "object".'
+          error '/[0]', 'Invalid type, got type "Integer", expected "object".'
         end
       end
 
@@ -64,7 +66,7 @@ module Schemacop
         assert_json(type: :array)
 
         assert_validation 42 do
-          error '/', EXP_INVALID_TYPE
+          error '/', ArrayNodeTest.invalid_type_error(Integer)
         end
 
         schema { ary! :foo }
@@ -79,11 +81,11 @@ module Schemacop
         )
 
         assert_validation foo: 42 do
-          error '/foo', EXP_INVALID_TYPE
+          error '/foo', ArrayNodeTest.invalid_type_error(Integer)
         end
 
         assert_validation foo: {} do
-          error '/foo', EXP_INVALID_TYPE
+          error '/foo', ArrayNodeTest.invalid_type_error(ActiveSupport::HashWithIndifferentAccess)
         end
       end
 
@@ -196,7 +198,7 @@ module Schemacop
         end
 
         assert_validation %i[foo] do
-          error '/[0]', 'Invalid type, expected "string".'
+          error '/[0]', 'Invalid type, got type "Symbol", expected "string".'
         end
       end
 
@@ -230,7 +232,7 @@ module Schemacop
         end
 
         assert_validation([42, 42, { name: 'Hello' }]) do
-          error '/[0]', 'Invalid type, expected "string".'
+          error '/[0]', 'Invalid type, got type "Integer", expected "string".'
         end
 
         assert_validation(['foo', 42, { namex: 'Hello' }]) do
@@ -305,7 +307,7 @@ module Schemacop
         assert_validation(['foo', 42])
         assert_validation(['foo', 42, 42])
         assert_validation(['foo', :foo]) do
-          error '/[1]', 'Invalid type, expected "integer".'
+          error '/[1]', 'Invalid type, got type "Symbol", expected "integer".'
         end
       end
 
@@ -328,7 +330,7 @@ module Schemacop
         assert_validation(['foo', 42])
         assert_validation(['foo', 42, 'additional', 'another'])
         assert_validation(['foo', 42, 'additional', 42, 'another']) do
-          error '/[3]', 'Invalid type, expected "string".'
+          error '/[3]', 'Invalid type, got type "Integer", expected "string".'
         end
 
         assert_cast(['foo', 42], ['foo', 42])
@@ -354,7 +356,7 @@ module Schemacop
         assert_validation(['foo', 42])
         assert_validation(['foo', 42, '1990-01-01'])
         assert_validation(['foo', 42, '1990-01-01', 42]) do
-          error '/[3]', 'Invalid type, expected "string".'
+          error '/[3]', 'Invalid type, got type "Integer", expected "string".'
         end
         assert_validation(['foo', 42, '1990-01-01', 'foo']) do
           error '/[3]', 'String does not match format "date".'
@@ -439,7 +441,7 @@ module Schemacop
         assert_validation(['foo', 42, { foo: '1990-01-01', bar: :baz }])
 
         assert_validation(['foo', 42, { foo: 1234 }]) do
-          error '/[2]/foo', 'Invalid type, expected "string".'
+          error '/[2]/foo', 'Invalid type, got type "Integer", expected "string".'
         end
         assert_validation(['foo', 42, { foo: 'String' }]) do
           error '/[2]/foo', 'String does not match format "date".'
@@ -555,16 +557,16 @@ module Schemacop
         # Even we put those types in the enum, they need to fail the validations,
         # as they are not arrays
         assert_validation('foo') do
-          error '/', 'Invalid type, expected "array".'
+          error '/', ArrayNodeTest.invalid_type_error(String)
         end
         assert_validation(1) do
-          error '/', 'Invalid type, expected "array".'
+          error '/', ArrayNodeTest.invalid_type_error(Integer)
         end
         assert_validation(:bar) do
-          error '/', 'Invalid type, expected "array".'
+          error '/', ArrayNodeTest.invalid_type_error(Symbol)
         end
         assert_validation({ qux: 42 }) do
-          error '/', 'Invalid type, expected "array".'
+          error '/', ArrayNodeTest.invalid_type_error(Hash)
         end
 
         # These need to fail validation, as they are not in the enum list
@@ -669,8 +671,8 @@ module Schemacop
         assert_validation([1, 2, 3, 4, 5, 6])
 
         assert_validation([1, :foo, 'bar']) do
-          error '/[1]', 'Invalid type, expected "integer".'
-          error '/[2]', 'Invalid type, expected "integer".'
+          error '/[1]', 'Invalid type, got type "Symbol", expected "integer".'
+          error '/[2]', 'Invalid type, got type "String", expected "integer".'
         end
       end
 

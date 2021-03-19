@@ -26,13 +26,13 @@ module Schemacop
           assert_validation(bar: { foo: 'String', baz: { foo: 42 } })
 
           assert_validation(foo: 42) do
-            error '/foo', 'Invalid type, expected "string".'
+            error '/foo', 'Invalid type, got type "Integer", expected "string".'
           end
           assert_validation(bar: { foo: 42 }) do
-            error '/bar/foo', 'Invalid type, expected "string".'
+            error '/bar/foo', 'Invalid type, got type "Integer", expected "string".'
           end
           assert_validation(bar: { foo: 'String', baz: { foo: '42' } }) do
-            error '/bar/baz/foo', 'Invalid type, expected "integer".'
+            error '/bar/baz/foo', 'Invalid type, got type "String", expected "integer".'
           end
 
           assert_json({
@@ -306,7 +306,7 @@ module Schemacop
         with_context context do
           assert_validation(first_name: 'John', last_name: 'Doe')
           assert_validation(first_name: 'John', last_name: 42) do
-            error '/last_name', 'Invalid type, expected "string".'
+            error '/last_name', 'Invalid type, got type "Integer", expected "string".'
           end
         end
 

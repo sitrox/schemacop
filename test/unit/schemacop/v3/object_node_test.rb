@@ -28,10 +28,10 @@ module Schemacop
         assert_validation 'foo'
         assert_validation Date.today
         assert_validation({}.with_indifferent_access) do
-          error '/', 'Invalid type, expected "Date" or "String".'
+          error '/', 'Invalid type, got type "ActiveSupport::HashWithIndifferentAccess", expected "Date" or "String".'
         end
         assert_validation DateTime.now do
-          error '/', 'Invalid type, expected "Date" or "String".'
+          error '/', 'Invalid type, got type "DateTime", expected "Date" or "String".'
         end
       end
 
@@ -44,7 +44,7 @@ module Schemacop
         assert_validation DateTime.now
         assert_validation({}.with_indifferent_access)
         assert_validation Time.now do
-          error '/', 'Invalid type, expected "Date" or "Hash" or "String".'
+          error '/', 'Invalid type, got type "Time", expected "Date" or "Hash" or "String".'
         end
       end
 
@@ -74,7 +74,7 @@ module Schemacop
         assert_validation myobj: ''
         assert_validation myobj: '42'
         assert_validation myobj: Date.today do
-          error '/myobj', 'Invalid type, expected "String".'
+          error '/myobj', 'Invalid type, got type "Date", expected "String".'
         end
         assert_validation({}) do
           error '/myobj', 'Value must be given.'
@@ -134,13 +134,13 @@ module Schemacop
 
         # These will fail, as they aren't of one of the classed we defined above
         assert_validation([]) do
-          error '/', 'Invalid type, expected "String" or "Symbol" or "TrueClass".'
+          error '/', 'Invalid type, got type "Array", expected "String" or "Symbol" or "TrueClass".'
         end
         assert_validation({ qux: '123' }) do
-          error '/', 'Invalid type, expected "String" or "Symbol" or "TrueClass".'
+          error '/', 'Invalid type, got type "Hash", expected "String" or "Symbol" or "TrueClass".'
         end
         assert_validation(false) do
-          error '/', 'Invalid type, expected "String" or "Symbol" or "TrueClass".'
+          error '/', 'Invalid type, got type "FalseClass", expected "String" or "Symbol" or "TrueClass".'
         end
       end
 

@@ -3,7 +3,9 @@ require 'test_helper'
 module Schemacop
   module V3
     class IntegerNodeTest < V3Test
-      EXP_INVALID_TYPE = 'Invalid type, expected "integer".'.freeze
+      def self.invalid_type_error(type)
+        "Invalid type, got type \"#{type}\", expected \"integer\"."
+      end
 
       def test_basic
         schema :integer
@@ -59,11 +61,11 @@ module Schemacop
         )
 
         assert_validation 42.5 do
-          error '/', EXP_INVALID_TYPE
+          error '/', IntegerNodeTest.invalid_type_error(Float)
         end
 
         assert_validation '42.5' do
-          error '/', EXP_INVALID_TYPE
+          error '/', IntegerNodeTest.invalid_type_error(String)
         end
 
         schema { int! :age }
@@ -78,27 +80,27 @@ module Schemacop
         )
 
         assert_validation age: :foo do
-          error '/age', EXP_INVALID_TYPE
+          error '/age', IntegerNodeTest.invalid_type_error(Symbol)
         end
 
         assert_validation age: '234' do
-          error '/age', EXP_INVALID_TYPE
+          error '/age', IntegerNodeTest.invalid_type_error(String)
         end
 
         assert_validation age: 10.0 do
-          error '/age', EXP_INVALID_TYPE
+          error '/age', IntegerNodeTest.invalid_type_error(Float)
         end
 
         assert_validation age: 4r do
-          error '/age', EXP_INVALID_TYPE
+          error '/age', IntegerNodeTest.invalid_type_error(Rational)
         end
 
         assert_validation age: (4 + 0i) do
-          error '/age', EXP_INVALID_TYPE
+          error '/age', IntegerNodeTest.invalid_type_error(Complex)
         end
 
         assert_validation age: BigDecimal(5) do
-          error '/age', EXP_INVALID_TYPE
+          error '/age', IntegerNodeTest.invalid_type_error(BigDecimal)
         end
       end
 
@@ -210,7 +212,7 @@ module Schemacop
         assert_validation(nil)
         assert_validation(50)
         assert_validation(5.2) do
-          error '/', 'Invalid type, expected "integer".'
+          error '/', IntegerNodeTest.invalid_type_error(Float)
         end
 
         assert_cast(5, 5)
@@ -289,18 +291,18 @@ module Schemacop
         # Even we put those types in the enum, they need to fail the validations,
         # as they are not integers
         assert_validation('foo') do
-          error '/', 'Invalid type, expected "integer".'
+          error '/', IntegerNodeTest.invalid_type_error(String)
         end
         assert_validation(:bar) do
-          error '/', 'Invalid type, expected "integer".'
+          error '/', IntegerNodeTest.invalid_type_error(Symbol)
         end
         assert_validation({ qux: 42 }) do
-          error '/', 'Invalid type, expected "integer".'
+          error '/', IntegerNodeTest.invalid_type_error(Hash)
         end
 
         # This needs to fail as it is a number (float) and not an integer
         assert_validation(4.2) do
-          error '/', 'Invalid type, expected "integer".'
+          error '/', IntegerNodeTest.invalid_type_error(Float)
         end
 
         # These need to fail validation, as they are not in the enum list

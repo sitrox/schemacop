@@ -206,7 +206,7 @@ module Schemacop
         # Validate type #
         if allowed_types.any? && allowed_types.keys.none? { |c| data.send(type_assertion_method, c) }
           collection = allowed_types.values.map { |t| "\"#{t}\"" }.uniq.sort.join(' or ')
-          result.error %(Invalid type, expected #{collection}.)
+          result.error "Invalid type, got type \"#{data.class}\", expected #{collection}."
           return nil
         end
 

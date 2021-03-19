@@ -4,7 +4,10 @@ require 'test_helper'
 module Schemacop
   module V3
     class BooleanNodeTest < V3Test
-      EXP_INVALID_TYPE = 'Invalid type, expected "boolean".'.freeze
+      def self.invalid_type_error(type)
+        type = type.class unless (type.class == Class)
+        "Invalid type, got type \"#{type}\", expected \"boolean\"."
+      end
 
       def test_basic
         schema :boolean
@@ -47,12 +50,12 @@ module Schemacop
         assert_json(type: :boolean)
 
         assert_validation 42 do
-          error '/', EXP_INVALID_TYPE
+          error '/', BooleanNodeTest.invalid_type_error(Integer)
         end
 
         [:true, 'true', :false, 'false', 0, 1].each do |value|
           assert_validation value do
-            error '/', EXP_INVALID_TYPE
+            error '/', BooleanNodeTest.invalid_type_error(value)
           end
         end
 
@@ -68,7 +71,7 @@ module Schemacop
 
         [:true, 'true', :false, 'false', 0, 1].each do |value|
           assert_validation name: value do
-            error '/name', EXP_INVALID_TYPE
+            error '/name', BooleanNodeTest.invalid_type_error(value)
           end
         end
       end
@@ -87,13 +90,13 @@ module Schemacop
         # Even we put those types in the enum, they need to fail the validations,
         # as they are not booleans
         assert_validation('foo') do
-          error '/', 'Invalid type, expected "boolean".'
+          error '/', BooleanNodeTest.invalid_type_error(String)
         end
         assert_validation(:bar) do
-          error '/', 'Invalid type, expected "boolean".'
+          error '/', BooleanNodeTest.invalid_type_error(Symbol)
         end
         assert_validation({ qux: 42 }) do
-          error '/', 'Invalid type, expected "boolean".'
+          error '/', BooleanNodeTest.invalid_type_error(Hash)
         end
 
         # These need to fail validation, as they are not in the enum list
