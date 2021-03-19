@@ -1,5 +1,9 @@
 # Change log
 
+## 3.0.10 (2021-03-19)
+
+* If wrong type is given, report class of wrong type in error message
+
 ## 3.0.9 (2021-02-26)
 
 * Fix casting of blank strings
