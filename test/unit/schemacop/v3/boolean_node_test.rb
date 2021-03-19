@@ -5,7 +5,7 @@ module Schemacop
   module V3
     class BooleanNodeTest < V3Test
       def self.invalid_type_error(type)
-        type = type.class unless (type.class == Class)
+        type = type.class unless type.class == Class
         "Invalid type, got type \"#{type}\", expected \"boolean\"."
       end
 
