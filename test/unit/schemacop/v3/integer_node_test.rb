@@ -339,6 +339,28 @@ module Schemacop
         assert_cast('1', 1)
         assert_cast(1, 1)
 
+        assert_cast(nil, nil)
+        assert_cast('', nil)
+
+        assert_validation('true') do
+          error '/', 'Matches 0 definitions but should match exactly 1.'
+        end
+      end
+
+      def test_cast_str_required
+        schema :integer, cast_str: true, required: true
+
+        assert_cast('1', 1)
+        assert_cast(1, 1)
+
+        assert_validation(nil) do
+          error '/', 'Value must be given.'
+        end
+
+        assert_validation('') do
+          error '/', 'Value must be given.'
+        end
+
         assert_validation('true') do
           error '/', 'Matches 0 definitions but should match exactly 1.'
         end

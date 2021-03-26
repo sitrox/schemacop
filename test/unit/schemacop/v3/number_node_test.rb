@@ -308,6 +308,9 @@ module Schemacop
         assert_cast('1', 1)
         assert_cast(1, 1)
 
+        assert_validation(nil)
+        assert_validation('')
+
         assert_cast('1.0', 1.0)
         assert_cast(1.0, 1.0)
 

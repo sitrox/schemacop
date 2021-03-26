@@ -33,10 +33,11 @@ module Schemacop
         if options.delete(:cast_str)
           format = NodeRegistry.name(klass)
           one_of_options = {
-            required:    options.delete(:required),
-            name:        options.delete(:name),
-            as:          options.delete(:as),
-            description: options.delete(:description)
+            required:           options.delete(:required),
+            treat_blank_as_nil: true,
+            name:               options.delete(:name),
+            as:                 options.delete(:as),
+            description:        options.delete(:description)
           }
           node = create(:one_of, **one_of_options) do
             self.node node

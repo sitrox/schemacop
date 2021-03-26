@@ -152,6 +152,36 @@ module Schemacop
         assert_validation('1') do
           error '/', 'Matches 0 definitions but should match exactly 1.'
         end
+
+        # Nil can be validated, as it's not required
+        assert_validation(nil)
+
+        assert_validation('')
+
+        assert_cast('', nil)
+        assert_cast(nil, nil)
+      end
+
+      def test_cast_str_required
+        schema :boolean, cast_str: true, required: true
+
+        assert_cast('true', true)
+        assert_cast('false', false)
+
+        assert_cast(true, true)
+        assert_cast(false, false)
+
+        assert_validation('1') do
+          error '/', 'Matches 0 definitions but should match exactly 1.'
+        end
+
+        assert_validation(nil) do
+          error '/', 'Value must be given.'
+        end
+
+        assert_validation('') do
+          error '/', 'Value must be given.'
+        end
       end
     end
   end

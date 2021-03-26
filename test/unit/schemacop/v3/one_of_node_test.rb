@@ -182,6 +182,18 @@ module Schemacop
           schema :one_of
         end
       end
+
+      def test_treat_blank_as_nil
+        schema :one_of, treat_blank_as_nil: true do
+          boo
+          str format: :boolean
+        end
+
+        assert_validation(nil)
+        assert_validation('')
+        assert_validation('true')
+        assert_validation(true)
+      end
     end
   end
 end

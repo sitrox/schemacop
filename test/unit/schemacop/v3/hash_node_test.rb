@@ -965,6 +965,46 @@ module Schemacop
         assert_cast({ foo: 42, bar: 13 }, { bar: 42 }.with_indifferent_access)
         assert_cast({ bar: 13, foo: 42 }, { bar: 42 }.with_indifferent_access)
       end
+
+      def test_cast_str_required
+        schema :hash do
+          boo! :active, cast_str: true
+          int! :id, cast_str: true
+        end
+
+        assert_validation({ active: true, id: 1 })
+        assert_validation({ active: 'true', id: '1' })
+
+        assert_validation({}) do
+          error '/active', 'Value must be given.'
+          error '/id', 'Value must be given.'
+        end
+
+        assert_cast({ active: 'true', id: '1' }, { active: true, id: 1 }.with_indifferent_access)
+
+        assert_validation({ active: '', id: '' }) do
+          error '/active', 'Value must be given.'
+          error '/id', 'Value must be given.'
+        end
+      end
+
+      def test_cast_str_optional
+        schema :hash do
+          boo? :active, cast_str: true
+          int? :id, cast_str: true
+        end
+
+        assert_validation({ active: true, id: 1 })
+        assert_validation({ active: 'true', id: '1' })
+
+        assert_cast({ active: 'true', id: '1' }, { active: true, id: 1 }.with_indifferent_access)
+
+        assert_validation({})
+        assert_validation({ active: nil, id: nil })
+
+        assert_validation({ active: '', id: '' })
+        assert_cast({ active: '', id: '' }, { active: nil, id: nil }.with_indifferent_access)
+      end
     end
   end
 end

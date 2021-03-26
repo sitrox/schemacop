@@ -317,7 +317,7 @@ integer can be done.
 * `cast_str`
   When set to `true`, this node also accepts strings that can be casted to an integer, e.g.
   the values `'-5'` or `'42'`. Please note that you can only validate numbers which
-  are in the `Integer` format.
+  are in the `Integer` format. Blank strings will be treated equally as `nil`.
 
 #### Examples
 
@@ -346,6 +346,19 @@ schema.validate!('102')           # => Schemacop::Exceptions::ValidationError: /
 schema.validate!('42.1')          # => Schemacop::Exceptions::ValidationError: /: Matches 0 definitions but should match exactly 1.
 schema.validate!('4r')            # => Schemacop::Exceptions::ValidationError: /: Matches 0 definitions but should match exactly 1.
 schema.validate!('(4 + 0i)')      # => Schemacop::Exceptions::ValidationError: /: Matches 0 definitions but should match exactly 1.
+schema.validate!(nil)             # => nil
+schema.validate!('')              # => nil
+```
+
+Please note, that `nil` and blank strings are treated equally when using the `cast_str` option,
+and validating a blank string will return `nil`.
+If you need a value, use the `required` option:
+
+```ruby
+schema = Schemacop::Schema3.new(:integer, minimum: 0, maximum: 100, multiple_of: 2, cast_str: true, required: true)
+schema.validate!('42')  # => 42
+schema.validate!(nil)   # => Schemacop::Exceptions::ValidationError: /: Value must be given.
+schema.validate!('')    # => Schemacop::Exceptions::ValidationError: /: Value must be given.
 ```
 
 ### Number
@@ -386,7 +399,7 @@ With the various available options, validations on the value of the number can b
   When set to `true`, this node also accepts strings that can be casted to a number, e.g.
   the values `'0.1'` or `'3.1415'`. Please note that you can only validate numbers which
   are in the `Integer` or `Float` format, i.e. values like `'1.5r'` or `'(4 + 0i)'` will
-  not work.
+  not work. Blank strings will be treated equally as `nil`.
 
 #### Examples
 
@@ -414,6 +427,19 @@ schema.validate!('51')        # => Schemacop::Exceptions::ValidationError: /: Ma
 schema.validate!('42.5')      # => 42.5
 schema.validate!('1.5r')      # => Schemacop::Exceptions::ValidationError: /: Matches 0 definitions but should match exactly 1.
 schema.validate!('(4 + 0i)')  # => Schemacop::Exceptions::ValidationError: /: Matches 0 definitions but should match exactly 1.
+schema.validate!(nil)         # => nil
+schema.validate!('')          # => nil
+```
+
+Please note, that `nil` and blank strings are treated equally when using the `cast_str` option,
+and validating a blank string will return `nil`.
+If you need a value, use the `required` option:
+
+```ruby
+schema = Schemacop::Schema3.new(:number, cast_str: true, minimum: 0.0, maximum: (50r), multiple_of: BigDecimal('0.5'), require: true)
+schema.validate!('42.5')  # => 42.5
+schema.validate!(nil)     # => Schemacop::Exceptions::ValidationError: /: Value must be given.
+schema.validate!('')      # => Schemacop::Exceptions::ValidationError: /: Value must be given.
 ```
 
 ### Symbol
@@ -426,7 +452,7 @@ The symbol type is used to validate elements for the Ruby `Symbol` class.
 #### Options
 
 * `cast_str`
-  When set to `true`, this node also accepts strings that can be casted to a symbol.
+  When set to `true`, this node also accepts strings that can be casted to a symbol. Blank strings will be treated equally as `nil`.
 
 #### Examples
 
@@ -450,6 +476,19 @@ schema.validate!('foo')    # => :foo
 schema.validate!('123')    # => :"123"
 schema.validate!('false')  # => :false
 schema.validate!(':false') # => :":false"
+schema.validate!(nil)      # => nil
+schema.validate!('')       # => nil
+```
+
+Please note, that `nil` and blank strings are treated equally when using the `cast_str` option,
+and validating a blank string will return `nil`.
+If you need a value, use the `required` option:
+
+```ruby
+schema = Schemacop::Schema3.new(:symbol, cast_str: true, required: true)
+schema.validate!('foo')   # => :foo
+schema.validate!(nil)     # => Schemacop::Exceptions::ValidationError: /: Value must be given.
+schema.validate!('')      # => Schemacop::Exceptions::ValidationError: /: Value must be given.
 ```
 
 ### Boolean
@@ -463,7 +502,7 @@ The boolean type is used to validate Ruby booleans, i.e. the `TrueClass` and `Fa
 
 * `cast_str`
   When set to `true`, this node also accepts strings that can be casted to a boolean, i.e.
-  the values `'true'` and `'false'`
+  the values `'true'` and `'false'`. Blank strings will be treated equally as `nil`.
 
 #### Examples
 
@@ -486,6 +525,19 @@ schema.validate!(false)   # => false
 schema.validate!(:false)  # => Schemacop::Exceptions::ValidationError: /: Matches 0 definitions but should match exactly 1.
 schema.validate!('false') # => false
 schema.validate!(1234)    # => Schemacop::Exceptions::ValidationError: /: Matches 0 definitions but should match exactly 1.
+schema.validate!(nil)     # => nil
+schema.validate!('')      # => nil
+```
+
+Please note, that `nil` and blank strings are treated equally when using the `cast_str` option,
+and validating a blank string will return `nil`.
+If you need a value, use the `required` option:
+
+```ruby
+schema = Schemacop::Schema3.new(:boolean, cast_str: true, required: true)
+schema.validate!('false') # => false
+schema.validate!(nil)     # => Schemacop::Exceptions::ValidationError: /: Value must be given.
+schema.validate!('')      # => Schemacop::Exceptions::ValidationError: /: Value must be given.
 ```
 
 ### Array

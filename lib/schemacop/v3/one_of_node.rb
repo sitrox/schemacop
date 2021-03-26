@@ -5,8 +5,30 @@ module Schemacop
         :oneOf
       end
 
+      def self.allowed_options
+        super + %i[treat_blank_as_nil]
+      end
+
+      def cast(value)
+        item = match(value)
+
+        unless item
+          if options[:treat_blank_as_nil] && value.blank? && !value.is_a?(FalseClass)
+            return nil
+          else
+            return value
+          end
+        end
+
+        return item.cast(value)
+      end
+
       def _validate(data, result:)
-        super_data = super
+        if options[:treat_blank_as_nil] && data.blank? && !data.is_a?(FalseClass)
+          data = nil
+        end
+
+        super_data = super(data, result: result)
         return if super_data.nil?
 
         matches = matches(super_data)
