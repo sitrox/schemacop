@@ -1,5 +1,9 @@
 # Change log
 
+## 3.0.11 (2021-03-26)
+
+* Treat blank string as nil when using `cast_str` option
+
 ## 3.0.10 (2021-03-19)
 
 * If wrong type is given, report class of wrong type in error message
