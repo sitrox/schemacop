@@ -1385,7 +1385,7 @@ end
 ```
 
 ```ruby
-# app/schemas/nested/user.rb
+# app/schemas/nested/group.rb
 schema :hash do
   str! :name
 end
