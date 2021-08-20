@@ -1341,7 +1341,8 @@ files.  This is especially useful is you have schemas in your application which
 are used multiple times throughout the application.
 
 For each schema, you define the schema in a separate file, and after loading the
-schemas, you can reference them in other schemas.
+schemas, you can reference them in other schemas. The schema can be retrieved
+by using the file name, e.g. `user` in the example `app/schemas/user.rb` below.
 
 The default load path is `'app/schemas'`, but this can be configured by setting
 the value of the `load_paths` attribute of the `Schemacop` module.
@@ -1358,7 +1359,7 @@ Where:
 * context schemas: Defined in the current context using `context.schema`
 * global schemas: Defined in a ruby file in the load path
 
-### Rails applications
+### External schemas in Rails applications
 
 In Rails applications, your schemas are automatically eager-loaded from the load
 path `'app/schemas'` when your application is started, unless your application
@@ -1409,7 +1410,7 @@ schema.validate!({usr: {first_name: 'Joe', last_name: 'Doe', groups: [{name: 'fo
   # => {"usr"=>{"first_name"=>"Joe", "last_name"=>"Doe", "groups"=>[{"name"=>"foo"}, {"name"=>"bar"}]}}
 ```
 
-### Non-Rails applications
+### External schemas in Non-Rails applications
 
 Usage in non-Rails applications is the same as with usage in Rails applications,
 however you might need to eager load the schemas yourself:
