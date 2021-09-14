@@ -38,7 +38,7 @@ module Schemacop
       end
 
       def matches(data)
-        @items.filter { |i| item_matches?(i, data) }
+        @items.select { |i| item_matches?(i, data) }
       end
     end
   end

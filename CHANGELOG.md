@@ -1,5 +1,9 @@
 # Change log
 
+## 3.0.12 (2021-09-14)
+
+* Fix compatibility issue with `ruby <= 2.5`
+
 ## 3.0.11 (2021-03-26)
 
 * Treat blank string as nil when using `cast_str` option
