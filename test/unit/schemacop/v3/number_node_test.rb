@@ -3,7 +3,9 @@ require 'test_helper'
 module Schemacop
   module V3
     class NumberNodeTest < V3Test
-      EXP_INVALID_TYPE = 'Invalid type, expected "big_decimal" or "float" or "integer" or "rational".'.freeze
+      def self.invalid_type_error(type)
+        "Invalid type, got type \"#{type}\", expected \"big_decimal\" or \"float\" or \"integer\" or \"rational\"."
+      end
 
       def test_basic
         schema :number
@@ -16,7 +18,7 @@ module Schemacop
         assert_validation(BigDecimal(6))
 
         assert_validation((6 + 0i)) do
-          error '/', EXP_INVALID_TYPE
+          error '/', NumberNodeTest.invalid_type_error(Complex)
         end
 
         assert_json(type: :number)
@@ -52,7 +54,7 @@ module Schemacop
         assert_validation [30.3, 42.0]
         assert_validation [30, 30r, 30.0, BigDecimal(30)]
         assert_validation ['30.3', 30.3] do
-          error '/[0]', EXP_INVALID_TYPE
+          error '/[0]', NumberNodeTest.invalid_type_error(String)
         end
       end
 
@@ -64,17 +66,17 @@ module Schemacop
         )
 
         assert_validation '42.5' do
-          error '/', EXP_INVALID_TYPE
+          error '/', NumberNodeTest.invalid_type_error(String)
         end
 
         schema { num! :age }
 
         assert_validation age: :foo do
-          error '/age', EXP_INVALID_TYPE
+          error '/age', NumberNodeTest.invalid_type_error(Symbol)
         end
 
         assert_validation age: '234' do
-          error '/age', EXP_INVALID_TYPE
+          error '/age', NumberNodeTest.invalid_type_error(String)
         end
       end
 
@@ -261,13 +263,13 @@ module Schemacop
         # Even we put those types in the enum, they need to fail the validations,
         # as they are not numbers
         assert_validation('foo') do
-          error '/', EXP_INVALID_TYPE
+          error '/', NumberNodeTest.invalid_type_error(String)
         end
         assert_validation(:bar) do
-          error '/', EXP_INVALID_TYPE
+          error '/', NumberNodeTest.invalid_type_error(Symbol)
         end
         assert_validation({ qux: 42 }) do
-          error '/', EXP_INVALID_TYPE
+          error '/', NumberNodeTest.invalid_type_error(Hash)
         end
 
         # These need to fail validation, as they are not in the enum list
@@ -305,6 +307,9 @@ module Schemacop
 
         assert_cast('1', 1)
         assert_cast(1, 1)
+
+        assert_validation(nil)
+        assert_validation('')
 
         assert_cast('1.0', 1.0)
         assert_cast(1.0, 1.0)

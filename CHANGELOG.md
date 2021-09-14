@@ -1,5 +1,19 @@
 # Change log
 
+## 3.0.11 (2021-03-26)
+
+* Treat blank string as nil when using `cast_str` option
+
+## 3.0.10 (2021-03-19)
+
+* If wrong type is given, report class of wrong type in error message
+
+## 3.0.9 (2021-02-26)
+
+* Fix casting of blank strings
+
+* Add `allow_blank` option to `String` nodes
+
 ## 3.0.8 (2021-02-23)
 
 * Fix `object` nodes in hashes with no classes

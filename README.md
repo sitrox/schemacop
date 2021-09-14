@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/sitrox/schemacop.svg?branch=master)](https://travis-ci.org/sitrox/schemacop)
+[![Ruby](https://github.com/sitrox/schemacop/actions/workflows/ruby.yml/badge.svg?branch=master)](https://github.com/sitrox/schemacop/actions/workflows/ruby.yml)
 [![Gem Version](https://badge.fury.io/rb/schemacop.svg)](https://badge.fury.io/rb/schemacop)
 
 # Schemacop

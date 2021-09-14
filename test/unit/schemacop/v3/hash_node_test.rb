@@ -3,8 +3,6 @@ require 'test_helper'
 module Schemacop
   module V3
     class HashNodeTest < V3Test
-      EXP_INVALID_TYPE = 'Invalid type, expected "hash".'.freeze
-
       def test_basic
         schema
         assert_validation({})
@@ -54,7 +52,7 @@ module Schemacop
 
         assert_validation(foo: 'bar', baz: 'foo', answer: '42')
         assert_validation(foo: 'bar', baz: 'foo', answer: 42) do
-          error '/answer', 'Invalid type, expected "string".'
+          error '/answer', 'Invalid type, got type "Integer", expected "string".'
         end
 
         assert_json(
@@ -70,7 +68,7 @@ module Schemacop
           @schema.validate!({ foo: 'foo' })
         end
 
-        assert_raises_with_message Exceptions::ValidationError, '/bar: Invalid type, expected "string".' do
+        assert_raises_with_message Exceptions::ValidationError, '/bar: Invalid type, got type "Symbol", expected "string".' do
           @schema.validate!({ foo: 'foo', bar: :baz })
         end
       end
@@ -247,7 +245,7 @@ module Schemacop
 
         assert_validation(name: 'John', xy: 'John', bar_baz: 'Doe') do
           error '/', 'Obsolete property "xy".'
-          error '/bar_baz', 'Invalid type, expected "integer".'
+          error '/bar_baz', 'Invalid type, got type "String", expected "integer".'
         end
 
         assert_json(
@@ -276,7 +274,7 @@ module Schemacop
         assert_validation(keyword: 'value')
 
         assert_validation(keyword: 42) do
-          error '/keyword', 'Invalid type, expected "string".'
+          error '/keyword', 'Invalid type, got type "Integer", expected "string".'
         end
 
         assert_json(
@@ -759,10 +757,10 @@ module Schemacop
         # Even we put those types in the enum, they need to fail the validations,
         # as they are not strings
         assert_validation({ foo: 123 }) do
-          error '/foo', 'Invalid type, expected "string".'
+          error '/foo', 'Invalid type, got type "Integer", expected "string".'
         end
         assert_validation({ foo: :faz }) do
-          error '/foo', 'Invalid type, expected "string".'
+          error '/foo', 'Invalid type, got type "Symbol", expected "string".'
         end
 
         # These need to fail validation, as they are not in the enum list
@@ -918,7 +916,7 @@ module Schemacop
         end
 
         assert_validation({ foo: '13' }) do
-          error '/foo', 'Invalid type, expected "integer".'
+          error '/foo', 'Invalid type, got type "String", expected "integer".'
         end
 
         assert_cast(nil, nil)
@@ -937,7 +935,7 @@ module Schemacop
         assert_validation({ foo: 42, bar: 13 })
 
         assert_validation({ foo: '13' }) do
-          error '/foo', 'Invalid type, expected "integer".'
+          error '/foo', 'Invalid type, got type "String", expected "integer".'
         end
 
         # assert_cast(nil, nil)
@@ -959,13 +957,53 @@ module Schemacop
         end
 
         assert_validation({ foo: '13' }) do
-          error '/foo', 'Invalid type, expected "integer".'
+          error '/foo', 'Invalid type, got type "String", expected "integer".'
         end
 
         assert_cast(nil, nil)
         assert_cast({ foo: 42 }, { bar: 42 }.with_indifferent_access)
         assert_cast({ foo: 42, bar: 13 }, { bar: 42 }.with_indifferent_access)
         assert_cast({ bar: 13, foo: 42 }, { bar: 42 }.with_indifferent_access)
+      end
+
+      def test_cast_str_required
+        schema :hash do
+          boo! :active, cast_str: true
+          int! :id, cast_str: true
+        end
+
+        assert_validation({ active: true, id: 1 })
+        assert_validation({ active: 'true', id: '1' })
+
+        assert_validation({}) do
+          error '/active', 'Value must be given.'
+          error '/id', 'Value must be given.'
+        end
+
+        assert_cast({ active: 'true', id: '1' }, { active: true, id: 1 }.with_indifferent_access)
+
+        assert_validation({ active: '', id: '' }) do
+          error '/active', 'Value must be given.'
+          error '/id', 'Value must be given.'
+        end
+      end
+
+      def test_cast_str_optional
+        schema :hash do
+          boo? :active, cast_str: true
+          int? :id, cast_str: true
+        end
+
+        assert_validation({ active: true, id: 1 })
+        assert_validation({ active: 'true', id: '1' })
+
+        assert_cast({ active: 'true', id: '1' }, { active: true, id: 1 }.with_indifferent_access)
+
+        assert_validation({})
+        assert_validation({ active: nil, id: nil })
+
+        assert_validation({ active: '', id: '' })
+        assert_cast({ active: '', id: '' }, { active: nil, id: nil }.with_indifferent_access)
       end
     end
   end

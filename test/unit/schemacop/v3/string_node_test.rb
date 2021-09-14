@@ -3,7 +3,9 @@ require 'test_helper'
 module Schemacop
   module V3
     class StringNodeTest < V3Test
-      EXP_INVALID_TYPE = 'Invalid type, expected "string".'.freeze
+      def self.invalid_type_error(type)
+        "Invalid type, got type \"#{type}\", expected \"string\"."
+      end
 
       def test_basic
         schema :string
@@ -33,7 +35,7 @@ module Schemacop
         assert_json(type: :string)
 
         assert_validation 42 do
-          error '/', EXP_INVALID_TYPE
+          error '/', StringNodeTest.invalid_type_error(Integer)
         end
 
         schema { str! :name }
@@ -41,11 +43,11 @@ module Schemacop
         assert_json(type: :object, properties: { name: { type: :string } }, required: %i[name], additionalProperties: false)
 
         assert_validation name: :foo do
-          error '/name', EXP_INVALID_TYPE
+          error '/name', StringNodeTest.invalid_type_error(Symbol)
         end
 
         assert_validation name: 234 do
-          error '/name', EXP_INVALID_TYPE
+          error '/name', StringNodeTest.invalid_type_error(Integer)
         end
       end
 
@@ -190,7 +192,7 @@ module Schemacop
         assert_validation ''
 
         assert_validation 234 do
-          error '/', 'Invalid type, expected "string".'
+          error '/', StringNodeTest.invalid_type_error(Integer)
         end
 
         assert_cast(nil, nil)
@@ -218,7 +220,7 @@ module Schemacop
         # Integer value 42 is in the enum of allowed values, but it's not a string,
         # so the validation still fails
         assert_validation 42 do
-          error '/', 'Invalid type, expected "string".'
+          error '/', StringNodeTest.invalid_type_error(Integer)
         end
       end
 
@@ -278,7 +280,7 @@ module Schemacop
         assert_validation(nil)
         assert_validation('Foo')
         assert_validation(5) do
-          error '/', 'Invalid type, expected "string".'
+          error '/', StringNodeTest.invalid_type_error(Integer)
         end
 
         assert_cast('Foo', 'Foo')
@@ -297,7 +299,7 @@ module Schemacop
         assert_validation(nil)
         assert_validation('123')
         assert_validation(5) do
-          error '/', 'Invalid type, expected "string".'
+          error '/', StringNodeTest.invalid_type_error(Integer)
         end
 
         assert_cast('123', 123)
@@ -364,13 +366,13 @@ module Schemacop
         # Even we put those types in the enum, they need to fail the validations,
         # as they are not strings
         assert_validation(1) do
-          error '/', 'Invalid type, expected "string".'
+          error '/', StringNodeTest.invalid_type_error(Integer)
         end
         assert_validation(:bar) do
-          error '/', 'Invalid type, expected "string".'
+          error '/', StringNodeTest.invalid_type_error(Symbol)
         end
         assert_validation({ qux: 42 }) do
-          error '/', 'Invalid type, expected "string".'
+          error '/', StringNodeTest.invalid_type_error(Hash)
         end
 
         # These need to fail validation, as they are not in the enum list
@@ -399,6 +401,53 @@ module Schemacop
                         'foo'
                       ]
                     })
+      end
+
+      def test_cast_empty_or_whitespace_string
+        schema :string
+
+        assert_cast(nil, nil)
+        assert_cast('', '')
+        assert_cast('    ', '    ')
+        assert_cast("\n", "\n")
+        assert_cast("\t", "\t")
+      end
+
+      def test_cast_empty_or_whitespace_string_required
+        schema :string, required: true
+
+        assert_validation(nil) do
+          error '/', 'Value must be given.'
+        end
+
+        assert_cast('', '')
+        assert_cast('    ', '    ')
+        assert_cast("\n", "\n")
+        assert_cast("\t", "\t")
+      end
+
+      def test_empty_or_whitespace_string_blank_not_allowed
+        schema :string, allow_blank: false
+
+        assert_validation(nil) do
+          error '/', 'String is blank but must not be blank!'
+        end
+
+        assert_validation('') do
+          error '/', 'String is blank but must not be blank!'
+        end
+
+        assert_validation('   ') do
+          error '/', 'String is blank but must not be blank!'
+        end
+
+        assert_validation("\n") do
+          error '/', 'String is blank but must not be blank!'
+        end
+
+        assert_validation("\t") do
+          error '/', 'String is blank but must not be blank!'
+        end
       end
     end
   end

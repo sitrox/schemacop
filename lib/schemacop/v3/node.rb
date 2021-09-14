@@ -33,10 +33,11 @@ module Schemacop
         if options.delete(:cast_str)
           format = NodeRegistry.name(klass)
           one_of_options = {
-            required:    options.delete(:required),
-            name:        options.delete(:name),
-            as:          options.delete(:as),
-            description: options.delete(:description)
+            required:           options.delete(:required),
+            treat_blank_as_nil: true,
+            name:               options.delete(:name),
+            as:                 options.delete(:as),
+            description:        options.delete(:description)
           }
           node = create(:one_of, **one_of_options) do
             self.node node
@@ -206,7 +207,7 @@ module Schemacop
         # Validate type #
         if allowed_types.any? && allowed_types.keys.none? { |c| data.send(type_assertion_method, c) }
           collection = allowed_types.values.map { |t| "\"#{t}\"" }.uniq.sort.join(' or ')
-          result.error %(Invalid type, expected #{collection}.)
+          result.error "Invalid type, got type \"#{data.class}\", expected #{collection}."
           return nil
         end
 

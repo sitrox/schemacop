@@ -75,12 +75,12 @@ Schemacop can raise the following exceptions:
   Example:
 
   ```ruby
-  schema = Schemacop::Schema3.new do
+  schema = Schemacop::Schema3.new :hash do
     int! :foo
   end
 
   schema.validate!(foo: 'bar')
-  # => Schemacop::Exceptions::ValidationError: /foo: Invalid type, expected "integer".
+  # => Schemacop::Exceptions::ValidationError: /foo: Invalid type, got type "String", expected "integer".
   ```
 
 * `Schemacop::Exceptions::InvalidSchemaError`: This exception is raised when the
@@ -141,7 +141,7 @@ schema = Schemacop::Schema3.new :string, enum: ['foo', 'bar', 42]
 
 schema.validate!('foo') # => "foo"
 schema.validate!('bar') # => "bar"
-schema.validate!(42)    # => Schemacop::Exceptions::ValidationError: /: Invalid type, expected "string".
+schema.validate!(42)    # => Schemacop::Exceptions::ValidationError: /: Invalid type, got type "Integer", expected "string".
 ```
 
 The enum will also be provided in the json output:
@@ -178,7 +178,7 @@ Note that the default value you use is also validated against the schema:
 schema = Schemacop::Schema3.new :string, default: 42
 
 schema.validate!('foo') # => "foo"
-schema.validate!(nil)   # => Schemacop::Exceptions::ValidationError: /: Invalid type, expected "string".
+schema.validate!(nil)   # => Schemacop::Exceptions::ValidationError: /: Invalid type, got type "Integer", expected "string".
 ```
 
 ## Nodes
@@ -208,6 +208,10 @@ transformed into various types.
   string values that are commonly used. See section *formats* for more
   information on the available formats. Note that strings with a format are also
   **casted** into that format.
+* `allow_blank`
+  By default, blank strings are allowed and left as they are when casted (e.g.
+  the string `''` is valid). If you want to disallow blank strings, set this
+  option to `false`.
 
 #### Formats
 
@@ -248,6 +252,38 @@ transformed into various types.
 #### Examples
 
 ```ruby
+# Basic example
+schema = Schemacop::Schema3.new :string
+schema.validate!(nil)   # => nil
+schema.validate!('')    # => ""
+schema.validate!('foo') # => "foo"
+schema.validate!("\n")  # => "\n"
+```
+
+With the `required` option:
+
+```ruby
+# Basic example
+schema = Schemacop::Schema3.new :string, required: true
+schema.validate!(nil)   # => Schemacop::Exceptions::ValidationError: /: Value must be given.
+schema.validate!('')    # => ""
+schema.validate!('foo') # => "foo"
+schema.validate!("\n")  # => "\n"
+```
+
+With the `allow_blank` option:
+
+```ruby
+# Basic example
+schema = Schemacop::Schema3.new :string, allow_blank: false
+schema.validate!(nil)   # => Schemacop::Exceptions::ValidationError: /: String is blank but must not be blank!
+schema.validate!('')    # => Schemacop::Exceptions::ValidationError: /: String is blank but must not be blank!
+schema.validate!('foo') # => "foo"
+schema.validate!("\n")  # => Schemacop::Exceptions::ValidationError: /: String is blank but must not be blank!
+```
+Example of using a `format` option:
+
+```ruby
 # By using a format, string values are casted to that respective format
 schema = Schemacop::Schema3.new(:string, format: :date)
 result = schema.validate('1980-01-13')
@@ -281,7 +317,7 @@ integer can be done.
 * `cast_str`
   When set to `true`, this node also accepts strings that can be casted to an integer, e.g.
   the values `'-5'` or `'42'`. Please note that you can only validate numbers which
-  are in the `Integer` format.
+  are in the `Integer` format. Blank strings will be treated equally as `nil`.
 
 #### Examples
 
@@ -292,10 +328,10 @@ schema.validate!(42)            # => 42
 schema.validate!(43)            # => Schemacop::Exceptions::ValidationError: /: Value must be a multiple of 2.
 schema.validate!(-2)            # => Schemacop::Exceptions::ValidationError: /: Value must have a minimum of 0.
 schema.validate!(102)           # => Schemacop::Exceptions::ValidationError: /: Value must have a maximum of 100.
-schema.validate!(42.1)          # => Schemacop::Exceptions::ValidationError: /: Invalid type, expected "integer".
-schema.validate!(4r)            # => Schemacop::Exceptions::ValidationError: /: Invalid type, expected "integer".
-schema.validate!((4 + 0i))      # => Schemacop::Exceptions::ValidationError: /: Invalid type, expected "integer".
-schema.validate!(BigDecimal(5)) # => Schemacop::Exceptions::ValidationError: /: Invalid type, expected "integer".
+schema.validate!(42.1)          # => Schemacop::Exceptions::ValidationError: /: Invalid type, got type "Float", expected "integer".
+schema.validate!(4r)            # => Schemacop::Exceptions::ValidationError: /: Invalid type, got type "Rational", expected "integer".
+schema.validate!((4 + 0i))      # => Schemacop::Exceptions::ValidationError: /: Invalid type, got type "Complex", expected "integer".
+schema.validate!(BigDecimal(5)) # => Schemacop::Exceptions::ValidationError: /: Invalid type, got type "BigDecimal", expected "integer".
 ```
 
 With `cast_str` enabled:
@@ -310,6 +346,19 @@ schema.validate!('102')           # => Schemacop::Exceptions::ValidationError: /
 schema.validate!('42.1')          # => Schemacop::Exceptions::ValidationError: /: Matches 0 definitions but should match exactly 1.
 schema.validate!('4r')            # => Schemacop::Exceptions::ValidationError: /: Matches 0 definitions but should match exactly 1.
 schema.validate!('(4 + 0i)')      # => Schemacop::Exceptions::ValidationError: /: Matches 0 definitions but should match exactly 1.
+schema.validate!(nil)             # => nil
+schema.validate!('')              # => nil
+```
+
+Please note, that `nil` and blank strings are treated equally when using the `cast_str` option,
+and validating a blank string will return `nil`.
+If you need a value, use the `required` option:
+
+```ruby
+schema = Schemacop::Schema3.new(:integer, minimum: 0, maximum: 100, multiple_of: 2, cast_str: true, required: true)
+schema.validate!('42')  # => 42
+schema.validate!(nil)   # => Schemacop::Exceptions::ValidationError: /: Value must be given.
+schema.validate!('')    # => Schemacop::Exceptions::ValidationError: /: Value must be given.
 ```
 
 ### Number
@@ -350,7 +399,7 @@ With the various available options, validations on the value of the number can b
   When set to `true`, this node also accepts strings that can be casted to a number, e.g.
   the values `'0.1'` or `'3.1415'`. Please note that you can only validate numbers which
   are in the `Integer` or `Float` format, i.e. values like `'1.5r'` or `'(4 + 0i)'` will
-  not work.
+  not work. Blank strings will be treated equally as `nil`.
 
 #### Examples
 
@@ -364,7 +413,7 @@ schema.validate!(51)            # => Schemacop::Exceptions::ValidationError: /: 
 schema.validate!(42.5)          # => 42.5
 schema.validate!(1.5r)          # => (3/2)
 schema.validate!(BigDecimal(5)) # => 0.5e1
-schema.validate!((4 + 0i))      # => Schemacop::Exceptions::ValidationError: /: Invalid type, expected "big_decimal" or "float" or "integer" or "rational".
+schema.validate!((4 + 0i))      # => Schemacop::Exceptions::ValidationError: /: Invalid type, got type "Complex", expected "big_decimal" or "float" or "integer" or "rational"
 ```
 
 With `cast_str` enabled:
@@ -378,6 +427,19 @@ schema.validate!('51')        # => Schemacop::Exceptions::ValidationError: /: Ma
 schema.validate!('42.5')      # => 42.5
 schema.validate!('1.5r')      # => Schemacop::Exceptions::ValidationError: /: Matches 0 definitions but should match exactly 1.
 schema.validate!('(4 + 0i)')  # => Schemacop::Exceptions::ValidationError: /: Matches 0 definitions but should match exactly 1.
+schema.validate!(nil)         # => nil
+schema.validate!('')          # => nil
+```
+
+Please note, that `nil` and blank strings are treated equally when using the `cast_str` option,
+and validating a blank string will return `nil`.
+If you need a value, use the `required` option:
+
+```ruby
+schema = Schemacop::Schema3.new(:number, cast_str: true, minimum: 0.0, maximum: (50r), multiple_of: BigDecimal('0.5'), require: true)
+schema.validate!('42.5')  # => 42.5
+schema.validate!(nil)     # => Schemacop::Exceptions::ValidationError: /: Value must be given.
+schema.validate!('')      # => Schemacop::Exceptions::ValidationError: /: Value must be given.
 ```
 
 ### Symbol
@@ -390,7 +452,7 @@ The symbol type is used to validate elements for the Ruby `Symbol` class.
 #### Options
 
 * `cast_str`
-  When set to `true`, this node also accepts strings that can be casted to a symbol.
+  When set to `true`, this node also accepts strings that can be casted to a symbol. Blank strings will be treated equally as `nil`.
 
 #### Examples
 
@@ -398,9 +460,9 @@ The symbol type is used to validate elements for the Ruby `Symbol` class.
 # Validates that the input is a symbol
 schema = Schemacop::Schema3.new(:symbol)
 schema.validate!(:foo)   # => :foo
-schema.validate!('foo')  # => Schemacop::Exceptions::ValidationError: /: Invalid type, expected "Symbol".
-schema.validate!(123)    # => Schemacop::Exceptions::ValidationError: /: Invalid type, expected "Symbol".
-schema.validate!(false)  # => Schemacop::Exceptions::ValidationError: /: Invalid type, expected "Symbol".
+schema.validate!('foo')  # => Schemacop::Exceptions::ValidationError: /: Invalid type, got type "String", expected "Symbol".
+schema.validate!(123)    # => Schemacop::Exceptions::ValidationError: /: Invalid type, got type "Integer", expected "Symbol".
+schema.validate!(false)  # => Schemacop::Exceptions::ValidationError: /: Invalid type, got type "FalseClass", expected "Symbol".
 schema.validate!(:false) # => :false
 ```
 
@@ -414,6 +476,19 @@ schema.validate!('foo')    # => :foo
 schema.validate!('123')    # => :"123"
 schema.validate!('false')  # => :false
 schema.validate!(':false') # => :":false"
+schema.validate!(nil)      # => nil
+schema.validate!('')       # => nil
+```
+
+Please note, that `nil` and blank strings are treated equally when using the `cast_str` option,
+and validating a blank string will return `nil`.
+If you need a value, use the `required` option:
+
+```ruby
+schema = Schemacop::Schema3.new(:symbol, cast_str: true, required: true)
+schema.validate!('foo')   # => :foo
+schema.validate!(nil)     # => Schemacop::Exceptions::ValidationError: /: Value must be given.
+schema.validate!('')      # => Schemacop::Exceptions::ValidationError: /: Value must be given.
 ```
 
 ### Boolean
@@ -427,7 +502,7 @@ The boolean type is used to validate Ruby booleans, i.e. the `TrueClass` and `Fa
 
 * `cast_str`
   When set to `true`, this node also accepts strings that can be casted to a boolean, i.e.
-  the values `'true'` and `'false'`
+  the values `'true'` and `'false'`. Blank strings will be treated equally as `nil`.
 
 #### Examples
 
@@ -436,9 +511,9 @@ The boolean type is used to validate Ruby booleans, i.e. the `TrueClass` and `Fa
 schema = Schemacop::Schema3.new(:boolean)
 schema.validate!(true)    # => true
 schema.validate!(false)   # => false
-schema.validate!(:false)  # => Schemacop::Exceptions::ValidationError: /: Invalid type, expected "boolean".
-schema.validate!('false') # => Schemacop::Exceptions::ValidationError: /: Invalid type, expected "boolean".
-schema.validate!(1234)    # => Schemacop::Exceptions::ValidationError: /: Invalid type, expected "boolean".
+schema.validate!(:false)  # => Schemacop::Exceptions::ValidationError: /: Invalid type, got type "Symbol", expected "boolean".
+schema.validate!('false') # => Schemacop::Exceptions::ValidationError: /: Invalid type, got type "String", expected "boolean".
+schema.validate!(1234)    # => Schemacop::Exceptions::ValidationError: /: Invalid type, got type "Integer", expected "boolean".
 ```
 
 With `cast_str` enabled:
@@ -450,6 +525,19 @@ schema.validate!(false)   # => false
 schema.validate!(:false)  # => Schemacop::Exceptions::ValidationError: /: Matches 0 definitions but should match exactly 1.
 schema.validate!('false') # => false
 schema.validate!(1234)    # => Schemacop::Exceptions::ValidationError: /: Matches 0 definitions but should match exactly 1.
+schema.validate!(nil)     # => nil
+schema.validate!('')      # => nil
+```
+
+Please note, that `nil` and blank strings are treated equally when using the `cast_str` option,
+and validating a blank string will return `nil`.
+If you need a value, use the `required` option:
+
+```ruby
+schema = Schemacop::Schema3.new(:boolean, cast_str: true, required: true)
+schema.validate!('false') # => false
+schema.validate!(nil)     # => Schemacop::Exceptions::ValidationError: /: Value must be given.
+schema.validate!('')      # => Schemacop::Exceptions::ValidationError: /: Value must be given.
 ```
 
 ### Array
@@ -492,7 +580,7 @@ end
 
 schema.validate!([])      # => Schemacop::Exceptions::ValidationError: /: At least one entry must match schema {"type"=>"integer", "minimum"=>5}.
 schema.validate!([1, 5])  # => [1, 5]
-schema.validate!(['foo']) # => Schemacop::Exceptions::ValidationError: /[0]: Invalid type, expected "integer". /: At least one entry must match schema {"type"=>"integer", "minimum"=>5}
+schema.validate!(['foo']) # => Schemacop::Exceptions::ValidationError: /[0]: Invalid type, got type "String", expected "integer". /: At least one entry must match schema {"type"=>"integer", "minimum"=>5}
 ```
 
 You can also use it with the tuple validation (see below), e.g. if you want
@@ -533,10 +621,10 @@ schema = Schemacop::Schema3.new :array do
   list :integer, minimum: 1, maximum: 5
 end
 
-schema.validate!([])     # => []
-schema.validate!([1, 3]) # => [1, 3]
-schema.validate!([0, 6]) # => Schemacop::Exceptions::ValidationError: /[0]: Value must have a minimum of 1. /[1]: Value must have a maximum of 5.
-schema.validate! ['foo'] # => Schemacop::Exceptions::ValidationError: /[0]: Invalid type, expected "integer".
+schema.validate!([])      # => []
+schema.validate!([1, 3])  # => [1, 3]
+schema.validate!([0, 6])  # => Schemacop::Exceptions::ValidationError: /[0]: Value must have a minimum of 1. /[1]: Value must have a maximum of 5.
+schema.validate!(['foo']) # => Schemacop::Exceptions::ValidationError: /[0]: Invalid type, got type "String", expected "integer".
 ```
 
 You can also build more complex structures, e.g. an array containing an arbitrary
@@ -551,7 +639,7 @@ end
 
 schema.validate!([])                # => []
 schema.validate!([[1], [2, 3]])     # => [[1], [2, 3]]
-schema.validate!([['foo'], [2, 3]]) # => Schemacop::Exceptions::ValidationError: /[0]/[0]: Invalid type, expected "integer".
+schema.validate!([['foo'], [2, 3]]) # => Schemacop::Exceptions::ValidationError: /[0]/[0]: Invalid type, got type "String", expected "integer".
 ```
 
 Please note that you can only specify *one* `list` item:
@@ -613,7 +701,7 @@ end
 
 schema.validate!([])                # => Schemacop::Exceptions::ValidationError: /: Array has 0 items but must have exactly 2.
 schema.validate!([1, 'foo'])        # => [1, "foo"]
-schema.validate!([1, 'foo', 'bar']) # => Schemacop::Exceptions::ValidationError: /[2]: Invalid type, expected "integer".
+schema.validate!([1, 'foo', 'bar']) # => Schemacop::Exceptions::ValidationError: /[2]: Invalid type, got type "String", expected "integer".
 schema.validate!([1, 'foo', 2, 3])  # => [1, "foo", 2, 3]
 ```
 
@@ -772,7 +860,7 @@ schema = Schemacop::Schema3.new :hash do
   str? :foo
 end
 
-schema.validate!({foo: 1})      # => Schemacop::Exceptions::ValidationError: /foo: Invalid type, expected "string".
+schema.validate!({foo: 1})      # => Schemacop::Exceptions::ValidationError: /foo: Invalid type, got type "Integer", expected "string".
 schema.validate!({foo: 'bar'})  # => {"foo"=>"bar"}
 ```
 
@@ -856,7 +944,7 @@ end
 
 schema.validate!({id: 1})             # => {"id"=>1}
 schema.validate!({id: 1, foo: 'bar'}) # => {"id"=>1, "foo"=>"bar"}
-schema.validate!({id: 1, foo: 42})    # => Schemacop::Exceptions::ValidationError: /foo: Invalid type, expected "string".
+schema.validate!({id: 1, foo: 42})    # => Schemacop::Exceptions::ValidationError: /foo: Invalid type, got type "Integer", expected "string".
 ```
 
 Using the option `property_names`, you can additionaly specify a pattern that
@@ -880,8 +968,8 @@ end
 
 schema.validate!({})                # => {}
 schema.validate!({foo: [1, 2, 3]})  # => {"foo"=>[1, 2, 3]}
-schema.validate!({foo: :bar})       # => Schemacop::Exceptions::ValidationError: /foo: Invalid type, expected "array".
-schema.validate!({Foo: :bar})       # => Schemacop::Exceptions::ValidationError: /: Property name :Foo does not match "^[a-z]+$". /Foo: Invalid type, expected "array".
+schema.validate!({foo: :bar})       # => Schemacop::Exceptions::ValidationError: /foo: Invalid type, got type "Symbol", expected "array".
+schema.validate!({Foo: :bar})       # => Schemacop::Exceptions::ValidationError: /: Property name :Foo does not match "^[a-z]+$". /Foo: Invalid type, got type "Symbol", expected "array".
 ```
 
 ##### Dependencies
@@ -955,10 +1043,10 @@ of allowed classes:
 schema = Schemacop::Schema3.new :object, classes: [String]
 
 schema.validate!(nil)             # => nil
-schema.validate!(true)            # => Schemacop::Exceptions::ValidationError: /: Invalid type, expected "String".
-schema.validate!(Object.new)      # => Schemacop::Exceptions::ValidationError: /: Invalid type, expected "String".
+schema.validate!(true)            # => Schemacop::Exceptions::ValidationError: /: Invalid type, got type "TrueClass", expected "String".
+schema.validate!(Object.new)      # => Schemacop::Exceptions::ValidationError: /: Invalid type, got type "Object", expected "String".
 schema.validate!('foo')           # => "foo"
-schema.validate!('foo'.html_safe) # => Schemacop::Exceptions::ValidationError: /: Invalid type, expected "String".
+schema.validate!('foo'.html_safe) # => Schemacop::Exceptions::ValidationError: /: Invalid type, got type "ActiveSupport::SafeBuffer", expected "String".
 ```
 
 Here, the node checks if the given value is an instance of any of the given
@@ -970,8 +1058,8 @@ If you want to allow subclasses, you can specify this by using the `strict` opti
 schema = Schemacop::Schema3.new :object, classes: [String], strict: false
 
 schema.validate!(nil)             # => nil
-schema.validate!(true)            # => Schemacop::Exceptions::ValidationError: /: Invalid type, expected "String".
-schema.validate!(Object.new)      # => Schemacop::Exceptions::ValidationError: /: Invalid type, expected "String".
+schema.validate!(true)            # => Schemacop::Exceptions::ValidationError: /: Invalid type, got type "TrueClass", expected "String".
+schema.validate!(Object.new)      # => Schemacop::Exceptions::ValidationError: /: Invalid type, got type "Object", expected "String".
 schema.validate!('foo')           # => "foo"
 schema.validate!('foo'.html_safe) # => "foo"
 ```
@@ -1144,7 +1232,7 @@ schema.validate!({
   shipping_address: 'foo',
   billing_address: 42
 })
-# => Schemacop::Exceptions::ValidationError: /shipping_address: Invalid type, expected "object". /billing_address: Invalid type, expected "object".
+# => Schemacop::Exceptions::ValidationError: /shipping_address: Invalid type, got type "String", expected "object". /billing_address: Invalid type, got type "Integer", expected "object".
 
 schema.validate!({
   shipping_address: {
@@ -1253,7 +1341,8 @@ files.  This is especially useful is you have schemas in your application which
 are used multiple times throughout the application.
 
 For each schema, you define the schema in a separate file, and after loading the
-schemas, you can reference them in other schemas.
+schemas, you can reference them in other schemas. The schema can be retrieved
+by using the file name, e.g. `user` in the example `app/schemas/user.rb` below.
 
 The default load path is `'app/schemas'`, but this can be configured by setting
 the value of the `load_paths` attribute of the `Schemacop` module.
@@ -1270,7 +1359,7 @@ Where:
 * context schemas: Defined in the current context using `context.schema`
 * global schemas: Defined in a ruby file in the load path
 
-### Rails applications
+### External schemas in Rails applications
 
 In Rails applications, your schemas are automatically eager-loaded from the load
 path `'app/schemas'` when your application is started, unless your application
@@ -1297,7 +1386,7 @@ end
 ```
 
 ```ruby
-# app/schemas/nested/user.rb
+# app/schemas/nested/group.rb
 schema :hash do
   str! :name
 end
@@ -1321,7 +1410,7 @@ schema.validate!({usr: {first_name: 'Joe', last_name: 'Doe', groups: [{name: 'fo
   # => {"usr"=>{"first_name"=>"Joe", "last_name"=>"Doe", "groups"=>[{"name"=>"foo"}, {"name"=>"bar"}]}}
 ```
 
-### Non-Rails applications
+### External schemas in Non-Rails applications
 
 Usage in non-Rails applications is the same as with usage in Rails applications,
 however you might need to eager load the schemas yourself:

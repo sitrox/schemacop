@@ -93,6 +93,10 @@ module Schemacop
           error '/', 'Value must be given.'
         end
 
+        assert_validation('') do
+          error '/', 'Value must be given.'
+        end
+
         assert_validation('5')
         assert_validation('5.3') do
           error '/', 'Matches 0 definitions but should match exactly 1.'
@@ -155,6 +159,12 @@ module Schemacop
         assert_validation(nil)
         assert_validation([nil]) do
           error '/[0]', 'Value must be given.'
+        end
+        assert_validation(['']) do
+          error '/[0]', 'Value must be given.'
+        end
+        assert_validation([]) do
+          error '/', 'Array has 0 items but must have exactly 1.'
         end
       end
 
