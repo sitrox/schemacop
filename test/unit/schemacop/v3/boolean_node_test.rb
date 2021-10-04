@@ -146,10 +146,13 @@ module Schemacop
         assert_cast('true', true)
         assert_cast('false', false)
 
+        assert_cast('1', true)
+        assert_cast('0', false)
+
         assert_cast(true, true)
         assert_cast(false, false)
 
-        assert_validation('1') do
+        assert_validation('5') do
           error '/', 'Matches 0 definitions but should match exactly 1.'
         end
 
@@ -171,7 +174,11 @@ module Schemacop
         assert_cast(true, true)
         assert_cast(false, false)
 
-        assert_validation('1') do
+        assert_validation('4') do
+          error '/', 'Matches 0 definitions but should match exactly 1.'
+        end
+
+        assert_validation('foo') do
           error '/', 'Matches 0 definitions but should match exactly 1.'
         end
 

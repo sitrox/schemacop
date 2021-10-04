@@ -1,5 +1,10 @@
 # Change log
 
+## 3.0.13 (2021-10-04)
+
+* When using `boolean` with `cast_str: true`, `"0"` is now casted to `false` and
+  `"1"` to `true`. This in addition to already casting `"true", "false"`.
+
 ## 3.0.12 (2021-09-14)
 
 * Fix compatibility issue with `ruby <= 2.5`

@@ -233,8 +233,8 @@ transformed into various types.
   addresses do not have their own ruby type.
 
 * `boolean`
-  The string must be either `true` or `false`. This value will be casted to
-  Ruby's `TrueClass` or `FalseClass`.
+  The string must be either `true`, `false`, `0` or `1`. This value will be
+  casted to Ruby's `TrueClass` or `FalseClass`.
 
 * `binary`
   The string is expected to contain binary contents. No casting or additional
@@ -501,8 +501,9 @@ The boolean type is used to validate Ruby booleans, i.e. the `TrueClass` and `Fa
 #### Options
 
 * `cast_str`
-  When set to `true`, this node also accepts strings that can be casted to a boolean, i.e.
-  the values `'true'` and `'false'`. Blank strings will be treated equally as `nil`.
+  When set to `true`, this node also accepts strings that can be casted to a
+  boolean, namely the values `'true'`, `'false'`, `'1'` and `'0'`. Blank strings
+  will be treated equally as `nil`.
 
 #### Examples
 
@@ -514,6 +515,11 @@ schema.validate!(false)   # => false
 schema.validate!(:false)  # => Schemacop::Exceptions::ValidationError: /: Invalid type, got type "Symbol", expected "boolean".
 schema.validate!('false') # => Schemacop::Exceptions::ValidationError: /: Invalid type, got type "String", expected "boolean".
 schema.validate!(1234)    # => Schemacop::Exceptions::ValidationError: /: Invalid type, got type "Integer", expected "boolean".
+
+schema.validate!('0', cast_str: true)     # => false
+schema.validate!('1', cast_str: true)     # => true
+schema.validate!('false', cast_str: true) # => false
+schema.validate!('true', cast_str: true)  # => true
 ```
 
 With `cast_str` enabled:

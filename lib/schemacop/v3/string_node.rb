@@ -13,7 +13,7 @@ module Schemacop
         'date-time': /^(-?(?:[1-9][0-9]*)?[0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])T(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(\.[0-9]+)?(Z|[+-](?:2[0-3]|[01][0-9]):[0-5][0-9])?$/,
         time:        /^(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(\.[0-9]+)?(Z|[+-](?:2[0-3]|[01][0-9]):[0-5][0-9])?$/,
         email:       URI::MailTo::EMAIL_REGEXP,
-        boolean:     /^(true|false)$/,
+        boolean:     /^(true|false|0|1)$/,
         binary:      nil,
         symbol:      nil,
         integer:     /^-?[0-9]+$/,
@@ -92,7 +92,7 @@ module Schemacop
 
         case options[:format]
         when :boolean
-          return to_cast == 'true'
+          return to_cast == 'true' || to_cast == '1'
         when :date
           return Date.parse(to_cast)
         when :'date-time'
