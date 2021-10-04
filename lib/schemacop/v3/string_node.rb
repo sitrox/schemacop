@@ -92,7 +92,7 @@ module Schemacop
 
         case options[:format]
         when :boolean
-          return to_cast == 'true' || to_cast == '1'
+          ['true', '1'].include?(to_cast)
         when :date
           return Date.parse(to_cast)
         when :'date-time'
