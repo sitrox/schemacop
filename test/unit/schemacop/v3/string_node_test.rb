@@ -200,6 +200,31 @@ module Schemacop
         assert_cast('039n23$g- sfk3/', :'039n23$g- sfk3/')
       end
 
+      def test_format_integer_list
+        schema :string, format: :integer_list
+
+        assert_json(type: :string, format: :'integer-list')
+
+        assert_validation '1,2,3,4'
+        assert_validation '1,2,-3,-54'
+        assert_validation '2'
+        assert_validation '-2'
+
+        assert_validation 234 do
+          error '/', StringNodeTest.invalid_type_error(Integer)
+        end
+
+        assert_validation 'sd sfdij soidf' do
+          error '/', 'String does not match format "integer-list".'
+        end
+
+        assert_cast(nil, nil)
+        assert_cast('1,-2,3', [1,-2,3])
+        assert_cast('1', [1])
+        assert_cast('-1', [-1])
+      end
+
+
       def test_enum
         schema :string, enum: ['foo', 'some string', 'some other string', 42]
 

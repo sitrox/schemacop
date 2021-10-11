@@ -246,6 +246,9 @@ transformed into various types.
 * `number`
   The string must be a number and will be casted to a ruby `Float` object.
 
+* `integer_list`
+  The string must consist of comma-separated integers casted to a ruby `Array<Integer>` object
+
 * `symbol`
   The string can be anything and will be casted to a ruby `Symbol` object.
 

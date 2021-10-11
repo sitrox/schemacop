@@ -1,5 +1,9 @@
 # Change log
 
+## 3.0.14 (2021-10-11)
+
+* Add string format `integer_list`
+
 ## 3.0.13 (2021-10-04)
 
 * When using `boolean` with `cast_str: true`, `"0"` is now casted to `false` and

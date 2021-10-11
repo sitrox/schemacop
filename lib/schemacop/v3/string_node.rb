@@ -9,15 +9,16 @@ module Schemacop
 
       # rubocop:disable Layout/LineLength
       FORMAT_PATTERNS = {
-        date:        /^([0-9]{4})-?(1[0-2]|0[1-9])-?(3[01]|0[1-9]|[12][0-9])$/,
-        'date-time': /^(-?(?:[1-9][0-9]*)?[0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])T(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(\.[0-9]+)?(Z|[+-](?:2[0-3]|[01][0-9]):[0-5][0-9])?$/,
-        time:        /^(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(\.[0-9]+)?(Z|[+-](?:2[0-3]|[01][0-9]):[0-5][0-9])?$/,
-        email:       URI::MailTo::EMAIL_REGEXP,
-        boolean:     /^(true|false|0|1)$/,
-        binary:      nil,
-        symbol:      nil,
-        integer:     /^-?[0-9]+$/,
-        number:      /^-?[0-9]+(\.[0-9]+)?$/
+        date:           /^([0-9]{4})-?(1[0-2]|0[1-9])-?(3[01]|0[1-9]|[12][0-9])$/,
+        'date-time':    /^(-?(?:[1-9][0-9]*)?[0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])T(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(\.[0-9]+)?(Z|[+-](?:2[0-3]|[01][0-9]):[0-5][0-9])?$/,
+        time:           /^(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(\.[0-9]+)?(Z|[+-](?:2[0-3]|[01][0-9]):[0-5][0-9])?$/,
+        email:          URI::MailTo::EMAIL_REGEXP,
+        boolean:        /^(true|false|0|1)$/,
+        binary:         nil,
+        symbol:         nil,
+        integer:        /^-?[0-9]+$/,
+        number:         /^-?[0-9]+(\.[0-9]+)?$/,
+        'integer-list': /^(-?[0-9]+)(,-?[0-9]+)*$/
       }.freeze
       # rubocop:enable Layout/LineLength
 
@@ -103,6 +104,8 @@ module Schemacop
           return Integer(to_cast)
         when :number
           return Float(to_cast)
+        when :'integer-list'
+          return to_cast.split(',').map(&:to_i)
         when :symbol
           return to_cast.to_sym
         else
