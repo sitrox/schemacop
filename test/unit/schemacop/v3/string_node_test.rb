@@ -218,12 +218,11 @@ module Schemacop
           error '/', 'String does not match format "integer-list".'
         end
 
-        assert_cast(nil, nil)
-        assert_cast('1,-2,3', [1,-2,3])
-        assert_cast('1', [1])
-        assert_cast('-1', [-1])
+        assert_cast nil,      nil
+        assert_cast '1,-2,3', [1, -2, 3]
+        assert_cast '1',      [1]
+        assert_cast '-1',     [-1]
       end
-
 
       def test_enum
         schema :string, enum: ['foo', 'some string', 'some other string', 42]

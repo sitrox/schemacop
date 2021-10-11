@@ -18,6 +18,38 @@ module Schemacop
         assert_json(type: :boolean)
       end
 
+      def test_required_default
+        schema do
+          boo? :enabled, default: true
+        end
+
+        assert_validation(enabled: true)
+        assert_validation(enabled: false)
+
+        assert_cast({}, { 'enabled' => true })
+
+        schema do
+          boo? :enabled, default: false
+        end
+
+        assert_validation(enabled: true)
+        assert_validation(enabled: false)
+
+        assert_cast({}, { 'enabled' => false })
+      end
+
+      def test_default_bug
+        schema do
+          str! :send_message
+          boo? :always_show_successful, default: true
+        end
+
+        assert_cast(
+          { 'send_message' => 'foo' },
+          { 'send_message' => 'foo', 'always_show_successful' => true }
+        )
+      end
+
       def test_required
         schema :boolean, required: true
 

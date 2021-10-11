@@ -178,7 +178,7 @@ module Schemacop
         json[:title] = @title if @title
         json[context.swagger_json? ? :example : :examples] = @examples if @examples
         json[:description] = @description if @description
-        json[:default] = @default if @default
+        json[:default] = @default unless @default.nil?
         json[:enum] = @enum.to_a if @enum
 
         return json.as_json
@@ -197,7 +197,7 @@ module Schemacop
 
         # Apply default #
         if data.nil?
-          if default
+          if !default.nil?
             data = default
           else
             return nil

@@ -4,6 +4,8 @@
 
 * Add string format `integer_list`
 
+* Improve handling for booleans
+
 ## 3.0.13 (2021-10-04)
 
 * When using `boolean` with `cast_str: true`, `"0"` is now casted to `false` and

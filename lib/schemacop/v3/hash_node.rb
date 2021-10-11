@@ -187,7 +187,7 @@ module Schemacop
 
           casted_data = prop.cast(data_hash[prop.name])
 
-          if casted_data.present? || data_hash.include?(prop.name)
+          if !casted_data.nil? || data_hash.include?(prop.name)
             result[prop_name] = casted_data
           end
 
