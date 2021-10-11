@@ -252,6 +252,24 @@ transformed into various types.
 * `symbol`
   The string can be anything and will be casted to a ruby `Symbol` object.
 
+#### Custom Formats
+
+You can also implement your custom formats or override the behavior of the
+standard formats. This can be done in the initializer configuration (in case of
+a Rails appliation):
+
+```ruby
+# config/initializers/schemacop.rb
+Schemacop.register_string_formatter(
+  :character_array,                        # Formatter name
+  pattern: /^[a-zA-Z](,[a-zA-Z])*/,        # Regex pattern for validation
+  handler: ->(value) { value.split(',') }  # Casting callback
+)
+
+# In your schema
+str! :my_list, format: :character_array
+```
+
 #### Examples
 
 ```ruby

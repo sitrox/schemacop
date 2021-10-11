@@ -158,6 +158,14 @@ module Schemacop
         assert_cast('2018-11-13T20:20:39+00:00', DateTime.new(2018, 11, 13, 20, 20, 39))
       end
 
+      def test_format_time
+        schema :string, format: :time
+        assert_json(type: :string, format: :time)
+        assert_cast '20:30:39+00:00', Time.strptime('20:30:39+00:00', '%H:%M:%S%z')
+
+        assert_cast nil, nil
+      end
+
       def test_format_email
         schema :string, format: :email
 
@@ -183,6 +191,17 @@ module Schemacop
         assert_cast('john.doe@example.com', 'john.doe@example.com')
       end
 
+      def test_format_boolean
+        schema :string, format: :boolean
+
+        assert_json(type: :string, format: :boolean)
+
+        assert_cast 'true', true
+        assert_cast 'false', false
+
+        assert_cast nil, nil
+      end
+
       def test_format_symbol
         schema :string, format: :symbol
 
@@ -198,6 +217,28 @@ module Schemacop
         assert_cast(nil, nil)
         assert_cast('foobar', :foobar)
         assert_cast('039n23$g- sfk3/', :'039n23$g- sfk3/')
+      end
+
+      def test_format_integer
+        schema :string, format: :integer
+
+        assert_json(type: :string, format: :integer)
+
+        assert_validation '23425'
+        assert_validation '-23425'
+
+        assert_validation 12_312 do
+          error '/', StringNodeTest.invalid_type_error(Integer)
+        end
+
+        assert_validation '24.32' do
+          error '/', 'String does not match format "integer".'
+        end
+
+        assert_cast(nil, nil)
+        assert_cast('2234', 2234)
+        assert_cast('-1', -1)
+        assert_cast('-0', 0)
       end
 
       def test_format_integer_list
@@ -224,6 +265,34 @@ module Schemacop
         assert_cast '-1',     [-1]
       end
 
+      def test_format_custom
+        Schemacop.register_string_formatter(
+          :integer_tuple_list,
+          pattern: /^(-?[0-9]+):(-?[0-9]+)(,(-?[0-9]+):(-?[0-9]+))*$/,
+          handler: proc do |value|
+            value.split(',').map { |t| t.split(':').map(&:to_i) }
+          end
+        )
+
+        schema :string, format: :integer_tuple_list
+
+        assert_json(type: :string, format: :'integer-tuple-list')
+
+        assert_validation '1:5,4:2,-4:4,4:-1,0:0'
+        assert_validation '-1:5'
+
+        assert_validation 234 do
+          error '/', StringNodeTest.invalid_type_error(Integer)
+        end
+
+        assert_validation 'sd sfdij soidf' do
+          error '/', 'String does not match format "integer-tuple-list".'
+        end
+
+        assert_cast nil, nil
+        assert_cast '1:2,3:4,5:-6', [[1, 2], [3, 4], [5, -6]]
+      end
+
       def test_enum
         schema :string, enum: ['foo', 'some string', 'some other string', 42]
 
@@ -246,33 +315,6 @@ module Schemacop
         assert_validation 42 do
           error '/', StringNodeTest.invalid_type_error(Integer)
         end
-      end
-
-      def test_boolean_casting
-        schema :string, format: :boolean
-
-        assert_json(type: :string, format: :boolean)
-
-        assert_cast 'true', true
-        assert_cast 'false', false
-
-        assert_cast nil, nil
-      end
-
-      def test_time_casting
-        schema :string, format: :time
-        assert_json(type: :string, format: :time)
-        assert_cast '20:30:39+00:00', Time.strptime('20:30:39+00:00', '%H:%M:%S%z')
-
-        assert_cast nil, nil
-      end
-
-      def test_date_casting
-        schema :string, format: :date
-        assert_json(type: :string, format: :date)
-        assert_cast '2018-11-13', Date.new(2018, 11, 13)
-
-        assert_cast nil, nil
       end
 
       def test_date_time_casting

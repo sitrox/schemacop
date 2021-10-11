@@ -7,21 +7,6 @@ module Schemacop
         format
       ].freeze
 
-      # rubocop:disable Layout/LineLength
-      FORMAT_PATTERNS = {
-        date:           /^([0-9]{4})-?(1[0-2]|0[1-9])-?(3[01]|0[1-9]|[12][0-9])$/,
-        'date-time':    /^(-?(?:[1-9][0-9]*)?[0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])T(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(\.[0-9]+)?(Z|[+-](?:2[0-3]|[01][0-9]):[0-5][0-9])?$/,
-        time:           /^(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(\.[0-9]+)?(Z|[+-](?:2[0-3]|[01][0-9]):[0-5][0-9])?$/,
-        email:          URI::MailTo::EMAIL_REGEXP,
-        boolean:        /^(true|false|0|1)$/,
-        binary:         nil,
-        symbol:         nil,
-        integer:        /^-?[0-9]+$/,
-        number:         /^-?[0-9]+(\.[0-9]+)?$/,
-        'integer-list': /^(-?[0-9]+)(,-?[0-9]+)*$/
-      }.freeze
-      # rubocop:enable Layout/LineLength
-
       def self.allowed_options
         super + ATTRIBUTES + %i[format_options pattern allow_blank]
       end
@@ -71,8 +56,9 @@ module Schemacop
         end
 
         # Validate format #
-        if options[:format] && FORMAT_PATTERNS.include?(options[:format])
-          pattern = FORMAT_PATTERNS[options[:format]]
+        if options[:format] && Schemacop.string_formatters.include?(options[:format])
+          pattern = Schemacop.string_formatters[options[:format]][:pattern]
+
           if pattern && !super_data.match?(pattern)
             result.error "String does not match format #{options[:format].to_s.inspect}."
           elsif options[:format_options] && Node.resolve_class(options[:format])
@@ -91,23 +77,8 @@ module Schemacop
           return nil
         end
 
-        case options[:format]
-        when :boolean
-          %w[true 1].include?(to_cast)
-        when :date
-          return Date.parse(to_cast)
-        when :'date-time'
-          return DateTime.parse(to_cast)
-        when :time
-          Time.parse(to_cast)
-        when :integer
-          return Integer(to_cast)
-        when :number
-          return Float(to_cast)
-        when :'integer-list'
-          return to_cast.split(',').map(&:to_i)
-        when :symbol
-          return to_cast.to_sym
+        if (handler = Schemacop.string_formatters.dig(options[:format], :handler))
+          return handler.call(to_cast)
         else
           return to_cast
         end
@@ -122,7 +93,7 @@ module Schemacop
       end
 
       def validate_self
-        if options.include?(:format) && !FORMAT_PATTERNS.include?(options[:format])
+        if options.include?(:format) && !Schemacop.string_formatters.include?(options[:format])
           fail "Format #{options[:format].to_s.inspect} is not supported."
         end
 

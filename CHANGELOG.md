@@ -1,5 +1,9 @@
 # Change log
 
+## 3.0.15 (2021-10-11)
+
+* Add support for custom string formatters
+
 ## 3.0.14 (2021-10-11)
 
 * Add string format `integer_list`
