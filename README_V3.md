@@ -1449,3 +1449,21 @@ Schemacop::V3::GlobalContext.eager_load!
 As mentioned before, you can also use the external schemas without having to
 eager-load them, but if you use the schemas multiple times, it might be better
 to eager-load them on start of your application / script.
+
+## Default options
+
+Using the setting `Schemacop.v3_default_options`, you can specify a hash
+containing default options that will be used for every schemacop node (options
+not supported by a particular node are automatically ignored). Options passed
+directly to a node still take precedence. The setting can be set in an
+initializer:
+
+```ruby
+# config/initializers/schemacop.rb
+Schemacop.v3_default_options = { cast_str: true }.freeze
+
+# Example schema: As cast_str is enabled in the default options, strings will
+# automatically be casted where supported.
+schema = Schemacop::Schema3.new(:integer)
+schema.validate!('42')  # => 42
+```

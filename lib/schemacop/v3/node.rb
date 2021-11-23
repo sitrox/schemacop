@@ -30,6 +30,8 @@ module Schemacop
 
         node = klass.new(**options, &block)
 
+        options = Schemacop.v3_default_options.slice(*klass.allowed_options).merge(options)
+
         if options.delete(:cast_str)
           format = NodeRegistry.name(klass)
           one_of_options = {

@@ -1,5 +1,11 @@
 # Change log
 
+## 3.0.16 (2021-11-23)
+
+* Add setting `Schemacop.v3_default_options` which allows to set default node
+  options vor V3 schemas. This is particularly useful for the option `cast_str`
+  to allow string casting globally.
+
 ## 3.0.15 (2021-10-11)
 
 * Add support for custom string formatters

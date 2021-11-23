@@ -16,6 +16,9 @@ module Schemacop
   mattr_accessor :string_formatters
   self.string_formatters = {}
 
+  mattr_accessor :v3_default_options
+  self.v3_default_options = {}
+
   def self.register_string_formatter(name, pattern:, handler:)
     name = name.to_s.dasherize.to_sym
 

@@ -181,6 +181,14 @@ module Schemacop
 
         assert_equal(@schema.root.children, [])
       end
+
+      def test_default_options
+        Schemacop.v3_default_options = { cast_str: true }.freeze
+        schema :number
+        assert_cast('1', 1)
+      ensure
+        Schemacop.v3_default_options = {}
+      end
     end
   end
 end
