@@ -21,6 +21,7 @@
     13. [Reference](#reference)
 5. [Context](#context)
 6. [External schemas](#external-schemas)
+7. [Default options](#default-options)
 
 ## Validation
 
