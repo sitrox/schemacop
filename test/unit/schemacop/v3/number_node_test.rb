@@ -308,6 +308,11 @@ module Schemacop
         assert_cast('1', 1)
         assert_cast(1, 1)
 
+        assert_cast('08', 8)
+        assert_cast('09', 9)
+        assert_cast('050', 50)
+        assert_cast('01', 1)
+
         assert_validation(nil)
         assert_validation('')
 

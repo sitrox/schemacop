@@ -340,6 +340,8 @@ integer can be done.
   When set to `true`, this node also accepts strings that can be casted to an integer, e.g.
   the values `'-5'` or `'42'`. Please note that you can only validate numbers which
   are in the `Integer` format. Blank strings will be treated equally as `nil`.
+  Strings will be parsed with base 10, so only decimal numbers are allowed.
+  Leading zeroes will be ignored.
 
 #### Examples
 
@@ -421,7 +423,9 @@ With the various available options, validations on the value of the number can b
   When set to `true`, this node also accepts strings that can be casted to a number, e.g.
   the values `'0.1'` or `'3.1415'`. Please note that you can only validate numbers which
   are in the `Integer` or `Float` format, i.e. values like `'1.5r'` or `'(4 + 0i)'` will
-  not work. Blank strings will be treated equally as `nil`.
+  not work. Blank strings will be treated equally as `nil`.  Strings will be
+  parsed with base 10, so only decimal numbers are allowed.  Leading zeroes will
+  be ignored.
 
 #### Examples
 

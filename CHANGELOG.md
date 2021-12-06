@@ -1,5 +1,12 @@
 # Change log
 
+## 3.0.17 (2021-12-06)
+
+* `#64545`: Fix an issue where `cast_str` in conjunction with `number` notes
+  lead to parsing errors when the given number had a leading zero, e.g. parsing
+  the string `08` lead to an error, as the number was interpreted as an octal
+  string. Numbers are now always being treated as decimal with base 10.
+
 ## 3.0.16 (2021-11-23)
 
 * Add setting `Schemacop.v3_default_options` which allows to set default node

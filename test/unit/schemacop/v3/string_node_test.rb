@@ -263,6 +263,10 @@ module Schemacop
         assert_cast '1,-2,3', [1, -2, 3]
         assert_cast '1',      [1]
         assert_cast '-1',     [-1]
+        assert_cast '08',     [8]
+        assert_cast '09',     [9]
+        assert_cast '050',    [50]
+        assert_cast '01,032', [1, 32]
       end
 
       def test_format_custom

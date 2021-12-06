@@ -75,7 +75,7 @@ module Schemacop
   register_string_formatter(
     :integer,
     pattern: /^-?[0-9]+$/,
-    handler: ->(value) { Integer(value) }
+    handler: ->(value) { Integer(value, 10) }
   )
 
   register_string_formatter(
@@ -87,7 +87,7 @@ module Schemacop
   register_string_formatter(
     :'integer-list',
     pattern: /^(-?[0-9]+)(,-?[0-9]+)*$/,
-    handler: ->(value) { value.split(',').map(&:to_i) }
+    handler: ->(value) { value.split(',').map { |i| Integer(i, 10) } }
   )
 
   def self.with_context(context)
