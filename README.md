@@ -14,7 +14,8 @@ Schemacop is tested with the following ruby versions:
 
 * 2.6.2
 * 2.7.1
-* 3.0.0
+* 3.0.1
+* 3.1.0
 
 Other ruby versions might work but are not covered by our Travis tests.
 
