@@ -118,4 +118,4 @@ To run tests:
 
 ## Copyright
 
-Copyright © 2016 - 2021 Sitrox. See `LICENSE` for further details.
+Copyright © 2016 - 2022 Sitrox. See `LICENSE` for further details.
