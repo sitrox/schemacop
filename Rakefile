@@ -1,7 +1,7 @@
 task :gemspec do
   gemspec = Gem::Specification.new do |spec|
     spec.name          = 'schemacop'
-    spec.version       = IO.read('VERSION').chomp
+    spec.version       = File.read('VERSION').chomp
     spec.authors       = ['Sitrox']
     spec.summary       = %(
       Schemacop validates ruby structures consisting of nested hashes and arrays
@@ -24,13 +24,13 @@ task :gemspec do
     spec.add_development_dependency 'minitest'
     spec.add_development_dependency 'minitest-reporters'
     spec.add_development_dependency 'colorize'
-    spec.add_development_dependency 'rubocop', '0.92.0'
+    spec.add_development_dependency 'rubocop', '1.24.1'
     spec.add_development_dependency 'pry'
     spec.add_development_dependency 'byebug'
     spec.add_development_dependency 'simplecov', '0.21.2'
   end
 
-  File.open('schemacop.gemspec', 'w') { |f| f.write(gemspec.to_ruby.strip) }
+  File.write('schemacop.gemspec', gemspec.to_ruby.strip)
 end
 
 begin

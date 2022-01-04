@@ -60,7 +60,7 @@ module Schemacop::V2
     def exception_message
       # rubocop:disable Style/StringConcatenation
       return "Schemacop validation failed:\n" + @exceptions.map do |e|
-        "- #{e[:path].join('')}: #{e[:message]}"
+        "- #{e[:path].join}: #{e[:message]}"
       end.join("\n")
       # rubocop:enable Style/StringConcatenation
     end

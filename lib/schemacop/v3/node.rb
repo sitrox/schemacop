@@ -199,10 +199,10 @@ module Schemacop
 
         # Apply default #
         if data.nil?
-          if !default.nil?
-            data = default
-          else
+          if default.nil?
             return nil
+          else
+            data = default
           end
         end
 

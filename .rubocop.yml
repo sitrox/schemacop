@@ -106,3 +106,6 @@ Style/ConditionalAssignment:
 
 Style/CaseLikeIf:
   Enabled: false
+
+Lint/EmptyClass:
+  Enabled: false

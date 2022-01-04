@@ -12,7 +12,7 @@ module Schemacop
       protected
 
       def allowed_types
-        Hash[@classes.map { |c| [c, c.name] }]
+        @classes.map { |c| [c, c.name] }.to_h
       end
 
       def init

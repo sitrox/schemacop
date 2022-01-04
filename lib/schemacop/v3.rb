@@ -9,7 +9,7 @@ module Schemacop
       return exp if exp.is_a?(String)
 
       _start_slash, caret, exp, dollar, _end_slash, flags = exp.inspect.match(%r{^(/?)(\^)?(.*?)(\$)?(/?)([ixm]*)?$}).captures
-      flags = flags.split('')
+      flags = flags.chars
 
       if flags.delete('i')
         exp = "(?i)(#{exp})"

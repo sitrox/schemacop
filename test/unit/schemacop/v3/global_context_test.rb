@@ -53,9 +53,9 @@ module Schemacop
       def test_file_reload
         dir = Dir.mktmpdir
         Schemacop.load_paths << dir
-        IO.write(File.join(dir, 'foo.rb'), %(schema :string))
+        File.write(File.join(dir, 'foo.rb'), %(schema :string))
         assert_is_a StringNode, GlobalContext.instance.schema_for('foo')
-        IO.write(File.join(dir, 'foo.rb'), %(schema :integer))
+        File.write(File.join(dir, 'foo.rb'), %(schema :integer))
         assert_is_a IntegerNode, GlobalContext.instance.schema_for('foo')
       end
 
@@ -63,12 +63,12 @@ module Schemacop
         dir = Dir.mktmpdir
         Schemacop.load_paths << dir
 
-        IO.write(File.join(dir, 'foo.rb'), %(schema :string))
+        File.write(File.join(dir, 'foo.rb'), %(schema :string))
 
         GlobalContext.instance.eager_load!
 
         assert_is_a StringNode, GlobalContext.instance.schema_for('foo')
-        IO.write(File.join(dir, 'foo.rb'), %(schema :integer))
+        File.write(File.join(dir, 'foo.rb'), %(schema :integer))
         assert_is_a StringNode, GlobalContext.instance.schema_for('foo')
       end
 
@@ -117,7 +117,7 @@ module Schemacop
       def test_empty_schema
         dir = Dir.mktmpdir
         Schemacop.load_paths << dir
-        IO.write(File.join(dir, 'foo.rb'), %())
+        File.write(File.join(dir, 'foo.rb'), %())
         assert_raises_with_message RuntimeError, /does not define any schema/ do
           GlobalContext.instance.schema_for('foo')
         end
@@ -126,7 +126,7 @@ module Schemacop
       def test_multiple_schemas
         dir = Dir.mktmpdir
         Schemacop.load_paths << dir
-        IO.write(File.join(dir, 'foo.rb'), %(schema :string\nschema :integer))
+        File.write(File.join(dir, 'foo.rb'), %(schema :string\nschema :integer))
         assert_raises_with_message RuntimeError, /Schema "#{File.join(dir, 'foo.rb')}" defines multiple schemas/ do
           GlobalContext.instance.schema_for('foo')
         end
@@ -135,7 +135,7 @@ module Schemacop
       def test_invalid_schema
         dir = Dir.mktmpdir
         Schemacop.load_paths << dir
-        IO.write(File.join(dir, 'foo.rb'), %(foobarbaz))
+        File.write(File.join(dir, 'foo.rb'), %(foobarbaz))
 
         assert_raises_with_message RuntimeError, /Could not load schema/ do
           GlobalContext.schema_for('foo')
@@ -145,7 +145,7 @@ module Schemacop
       def test_overrides_with_eager_load
         dir = Dir.mktmpdir
         Schemacop.load_paths << dir
-        IO.write(File.join(dir, 'user.rb'), %(schema :string))
+        File.write(File.join(dir, 'user.rb'), %(schema :string))
 
         assert_raises_with_message RuntimeError, %r{in both load paths "test/schemas" and "#{dir}"} do
           GlobalContext.eager_load!
@@ -155,7 +155,7 @@ module Schemacop
       def test_overrides_with_lazy_load
         dir = Dir.mktmpdir
         Schemacop.load_paths << dir
-        IO.write(File.join(dir, 'user.rb'), %(schema :string))
+        File.write(File.join(dir, 'user.rb'), %(schema :string))
 
         assert_raises_with_message RuntimeError, %r{in both load paths "test/schemas" and "#{dir}"} do
           GlobalContext.instance.schema_for('user')
