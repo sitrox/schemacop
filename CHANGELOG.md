@@ -1,6 +1,6 @@
 # Change log
 
-## 3.0.18 (2022-08-06)
+## 3.0.18 (2022-06-08)
 
 * Add options `filter` and `reject` to array nodes which allow to filter arrays
   before they are validated.
