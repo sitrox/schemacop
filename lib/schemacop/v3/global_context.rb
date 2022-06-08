@@ -86,7 +86,7 @@ module Schemacop
         begin
           @current_schemas = []
           env = ScopedEnv.new(self, DSL_METHODS)
-          env.instance_eval IO.read(path)
+          env.instance_eval File.read(path)
         rescue StandardError => e
           fail "Could not load schema #{path.inspect}: #{e.message}"
         end

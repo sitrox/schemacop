@@ -14,9 +14,10 @@ Schemacop is tested with the following ruby versions:
 
 * 2.6.2
 * 2.7.1
-* 3.0.0
+* 3.0.1
+* 3.1.0
 
-Other ruby versions might work but are not covered by our Travis tests.
+Other ruby versions might work but are not covered by our automated tests.
 
 ## Basic example
 
@@ -118,4 +119,4 @@ To run tests:
 
 ## Copyright
 
-Copyright © 2016 - 2021 Sitrox. See `LICENSE` for further details.
+Copyright © 2016 - 2022 Sitrox. See `LICENSE` for further details.

@@ -1,6 +1,6 @@
 require 'test_helper'
 
-# Note: A test for req and opt is part of validator_hash_test.rb
+# NOTE: A test for req and opt is part of validator_hash_test.rb
 
 module Schemacop
   module V2
