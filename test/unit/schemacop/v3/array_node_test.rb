@@ -462,6 +462,112 @@ module Schemacop
         end
       end
 
+      def test_reject_with_symbol
+        schema :array, min_items: 3, max_items: 3, reject: :blank? do
+          list :symbol
+        end
+
+        input = [:foo, :bar, :baz, :'']
+        input_was = input.dup
+
+        assert_validation(input)
+        assert_cast(input, %i[foo bar baz])
+
+        assert_equal input, input_was
+      end
+
+      def test_reject_with_proc
+        schema :array, reject: ->(i) { i > 5 } do
+          list :integer, maximum: 5
+        end
+
+        input = [1, 2, 3, 4, 5, 6]
+        input_was = input.dup
+
+        assert_validation(input)
+        assert_cast(input, [1, 2, 3, 4, 5])
+
+        assert_equal input, input_was
+      end
+
+      def test_reject_with_argument_error
+        schema :array, reject: :zero? do
+          list :integer
+        end
+
+        assert_validation([0, 1, 2, :a]) do
+          error '/[2]', 'Invalid type, got type "Symbol", expected "integer".'
+        end
+      end
+
+      def test_filter_with_symbol
+        schema :array, min_items: 3, max_items: 3, filter: :present? do
+          list :symbol
+        end
+
+        input = [:foo, :bar, :baz, :'']
+        input_was = input.dup
+
+        assert_validation(input)
+        assert_cast(input, %i[foo bar baz])
+
+        assert_equal input, input_was
+      end
+
+      def test_filter_with_proc
+        schema :array, filter: ->(i) { i <= 5 } do
+          list :integer, maximum: 5
+        end
+
+        input = [1, 2, 3, 4, 5, 6]
+        input_was = input.dup
+
+        assert_validation(input)
+        assert_cast(input, [1, 2, 3, 4, 5])
+
+        assert_equal input, input_was
+      end
+
+      def test_filter_with_argument_error
+        schema :array, filter: :nonzero? do
+          list :integer
+        end
+
+        assert_validation([0, 1, 2, :a]) do
+          error '/[2]', 'Invalid type, got type "Symbol", expected "integer".'
+        end
+      end
+
+      def test_doc_example_reject_blank
+        # FYI: This example requires active_support for the blank? method
+        schema = Schemacop::Schema3.new :array, reject: :blank? do
+          list :string
+        end
+
+        assert_equal ['foo'], schema.validate!(['', 'foo'])
+      end
+
+      def test_doc_example_filter_proc
+        schema = Schemacop::Schema3.new :array, filter: ->(value) { value.is_a?(String) } do
+          list :string
+        end
+
+        assert_equal ['foo'], schema.validate!(['foo', 42])
+      end
+
+      def test_doc_example_reject_zero
+        schema = Schemacop::Schema3.new :array, reject: :zero? do
+          list :integer
+        end
+
+        assert_raises_with_message(
+          Schemacop::Exceptions::ValidationError,
+          '/[0]: Invalid type, got type "String", expected "integer".'
+        ) do
+          schema.validate!(['foo', 42, 0])
+        end
+      end
+
       def test_contains
         schema :array do
           cont :string

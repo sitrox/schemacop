@@ -595,6 +595,26 @@ It consists of one or multiple values, which can be validated using arbitrary no
   each other, or if there may be duplicate values. By default, this is false,
   i.e. duplicate values are allowed
 
+* `filter`
+  This option allows you to filter an array *before it is validated*. When using
+  casting, this also filters the data returned by the validator. If the given value
+  is a `Symbol`, the method with the given name will be executed on each array
+  item in order to determine whether it is kept. If the given value is a `Proc`,
+  it will be called for each array item to determine whether it is kept. Both
+  functions or Procs are expected to return either `true` or `false`.
+
+  This is the inverse of option `reject`.
+
+* `reject`
+  This option allows you to filter an array *before it is validated*. When using
+  casting, this also filters the data returned by the validator. If the given value
+  is a `Symbol`, the method with the given name will be executed on each array
+  item in order to determine whether it is removed. If the given value is a `Proc`,
+  it will be called for each array item to determine whether it is removed. Both
+  functions or Procs are expected to return either `true` or `false`.
+
+  This is the inverse of option `filter`.
+
 #### Contains
 
 The `array` node features the *contains* node, which you can use with the DSL
@@ -768,6 +788,53 @@ schema.validate!([])          # => Schemacop::Exceptions::ValidationError: /: Ar
 schema.validate!([1, 2])      # => [1, 2]
 schema.validate!([1, 'foo'])  # => [1, "foo"]
 schema.validate!([1, :bar])   # => Schemacop::Exceptions::ValidationError: /[1]: Matches 0 definitions but should match exactly 1.
+```
+
+#### Filtering
+
+Using the options `filter` and `reject`, arrays can be filtered. Filtering
+happens before validation. Both options behave in the same way, with the only
+difference being that `filter` uses a inclusive approach and `reject` an
+exclusive (see [filter](https://apidock.com/ruby/Array/filter) and
+[reject](https://apidock.com/ruby/Array/reject] in the Ruby API, as they behave
+in a similar manor).
+
+You can either pass a Symbol which specifies the name of the method that is
+called on each array item:
+
+```ruby
+# FYI: This example requires active_support for the blank? method
+schema = Schemacop::Schema3.new :array, reject: :blank? do
+  list :string
+end
+
+schema.validate!(['', 'foo'])  # => ["foo"]
+```
+
+You can also pass a proc to `filter` or `reject`:
+
+```ruby
+schema = Schemacop::Schema3.new :array, filter: ->(value) { value.is_a?(String) } do
+  list :string
+end
+
+schema.validate!(['foo', 42])  # => ["foo"]
+```
+
+Note that the given method name or proc should work with all element types that
+could possibly be in the (unvalidated) array. If a `NoMethodError` is
+encountered during a single filtering iteration, the element will be left in the
+array and, in most cases, trigger a validation error later:
+
+```ruby
+schema = Schemacop::Schema3.new :array, reject: :zero? do
+  list :integer
+end
+
+# In this example, the value 'foo' does not respond to the method `zero?` which
+# lead to a `NoMethodError` that is caught by Schemacop which in turn leaves the
+# value in the array.
+schema.validate!(['foo', 42, 0]) # => Schemacop::Exceptions::ValidationError: /[0]: Invalid type, got type "String", expected "integer".
 ```
 
 ### Hash

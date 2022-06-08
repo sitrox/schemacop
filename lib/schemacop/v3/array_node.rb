@@ -10,7 +10,7 @@ module Schemacop
       supports_children
 
       def self.allowed_options
-        super + ATTRIBUTES + %i[additional_items]
+        super + ATTRIBUTES + %i[additional_items reject filter]
       end
 
       def self.dsl_methods
@@ -80,7 +80,10 @@ module Schemacop
         super_data = super
         return if super_data.nil?
 
-        # Validate length #
+        # Preprocess
+        super_data = preprocess_array(super_data)
+
+        # Validate length
         length = super_data.size
 
         if options[:min_items] && length < options[:min_items]
@@ -163,10 +166,36 @@ module Schemacop
           end
         end
 
-        return result
+        return preprocess_array(result)
       end
 
       protected
+
+      def preprocess_array(value)
+        # Handle filter
+        if options[:filter]
+          block = Proc.new(&options[:filter])
+
+          value = value.filter do |item|
+            block.call(item)
+          rescue NoMethodError
+            true
+          end
+        end
+
+        # Handle reject
+        if options[:reject]
+          block = Proc.new(&options[:reject])
+
+          value = value.reject do |item|
+            block.call(item)
+          rescue NoMethodError
+            false
+          end
+        end
+
+        return value
+      end
 
       def list?
         list_item.present?
