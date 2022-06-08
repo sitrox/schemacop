@@ -1,11 +1,9 @@
 # Change log
 
-## 3.0.18 (2022-06-08)
+## 3.0.17 (2022-06-08)
 
 * Add options `filter` and `reject` to array nodes which allow to filter arrays
   before they are validated.
-
-## 3.0.17 (2021-12-06)
 
 * `#64545`: Fix an issue where `cast_str` in conjunction with `number` notes
   lead to parsing errors when the given number had a leading zero, e.g. parsing
