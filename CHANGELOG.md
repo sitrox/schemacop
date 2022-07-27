@@ -1,5 +1,9 @@
 # Change log
 
+## 3.0.18 (2022-07-27)
+
+* Add option `ignore_obsolete_properties` to `HashNode` for Schemacop v3
+
 ## 3.0.17 (2022-06-08)
 
 * Add options `filter` and `reject` to array nodes which allow to filter arrays

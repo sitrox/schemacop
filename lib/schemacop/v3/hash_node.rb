@@ -14,7 +14,7 @@ module Schemacop
       attr_reader :properties
 
       def self.allowed_options
-        super + ATTRIBUTES - %i[dependencies] + %i[additional_properties]
+        super + ATTRIBUTES - %i[dependencies] + %i[additional_properties ignore_obsolete_properties]
       end
 
       def self.dsl_methods
@@ -141,7 +141,7 @@ module Schemacop
               result.in_path(name) do
                 property_patterns[match]._validate(additional_property, result: result)
               end
-            else
+            elsif !options[:ignore_obsolete_properties]
               result.error "Obsolete property #{name.to_s.inspect}."
             end
           elsif options[:additional_properties].is_a?(Node)
@@ -235,9 +235,19 @@ module Schemacop
           fail Schemacop::Exceptions::InvalidSchemaError, 'Option "additional_properties" must be a boolean value'
         end
 
+        # Cannot set additional_properties and ignore_obsolete_properties option to true at the same time
+        if @options[:additional_properties].is_a?(TrueClass) && options[:ignore_obsolete_properties].is_a?(TrueClass)
+          fail Schemacop::Exceptions::InvalidSchemaError, 'Cannot set "additional_properties" and "ignore_obsolete_properties" to true at the same time'
+        end
+
         # Default the additional_properties option to false if it's not given
         if @options[:additional_properties].nil?
           @options[:additional_properties] = false
+        end
+
+        # Default the ignore_obsolete_properties option to false if it's not given
+        if @options[:ignore_obsolete_properties].nil?
+          @options[:ignore_obsolete_properties] = false
         end
       end
 
