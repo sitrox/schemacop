@@ -235,7 +235,9 @@ transformed into various types.
 
 * `boolean`
   The string must be either `true`, `false`, `0` or `1`. This value will be
-  casted to Ruby's `TrueClass` or `FalseClass`.
+  casted to Ruby's `TrueClass` or `FalseClass`. Please note that the strings
+  `true` and `false` are case-insensitive, i.e. `True`, `TRUE` etc. will also
+  work.
 
 * `binary`
   The string is expected to contain binary contents. No casting or additional
@@ -529,7 +531,7 @@ The boolean type is used to validate Ruby booleans, i.e. the `TrueClass` and `Fa
 * `cast_str`
   When set to `true`, this node also accepts strings that can be casted to a
   boolean, namely the values `'true'`, `'false'`, `'1'` and `'0'`. Blank strings
-  will be treated equally as `nil`.
+  will be treated equally as `nil`. This casting is case-insensitive.
 
 #### Examples
 

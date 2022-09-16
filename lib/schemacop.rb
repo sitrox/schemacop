@@ -56,8 +56,8 @@ module Schemacop
 
   register_string_formatter(
     :boolean,
-    pattern: /^(true|false|0|1)$/,
-    handler: ->(value) { %w[true 1].include?(value) }
+    pattern: /^(true|false|0|1)$/i,
+    handler: ->(value) { %w[true 1].include?(value&.downcase) }
   )
 
   register_string_formatter(

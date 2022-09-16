@@ -1,5 +1,9 @@
 # Change log
 
+## 3.0.19 (UNRELEASED)
+
+* Make `cast_str` of `BooleanNode` in  `v3` case-insensitive
+
 ## 3.0.18 (2022-07-27)
 
 * Add option `ignore_obsolete_properties` to `HashNode` for Schemacop v3
