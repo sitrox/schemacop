@@ -235,7 +235,9 @@ transformed into various types.
 
 * `boolean`
   The string must be either `true`, `false`, `0` or `1`. This value will be
-  casted to Ruby's `TrueClass` or `FalseClass`.
+  casted to Ruby's `TrueClass` or `FalseClass`. Please note that the strings
+  `true` and `false` are case-insensitive, i.e. `True`, `TRUE` etc. will also
+  work.
 
 * `binary`
   The string is expected to contain binary contents. No casting or additional
@@ -529,7 +531,7 @@ The boolean type is used to validate Ruby booleans, i.e. the `TrueClass` and `Fa
 * `cast_str`
   When set to `true`, this node also accepts strings that can be casted to a
   boolean, namely the values `'true'`, `'false'`, `'1'` and `'0'`. Blank strings
-  will be treated equally as `nil`.
+  will be treated equally as `nil`. This casting is case-insensitive.
 
 #### Examples
 
@@ -864,6 +866,13 @@ It consists of key-value-pairs that can be validated using arbitrary nodes.
 * `max_properties`
   Specifies the (inclusive) maximum number of properties a hash must contain.
 
+* `ignore_obsolete_properties`
+  Similar to `additional_properties`. If this is set to `true`, all additional
+  properties are allowed (i.e. they pass the validation), but they are removed
+  from the result hash. This is useful e.g. to validate params coming from the
+  controller, as this only allows white-listed params and removes any params
+  which are not whitelisted (i.e. similar to strong params from Rails).
+
 #### Specifying properties
 
 Hash nodes support a block in which you can specify the required hash contents.
@@ -1069,6 +1078,22 @@ schema.validate!({})                # => {}
 schema.validate!({foo: [1, 2, 3]})  # => {"foo"=>[1, 2, 3]}
 schema.validate!({foo: :bar})       # => Schemacop::Exceptions::ValidationError: /foo: Invalid type, got type "Symbol", expected "array".
 schema.validate!({Foo: :bar})       # => Schemacop::Exceptions::ValidationError: /: Property name :Foo does not match "^[a-z]+$". /Foo: Invalid type, got type "Symbol", expected "array".
+```
+
+##### Ignoring obsolete properties
+
+By enabling `ignore_obsolete_properties`, you can filter out any unspecified params,
+while still passing validation:
+
+```ruby
+# This schema will accept any additional properties, but remove them from the result
+schema = Schemacop::Schema3.new :hash, ignore_obsolete_properties: true do
+  int? :foo
+end
+
+schema.validate!({}) # => {}
+schema.validate!({foo: :bar}) # => {"foo"=>:bar}
+schema.validate!({foo: :bar, baz: 42}) # => {"foo"=>:bar}
 ```
 
 ##### Dependencies

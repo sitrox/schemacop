@@ -1005,6 +1005,133 @@ module Schemacop
         assert_validation({ active: '', id: '' })
         assert_cast({ active: '', id: '' }, { active: nil, id: nil }.with_indifferent_access)
       end
+
+      def test_ignore_obsolete_properties_true
+        schema :hash, ignore_obsolete_properties: true do
+          int? :foo
+          str? :bar
+        end
+
+        # Some standard validations first
+        assert_validation({})
+        assert_validation({ foo: 1 })
+        assert_validation({ bar: 'baz' })
+        assert_validation({ foo: 1, bar: 'baz' })
+
+        assert_cast({}, {}.with_indifferent_access)
+        assert_cast({ foo: 1 }, { foo: 1 }.with_indifferent_access)
+        assert_cast({ bar: 'baz' }, { bar: 'baz' }.with_indifferent_access)
+        assert_cast({ foo: 1, bar: 'baz' }, { foo: 1, bar: 'baz' }.with_indifferent_access)
+
+        # Should allow obsolete properties and remove them from the result
+        assert_validation({ obsolete_key: 42 })
+        assert_validation({ foo: 1, obsolete_key: 42 })
+        assert_validation({ bar: 'baz', obsolete_key: 42 })
+        assert_validation({ foo: 1, bar: 'baz', obsolete_key: 42 })
+
+        assert_cast({ obsolete_key: 42 }, {}.with_indifferent_access)
+        assert_cast({ foo: 1, obsolete_key: 42 }, { foo: 1 }.with_indifferent_access)
+        assert_cast({ bar: 'baz', obsolete_key: 42 }, { bar: 'baz' }.with_indifferent_access)
+        assert_cast({ foo: 1, bar: 'baz', obsolete_key: 42 }, { foo: 1, bar: 'baz' }.with_indifferent_access)
+      end
+
+      def test_ignore_obsolete_properties_false
+        schema :hash, ignore_obsolete_properties: false do
+          int? :foo
+          str? :bar
+        end
+
+        # Some standard validations first
+        assert_validation({})
+        assert_validation({ foo: 1 })
+        assert_validation({ bar: 'baz' })
+        assert_validation({ foo: 1, bar: 'baz' })
+
+        assert_cast({}, {}.with_indifferent_access)
+        assert_cast({ foo: 1 }, { foo: 1 }.with_indifferent_access)
+        assert_cast({ bar: 'baz' }, { bar: 'baz' }.with_indifferent_access)
+        assert_cast({ foo: 1, bar: 'baz' }, { foo: 1, bar: 'baz' }.with_indifferent_access)
+
+        # Should not allow obsolete properties as the option is set to false
+        assert_validation({ obsolete_key: 42 }) do
+          error '/', 'Obsolete property "obsolete_key".'
+        end
+        assert_validation({ foo: 1, obsolete_key: 42 }) do
+          error '/', 'Obsolete property "obsolete_key".'
+        end
+        assert_validation({ bar: 'baz', obsolete_key: 42 }) do
+          error '/', 'Obsolete property "obsolete_key".'
+        end
+        assert_validation({ foo: 1, bar: 'baz', obsolete_key: 42 }) do
+          error '/', 'Obsolete property "obsolete_key".'
+        end
+      end
+
+      def test_ignore_obsolete_properties_true_and_additional_properties_true
+        # Cannot set both options to true at the same time
+        assert_raises_with_message Exceptions::InvalidSchemaError,
+                                   'Cannot set "additional_properties" and "ignore_obsolete_properties" to true at the same time' do
+          schema :hash, ignore_obsolete_properties: true, additional_properties: true
+        end
+      end
+
+      def test_ignore_obsolete_properties_false_and_additional_properties_true
+        # This should allow any additional properties and keep them in the hash
+        schema :hash, ignore_obsolete_properties: false, additional_properties: true do
+          int? :foo
+          str? :bar
+        end
+
+        assert_validation({ obsolete_key: 42 })
+        assert_validation({ foo: 1, obsolete_key: 42 })
+        assert_validation({ bar: 'baz', obsolete_key: 42 })
+        assert_validation({ foo: 1, bar: 'baz', obsolete_key: 42 })
+
+        assert_cast({ obsolete_key: 42 }, { obsolete_key: 42 }.with_indifferent_access)
+        assert_cast({ foo: 1, obsolete_key: 42 }, { foo: 1, obsolete_key: 42 }.with_indifferent_access)
+        assert_cast({ bar: 'baz', obsolete_key: 42 }, { bar: 'baz', obsolete_key: 42 }.with_indifferent_access)
+        assert_cast({ foo: 1, bar: 'baz', obsolete_key: 42 }, { foo: 1, bar: 'baz', obsolete_key: 42 }.with_indifferent_access)
+      end
+
+      def test_ignore_obsolete_properties_true_and_additional_properties_false
+        # This should allow any additional properties and keep them in the hash
+        schema :hash, ignore_obsolete_properties: true, additional_properties: false do
+          int? :foo
+          str? :bar
+        end
+
+        # Should allow obsolete properties and remove them from the result
+        assert_validation({ obsolete_key: 42 })
+        assert_validation({ foo: 1, obsolete_key: 42 })
+        assert_validation({ bar: 'baz', obsolete_key: 42 })
+        assert_validation({ foo: 1, bar: 'baz', obsolete_key: 42 })
+
+        assert_cast({ obsolete_key: 42 }, {}.with_indifferent_access)
+        assert_cast({ foo: 1, obsolete_key: 42 }, { foo: 1 }.with_indifferent_access)
+        assert_cast({ bar: 'baz', obsolete_key: 42 }, { bar: 'baz' }.with_indifferent_access)
+        assert_cast({ foo: 1, bar: 'baz', obsolete_key: 42 }, { foo: 1, bar: 'baz' }.with_indifferent_access)
+      end
+
+      def test_ignore_obsolete_properties_false_and_additional_properties_false
+        # This should not allow any additional properties
+        schema :hash, ignore_obsolete_properties: false, additional_properties: false do
+          int? :foo
+          str? :bar
+        end
+
+        assert_validation({ obsolete_key: 42 }) do
+          error '/', 'Obsolete property "obsolete_key".'
+        end
+        assert_validation({ foo: 1, obsolete_key: 42 }) do
+          error '/', 'Obsolete property "obsolete_key".'
+        end
+        assert_validation({ bar: 'baz', obsolete_key: 42 }) do
+          error '/', 'Obsolete property "obsolete_key".'
+        end
+        assert_validation({ foo: 1, bar: 'baz', obsolete_key: 42 }) do
+          error '/', 'Obsolete property "obsolete_key".'
+        end
+      end
     end
   end
 end
