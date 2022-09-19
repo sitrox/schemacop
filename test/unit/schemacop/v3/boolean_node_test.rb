@@ -184,6 +184,9 @@ module Schemacop
         assert_cast(true, true)
         assert_cast(false, false)
 
+        assert_cast('True', true)
+        assert_cast('False', false)
+
         assert_validation('5') do
           error '/', 'Matches 0 definitions but should match exactly 1.'
         end
@@ -205,6 +208,13 @@ module Schemacop
 
         assert_cast(true, true)
         assert_cast(false, false)
+
+        # Test case-insentiveness
+        assert_cast('True', true)
+        assert_cast('False', false)
+
+        assert_cast('TRUE', true)
+        assert_cast('FALSE', false)
 
         assert_validation('4') do
           error '/', 'Matches 0 definitions but should match exactly 1.'
