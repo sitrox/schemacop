@@ -1,6 +1,6 @@
 # Change log
 
-## 3.0.19 (UNRELEASED)
+## 3.0.19 (2022-09-19)
 
 * Make `cast_str` of `BooleanNode` in  `v3` case-insensitive
 
