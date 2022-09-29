@@ -354,7 +354,12 @@ module Schemacop
         assert_validation(str: '1234')
         assert_validation(str: '12345')
         assert_validation(str: '0') do
-          error '/str', 'Does not match all allOf conditions.'
+          error '/str', <<~PLAIN.strip
+            Matches 1 schemas but should match all of them:
+              - Schema 1:
+                - /: String is 1 characters long but must be at least 3.
+              - Schema 2: Matches
+          PLAIN
         end
       end
 
@@ -372,7 +377,11 @@ module Schemacop
           error '/str', 'Value must be given.'
         end
         assert_validation(str: '1234') do
-          error '/str', 'Matches 2 definitions but should match exactly 1.'
+          error '/str', <<~PLAIN.strip
+            Matches 2 schemas but should match exactly 1:
+              - Schema 1: Matches
+              - Schema 2: Matches
+          PLAIN
         end
       end
 
@@ -389,7 +398,11 @@ module Schemacop
         assert_validation(str: nil)
         assert_validation({})
         assert_validation(str: '1234') do
-          error '/str', 'Matches 2 definitions but should match exactly 1.'
+          error '/str', <<~PLAIN.strip
+            Matches 2 schemas but should match exactly 1:
+              - Schema 1: Matches
+              - Schema 2: Matches
+          PLAIN
         end
       end
 
@@ -404,7 +417,13 @@ module Schemacop
         assert_validation(str_or_int: 'Hello World')
         assert_validation(str_or_int: 42)
         assert_validation(str_or_int: :foo) do
-          error '/str_or_int', 'Does not match any anyOf condition.'
+          error '/str_or_int', <<~PLAIN.strip
+            Matches 0 schemas but should match at least 1:
+              - Schema 1:
+                - /: Invalid type, got type "Symbol", expected "string".
+              - Schema 2:
+                - /: Invalid type, got type "Symbol", expected "integer".
+          PLAIN
         end
       end
 
@@ -421,7 +440,13 @@ module Schemacop
         assert_validation(str_or_int: nil)
         assert_validation({})
         assert_validation(str_or_int: :foo) do
-          error '/str_or_int', 'Does not match any anyOf condition.'
+          error '/str_or_int', <<~PLAIN.strip
+            Matches 0 schemas but should match at least 1:
+              - Schema 1:
+                - /: Invalid type, got type "Symbol", expected "string".
+              - Schema 2:
+                - /: Invalid type, got type "Symbol", expected "integer".
+          PLAIN
         end
       end
 
@@ -659,7 +684,13 @@ module Schemacop
         assert_validation(foo: '1', bar: '2')
         assert_validation(foo: '1', bar: '2', baz: 3)
         assert_validation(foo: '1', bar: '2', baz: 3, qux: [1, 2]) do
-          error '/qux', 'Does not match any anyOf condition.'
+          error '/qux', <<~PLAIN.strip
+            Matches 0 schemas but should match at least 1:
+              - Schema 1:
+                - /: Invalid type, got type "Array", expected "string".
+              - Schema 2:
+                - /: Invalid type, got type "Array", expected "integer".
+          PLAIN
         end
 
         assert_cast({ foo: '1', bar: '2' }, { foo: 1, bar: '2' }.with_indifferent_access)
@@ -700,7 +731,15 @@ module Schemacop
         assert_validation(foo: '1', bar: '2')
         assert_validation(foo: '1', bar: '2', baz: 3)
         assert_validation(foo: '1', bar: '2', baz: 3, qux: [1, 2]) do
-          error '/qux', 'Does not match any anyOf condition.'
+          error '/qux', <<~PLAIN.strip
+            Matches 0 schemas but should match at least 1:
+              - Schema 1:
+                - /: Invalid type, got type "Array", expected "string".
+              - Schema 2:
+                - /: Invalid type, got type "Array", expected "string".
+              - Schema 3:
+                - /: Invalid type, got type "Array", expected "integer".
+          PLAIN
         end
 
         assert_cast({ foo: '1', bar: '2' }, { foo: 1, bar: 2 }.with_indifferent_access)

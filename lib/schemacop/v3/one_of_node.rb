@@ -36,7 +36,10 @@ module Schemacop
         if matches.size == 1
           matches.first._validate(super_data, result: result)
         else
-          result.error "Matches #{matches.size} definitions but should match exactly 1."
+          result.error <<~PLAIN.strip
+            Matches #{matches.size} schemas but should match exactly 1:
+            #{schema_messages(data).join("\n")}
+          PLAIN
         end
       end
 

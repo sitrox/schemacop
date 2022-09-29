@@ -9,8 +9,13 @@ module Schemacop
         super_data = super
         return if super_data.nil?
 
-        if matches(super_data).size != @items.size
-          result.error 'Does not match all allOf conditions.'
+        matches = matches(super_data)
+
+        if matches.size != @items.size
+          result.error <<~PLAIN.strip
+            Matches #{matches.size} schemas but should match all of them:
+            #{schema_messages(data).join("\n")}
+          PLAIN
         end
       end
 

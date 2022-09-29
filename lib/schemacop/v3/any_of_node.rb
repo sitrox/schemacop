@@ -14,7 +14,10 @@ module Schemacop
         if match
           match._validate(super_data, result: result)
         else
-          result.error 'Does not match any anyOf condition.'
+          result.error <<~PLAIN.strip
+            Matches 0 schemas but should match at least 1:
+            #{schema_messages(super_data).join("\n")}
+          PLAIN
         end
       end
 

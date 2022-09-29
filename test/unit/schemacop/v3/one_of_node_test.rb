@@ -3,6 +3,31 @@ require 'test_helper'
 module Schemacop
   module V3
     class OneOfNodeTest < V3Test
+      def test_todo
+        schema(:one_of) do
+          hsh do
+            str! :name
+            str! :email
+          end
+          hsh do
+            int! :id
+          end
+        end
+
+        assert_validation(name: 'John', email: 'john@doe.com')
+        assert_validation(id: 42)
+        assert_validation(id: 42, name: 'John') do
+          error '/', <<~PLAIN.strip
+            Matches 0 schemas but should match exactly 1:
+              - Schema 1:
+                - /email: Value must be given.
+                - /: Obsolete property "id".
+              - Schema 2:
+                - /: Obsolete property "name".
+          PLAIN
+        end
+      end
+
       def test_optional
         schema :one_of do
           num multiple_of: 2
@@ -15,13 +40,35 @@ module Schemacop
         assert_validation(9)
         assert_validation('foo')
         assert_validation(12) do
-          error '/', 'Matches 2 definitions but should match exactly 1.'
+          error '/', <<~PLAIN.strip
+            Matches 2 schemas but should match exactly 1:
+              - Schema 1: Matches
+              - Schema 2: Matches
+              - Schema 3:
+                - /: Invalid type, got type "Integer", expected "string".
+          PLAIN
         end
         assert_validation(1) do
-          error '/', 'Matches 0 definitions but should match exactly 1.'
+          error '/', <<~PLAIN.strip
+            Matches 0 schemas but should match exactly 1:
+              - Schema 1:
+                - /: Value must be a multiple of 2.
+              - Schema 2:
+                - /: Value must be a multiple of 3.
+              - Schema 3:
+                - /: Invalid type, got type "Integer", expected "string".
+          PLAIN
         end
         assert_validation(:foo) do
-          error '/', 'Matches 0 definitions but should match exactly 1.'
+          error '/', <<~PLAIN.strip
+            Matches 0 schemas but should match exactly 1:
+              - Schema 1:
+                - /: Invalid type, got type "Symbol", expected "big_decimal" or "float" or "integer" or "rational".
+              - Schema 2:
+                - /: Invalid type, got type "Symbol", expected "big_decimal" or "float" or "integer" or "rational".
+              - Schema 3:
+                - /: Invalid type, got type "Symbol", expected "string".
+          PLAIN
         end
       end
 
@@ -57,10 +104,22 @@ module Schemacop
         assert_validation(foo: 9)
         assert_validation(foo: 7)
         assert_validation(foo: 14) do
-          error '/', 'Matches 2 definitions but should match exactly 1.'
+          error '/', <<~PLAIN.strip
+            Matches 2 schemas but should match exactly 1:
+              - Schema 1: Matches
+              - Schema 2: Matches
+          PLAIN
         end
         assert_validation(foo: 12) do
-          error '/', 'Matches 0 definitions but should match exactly 1.'
+          error '/', <<~PLAIN.strip
+            Matches 0 schemas but should match exactly 1:
+              - Schema 1:
+                - /foo: Matches 2 schemas but should match exactly 1:
+                  - Schema 1: Matches
+                  - Schema 2: Matches
+              - Schema 2:
+                - /foo: Value must be a multiple of 7.
+          PLAIN
         end
 
         assert_json(
@@ -122,7 +181,13 @@ module Schemacop
         assert_validation(foo: { baz: 'Baz' })
 
         assert_validation(foo: { xyz: 'Baz' }) do
-          error '/foo', 'Matches 0 definitions but should match exactly 1.'
+          error '/foo', <<~PLAIN.strip
+            Matches 0 schemas but should match exactly 1:
+              - Schema 1:
+                - /: Obsolete property "xyz".
+              - Schema 2:
+                - /: Obsolete property "xyz".
+          PLAIN
         end
 
         assert_cast(

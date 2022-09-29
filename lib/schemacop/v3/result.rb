@@ -35,16 +35,22 @@ module Schemacop
       messages.join("\n")
     end
 
-    def messages
+    def messages(pad: 0, itemize: false)
       messages = []
+
+      item_str = itemize ? '- ' : nil
 
       @errors.each do |path, path_messages|
         messages += path_messages.map do |path_message|
-          "/#{path.join('/')}: #{path_message}"
+          pad_lines("#{item_str}/#{path.join('/')}: #{path_message}", pad)
         end
       end
 
       return messages
+    end
+
+    def pad_lines(string, pad = 2)
+      string.split("\n").map { |line| "#{' ' * pad}#{line}" }.join("\n")
     end
 
     def in_path(segment)

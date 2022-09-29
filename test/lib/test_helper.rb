@@ -125,9 +125,17 @@ class V3Test < SchemacopTest
           if match
             actual_errors.delete(match)
           else
-            assert match,
-                   "Did not find error #{expected_error.inspect} in path #{path}, errors: " \
-                   + result.messages_by_path[path].inspect
+            assert match, <<~ERROR.strip
+              Errors mismatch in path #{path}:
+
+              Expected
+              --------
+              #{expected_error.blue}
+
+              #{'Actual'.red}
+              #{'------'.red}
+              #{result.messages_by_path[path].join("\n\n").green}
+            ERROR
           end
         end
       end

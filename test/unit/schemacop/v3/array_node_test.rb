@@ -393,10 +393,22 @@ module Schemacop
         assert_validation(['foo', 42])
         assert_validation(['foo', 42, '1990-01-01'])
         assert_validation(['foo', 42, '1990-01-01', 42]) do
-          error '/[3]', 'Matches 0 definitions but should match exactly 1.'
+          error '/[3]', <<~PLAIN.strip
+            Matches 0 schemas but should match exactly 1:
+              - Schema 1:
+                - /: Invalid type, got type "Integer", expected "string".
+              - Schema 2:
+                - /: Invalid type, got type "Integer", expected "string".
+          PLAIN
         end
         assert_validation(['foo', 42, '1990-01-01', 'foo']) do
-          error '/[3]', 'Matches 0 definitions but should match exactly 1.'
+          error '/[3]', <<~PLAIN.strip
+            Matches 0 schemas but should match exactly 1:
+              - Schema 1:
+                - /: String does not match format "date".
+              - Schema 2:
+                - /: String does not match format "integer".
+          PLAIN
         end
 
         assert_cast(['foo', 42], ['foo', 42])

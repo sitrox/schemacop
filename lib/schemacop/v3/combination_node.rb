@@ -40,6 +40,19 @@ module Schemacop
       def matches(data)
         @items.select { |i| item_matches?(i, data) }
       end
+
+      def schema_messages(data)
+        return @items.each_with_index.map do |item, index|
+          item_result = Result.new(self)
+          item._validate(data, result: item_result)
+          if item_result.valid?
+            "  - Schema #{index + 1}: Matches"
+          else
+            message = "  - Schema #{index + 1}:\n"
+            message << item_result.messages(pad: 4, itemize: true).join("\n")
+          end
+        end
+      end
     end
   end
 end

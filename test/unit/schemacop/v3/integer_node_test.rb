@@ -348,7 +348,13 @@ module Schemacop
         assert_cast('', nil)
 
         assert_validation('true') do
-          error '/', 'Matches 0 definitions but should match exactly 1.'
+          error '/', <<~PLAIN.strip
+            Matches 0 schemas but should match exactly 1:
+              - Schema 1:
+                - /: Invalid type, got type "String", expected "integer".
+              - Schema 2:
+                - /: String does not match format "integer".
+          PLAIN
         end
       end
 
@@ -367,7 +373,13 @@ module Schemacop
         end
 
         assert_validation('true') do
-          error '/', 'Matches 0 definitions but should match exactly 1.'
+          error '/', <<~PLAIN.strip
+            Matches 0 schemas but should match exactly 1:
+              - Schema 1:
+                - /: Invalid type, got type "String", expected "integer".
+              - Schema 2:
+                - /: String does not match format "integer".
+          PLAIN
         end
       end
     end

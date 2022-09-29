@@ -99,7 +99,13 @@ module Schemacop
 
         assert_validation('5')
         assert_validation('5.3') do
-          error '/', 'Matches 0 definitions but should match exactly 1.'
+          error '/', <<~PLAIN.strip
+            Matches 0 schemas but should match exactly 1:
+              - Schema 1:
+                - /: Invalid type, got type "String", expected "integer".
+              - Schema 2:
+                - /: String does not match format "integer".
+          PLAIN
         end
 
         assert_cast(5, 5)
@@ -125,13 +131,31 @@ module Schemacop
         assert_validation([nil])
         assert_validation([5, 5.3, '42.0', '42.42'])
         assert_validation([5, 5.3, '42.0', '42.42', 'bar']) do
-          error '/[4]', 'Matches 0 definitions but should match exactly 1.'
+          error '/[4]', <<~PLAIN.strip
+            Matches 0 schemas but should match exactly 1:
+              - Schema 1:
+                - /: Invalid type, got type "String", expected "big_decimal" or "float" or "integer" or "rational".
+              - Schema 2:
+                - /: String does not match format "number".
+          PLAIN
         end
         assert_validation([2]) do
-          error '/[0]', 'Matches 0 definitions but should match exactly 1.'
+          error '/[0]', <<~PLAIN.strip
+            Matches 0 schemas but should match exactly 1:
+              - Schema 1:
+                - /: Value must have a minimum of 3.
+              - Schema 2:
+                - /: Invalid type, got type "Integer", expected "string".
+          PLAIN
         end
         assert_validation(['2']) do
-          error '/[0]', 'Matches 0 definitions but should match exactly 1.'
+          error '/[0]', <<~PLAIN.strip
+            Matches 0 schemas but should match exactly 1:
+              - Schema 1:
+                - /: Invalid type, got type "String", expected "big_decimal" or "float" or "integer" or "rational".
+              - Schema 2:
+                - /: Value must have a minimum of 3.
+          PLAIN
         end
 
         assert_cast(['3'], [3])

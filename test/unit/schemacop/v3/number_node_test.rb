@@ -323,19 +323,43 @@ module Schemacop
         assert_validation('0.5')
 
         assert_validation('true') do
-          error '/', 'Matches 0 definitions but should match exactly 1.'
+          error '/', <<~PLAIN.strip
+            Matches 0 schemas but should match exactly 1:
+              - Schema 1:
+                - /: Invalid type, got type "String", expected "big_decimal" or "float" or "integer" or "rational".
+              - Schema 2:
+                - /: String does not match format "number".
+          PLAIN
         end
 
         assert_validation('51') do
-          error '/', 'Matches 0 definitions but should match exactly 1.'
+          error '/', <<~PLAIN.strip
+            Matches 0 schemas but should match exactly 1:
+              - Schema 1:
+                - /: Invalid type, got type "String", expected "big_decimal" or "float" or "integer" or "rational".
+              - Schema 2:
+                - /: Value must have a maximum of 50/1.
+          PLAIN
         end
 
         assert_validation('-2') do
-          error '/', 'Matches 0 definitions but should match exactly 1.'
+          error '/', <<~PLAIN.strip
+            Matches 0 schemas but should match exactly 1:
+              - Schema 1:
+                - /: Invalid type, got type "String", expected "big_decimal" or "float" or "integer" or "rational".
+              - Schema 2:
+                - /: Value must have a minimum of 0.0.
+          PLAIN
         end
 
         assert_validation('3.1415') do
-          error '/', 'Matches 0 definitions but should match exactly 1.'
+          error '/', <<~PLAIN.strip
+            Matches 0 schemas but should match exactly 1:
+              - Schema 1:
+                - /: Invalid type, got type "String", expected "big_decimal" or "float" or "integer" or "rational".
+              - Schema 2:
+                - /: Value must be a multiple of 0.5.
+          PLAIN
         end
       end
     end

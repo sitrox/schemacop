@@ -1,5 +1,9 @@
 # Change log
 
+## 3.0.20 (2022-09-29)
+
+* Improve error messages for `all_of`, `any_of` and `one_of`
+
 ## 3.0.19 (2022-09-19)
 
 * Make `cast_str` of `BooleanNode` in  `v3` case-insensitive

@@ -188,7 +188,13 @@ module Schemacop
         assert_cast('False', false)
 
         assert_validation('5') do
-          error '/', 'Matches 0 definitions but should match exactly 1.'
+          error '/', <<~PLAIN.strip
+            Matches 0 schemas but should match exactly 1:
+              - Schema 1:
+                - /: Invalid type, got type "String", expected "boolean".
+              - Schema 2:
+                - /: String does not match format "boolean".
+          PLAIN
         end
 
         # Nil can be validated, as it's not required
@@ -217,11 +223,23 @@ module Schemacop
         assert_cast('FALSE', false)
 
         assert_validation('4') do
-          error '/', 'Matches 0 definitions but should match exactly 1.'
+          error '/', <<~PLAIN.strip
+            Matches 0 schemas but should match exactly 1:
+              - Schema 1:
+                - /: Invalid type, got type "String", expected "boolean".
+              - Schema 2:
+                - /: String does not match format "boolean".
+          PLAIN
         end
 
         assert_validation('foo') do
-          error '/', 'Matches 0 definitions but should match exactly 1.'
+          error '/', <<~PLAIN.strip
+            Matches 0 schemas but should match exactly 1:
+              - Schema 1:
+                - /: Invalid type, got type "String", expected "boolean".
+              - Schema 2:
+                - /: String does not match format "boolean".
+          PLAIN
         end
 
         assert_validation(nil) do

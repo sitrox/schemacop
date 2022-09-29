@@ -13,10 +13,20 @@ module Schemacop
         assert_validation('12')
         assert_validation('1234')
         assert_validation('1') do
-          error '/', 'Does not match all allOf conditions.'
+          error '/', <<~PLAIN.strip
+            Matches 1 schemas but should match all of them:
+              - Schema 1:
+                - /: String is 1 characters long but must be at least 2.
+              - Schema 2: Matches
+          PLAIN
         end
         assert_validation('12345') do
-          error '/', 'Does not match all allOf conditions.'
+          error '/', <<~PLAIN.strip
+            Matches 1 schemas but should match all of them:
+              - Schema 1: Matches
+              - Schema 2:
+                - /: String is 5 characters long but must be at most 4.
+          PLAIN
         end
       end
 
@@ -31,16 +41,37 @@ module Schemacop
         assert_validation(4)
 
         assert_validation(5) do
-          error '/', 'Does not match all allOf conditions.'
+          error '/', <<~PLAIN.strip
+            Matches 1 schemas but should match all of them:
+              - Schema 1: Matches
+              - Schema 2:
+                - /: Value must have a maximum of 4.
+          PLAIN
         end
         assert_validation(1) do
-          error '/', 'Does not match all allOf conditions.'
+          error '/', <<~PLAIN.strip
+            Matches 1 schemas but should match all of them:
+              - Schema 1:
+                - /: Value must have a minimum of 2.
+              - Schema 2: Matches
+          PLAIN
         end
         assert_validation({}) do
-          error '/', 'Does not match all allOf conditions.'
+          error '/', <<~PLAIN.strip
+            Matches 0 schemas but should match all of them:
+              - Schema 1:
+                - /: Invalid type, got type "Hash", expected "integer".
+              - Schema 2:
+                - /: Invalid type, got type "Hash", expected "integer".
+          PLAIN
         end
         assert_validation(42) do
-          error '/', 'Does not match all allOf conditions.'
+          error '/', <<~PLAIN.strip
+            Matches 1 schemas but should match all of them:
+              - Schema 1: Matches
+              - Schema 2:
+                - /: Value must have a maximum of 4.
+          PLAIN
         end
       end
 
@@ -62,10 +93,27 @@ module Schemacop
 
         assert_validation(foo: 2, bar: 7)
         assert_validation(foo: 5, bar: 7) do
-          error '/', 'Does not match all allOf conditions.'
+          error '/', <<~PLAIN.strip
+            Matches 1 schemas but should match all of them:
+              - Schema 1:
+                - /foo: Matches 1 schemas but should match all of them:
+                  - Schema 1: Matches
+                  - Schema 2:
+                    - /: Value must have a maximum of 4.
+              - Schema 2: Matches
+          PLAIN
         end
         assert_validation(foo: 5) do
-          error '/', 'Does not match all allOf conditions.'
+          error '/', <<~PLAIN.strip
+            Matches 0 schemas but should match all of them:
+              - Schema 1:
+                - /foo: Matches 1 schemas but should match all of them:
+                  - Schema 1: Matches
+                  - Schema 2:
+                    - /: Value must have a maximum of 4.
+              - Schema 2:
+                - /bar: Value must be given.
+          PLAIN
         end
       end
 
@@ -77,7 +125,11 @@ module Schemacop
         assert_validation(nil)
         assert_validation('1')
         assert_validation('Foo') do
-          error '/', 'Does not match all allOf conditions.'
+          error '/', <<~PLAIN.strip
+            Matches 0 schemas but should match all of them:
+              - Schema 1:
+                - /: String does not match format "integer".
+          PLAIN
         end
 
         assert_cast('1', 1)
@@ -96,11 +148,23 @@ module Schemacop
         assert_validation('123')
 
         assert_validation('1') do
-          error '/', 'Does not match all allOf conditions.'
+          error '/', <<~PLAIN.strip
+            Matches 2 schemas but should match all of them:
+              - Schema 1: Matches
+              - Schema 2:
+                - /: String is 1 characters long but must be at least 2.
+              - Schema 3: Matches
+          PLAIN
         end
 
         assert_validation('1234') do
-          error '/', 'Does not match all allOf conditions.'
+          error '/', <<~PLAIN.strip
+            Matches 2 schemas but should match all of them:
+              - Schema 1: Matches
+              - Schema 2: Matches
+              - Schema 3:
+                - /: String is 4 characters long but must be at most 3.
+          PLAIN
         end
         assert_cast('42', 42)
       end
@@ -117,11 +181,23 @@ module Schemacop
         assert_validation('123')
 
         assert_validation('1') do
-          error '/', 'Does not match all allOf conditions.'
+          error '/', <<~PLAIN.strip
+            Matches 2 schemas but should match all of them:
+              - Schema 1:
+                - /: String is 1 characters long but must be at least 2.
+              - Schema 2: Matches
+              - Schema 3: Matches
+          PLAIN
         end
 
         assert_validation('1234') do
-          error '/', 'Does not match all allOf conditions.'
+          error '/', <<~PLAIN.strip
+            Matches 2 schemas but should match all of them:
+              - Schema 1: Matches
+              - Schema 2:
+                - /: String is 4 characters long but must be at most 3.
+              - Schema 3: Matches
+          PLAIN
         end
 
         assert_cast('42', 42)
@@ -154,10 +230,20 @@ module Schemacop
 
         assert_validation(nil)
         assert_validation('42') do
-          error '/', 'Does not match all allOf conditions.'
+          error '/', <<~PLAIN.strip
+            Matches 1 schemas but should match all of them:
+              - Schema 1: Matches
+              - Schema 2:
+                - /: String does not match format "boolean".
+          PLAIN
         end
         assert_validation('true') do
-          error '/', 'Does not match all allOf conditions.'
+          error '/', <<~PLAIN.strip
+            Matches 1 schemas but should match all of them:
+              - Schema 1:
+                - /: String does not match format "integer".
+              - Schema 2: Matches
+          PLAIN
         end
       end
 

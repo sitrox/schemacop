@@ -13,10 +13,22 @@ module Schemacop
         assert_validation('string')
         assert_validation(42)
         assert_validation(42.1) do
-          error '/', 'Does not match any anyOf condition.'
+          error '/', <<~PLAIN.strip
+            Matches 0 schemas but should match at least 1:
+              - Schema 1:
+                - /: Invalid type, got type "Float", expected "string".
+              - Schema 2:
+                - /: Invalid type, got type "Float", expected "integer".
+          PLAIN
         end
         assert_validation({}) do
-          error '/', 'Does not match any anyOf condition.'
+          error '/', <<~PLAIN.strip
+            Matches 0 schemas but should match at least 1:
+              - Schema 1:
+                - /: Invalid type, got type "Hash", expected "string".
+              - Schema 2:
+                - /: Invalid type, got type "Hash", expected "integer".
+          PLAIN
         end
       end
 
@@ -34,10 +46,22 @@ module Schemacop
         end
 
         assert_validation(42.1) do
-          error '/', 'Does not match any anyOf condition.'
+          error '/', <<~PLAIN.strip
+            Matches 0 schemas but should match at least 1:
+              - Schema 1:
+                - /: Invalid type, got type "Float", expected "string".
+              - Schema 2:
+                - /: Invalid type, got type "Float", expected "integer".
+          PLAIN
         end
         assert_validation({}) do
-          error '/', 'Does not match any anyOf condition.'
+          error '/', <<~PLAIN.strip
+            Matches 0 schemas but should match at least 1:
+              - Schema 1:
+                - /: Invalid type, got type "Hash", expected "string".
+              - Schema 2:
+                - /: Invalid type, got type "Hash", expected "integer".
+          PLAIN
         end
       end
 
@@ -57,13 +81,36 @@ module Schemacop
         assert_validation(foo: 42)
         assert_validation(foo: 'str')
         assert_validation('string') do
-          error '/', 'Does not match any anyOf condition.'
+          error '/', <<~PLAIN.strip
+            Matches 0 schemas but should match at least 1:
+              - Schema 1:
+                - /: Invalid type, got type "String", expected "object".
+              - Schema 2:
+                - /: Invalid type, got type "String", expected "integer".
+          PLAIN
         end
         assert_validation(bar: :baz) do
-          error '/', 'Does not match any anyOf condition.'
+          error '/', <<~PLAIN.strip
+            Matches 0 schemas but should match at least 1:
+              - Schema 1:
+                - /foo: Value must be given.
+                - /: Obsolete property "bar".
+              - Schema 2:
+                - /: Invalid type, got type "Hash", expected "integer".
+          PLAIN
         end
         assert_validation(foo: :bar) do
-          error '/', 'Does not match any anyOf condition.'
+          error '/', <<~PLAIN.strip
+            Matches 0 schemas but should match at least 1:
+              - Schema 1:
+                - /foo: Matches 0 schemas but should match at least 1:
+                  - Schema 1:
+                    - /: Invalid type, got type "Symbol", expected "integer".
+                  - Schema 2:
+                    - /: Invalid type, got type "Symbol", expected "string".
+              - Schema 2:
+                - /: Invalid type, got type "Hash", expected "integer".
+          PLAIN
         end
       end
 
@@ -109,13 +156,109 @@ module Schemacop
           assert_validation(Time.now)
 
           assert_validation('1990-01-13 12') do
-            error '/', 'Does not match any anyOf condition.'
+            error '/', <<~PLAIN.strip
+              Matches 0 schemas but should match at least 1:
+                - Schema 1:
+                  - /: Matches 0 schemas but should match all of them:
+                    - Schema 1:
+                      - /: Invalid type, got type "String", expected "object".
+                - Schema 2:
+                  - /: Matches 0 schemas but should match at least 1:
+                    - Schema 1:
+                      - /: Invalid type, got type "String", expected "Date".
+                    - Schema 2:
+                      - /: Invalid type, got type "String", expected "Time".
+                - Schema 3:
+                  - /: Invalid type, got type "String", expected "array".
+                - Schema 4:
+                  - /: Invalid type, got type "String", expected "boolean".
+                - Schema 5:
+                  - /: Invalid type, got type "String", expected "integer".
+                - Schema 6:
+                  - /: Invalid type, got type "String", expected "big_decimal" or "float" or "integer" or "rational".
+                - Schema 7:
+                  - /: Invalid type, got type "String", expected "object".
+                - Schema 8:
+                  - /: Matches 0 schemas but should match exactly 1:
+                    - Schema 1:
+                      - /: Invalid type, got type "String", expected "object".
+                    - Schema 2:
+                      - /: Invalid type, got type "String", expected "object".
+                - Schema 9:
+                  - /: String does not match format "date".
+                - Schema 10:
+                  - /: String is 13 characters long but must be at most 2.
+            PLAIN
           end
           assert_validation(a: 'a hello z') do
-            error '/', 'Does not match any anyOf condition.'
+            error '/', <<~PLAIN.strip
+              Matches 0 schemas but should match at least 1:
+                - Schema 1:
+                  - /: Matches 0 schemas but should match all of them:
+                    - Schema 1:
+                      - /foo: Value must be given.
+                      - /: Obsolete property "a".
+                - Schema 2:
+                  - /: Matches 0 schemas but should match at least 1:
+                    - Schema 1:
+                      - /: Invalid type, got type "Hash", expected "Date".
+                    - Schema 2:
+                      - /: Invalid type, got type "Hash", expected "Time".
+                - Schema 3:
+                  - /: Invalid type, got type "Hash", expected "array".
+                - Schema 4:
+                  - /: Invalid type, got type "Hash", expected "boolean".
+                - Schema 5:
+                  - /: Invalid type, got type "Hash", expected "integer".
+                - Schema 6:
+                  - /: Invalid type, got type "Hash", expected "big_decimal" or "float" or "integer" or "rational".
+                - Schema 7:
+                  - /bar: Value must be given.
+                  - /: Obsolete property "a".
+                - Schema 8:
+                  - /: Matches 2 schemas but should match exactly 1:
+                    - Schema 1: Matches
+                    - Schema 2: Matches
+                - Schema 9:
+                  - /: Invalid type, got type "Hash", expected "string".
+                - Schema 10:
+                  - /: Invalid type, got type "Hash", expected "string".
+            PLAIN
           end
           assert_validation(Object.new) do
-            error '/', 'Does not match any anyOf condition.'
+            error '/', <<~PLAIN.strip
+              Matches 0 schemas but should match at least 1:
+                - Schema 1:
+                  - /: Matches 0 schemas but should match all of them:
+                    - Schema 1:
+                      - /: Invalid type, got type "Object", expected "object".
+                - Schema 2:
+                  - /: Matches 0 schemas but should match at least 1:
+                    - Schema 1:
+                      - /: Invalid type, got type "Object", expected "Date".
+                    - Schema 2:
+                      - /: Invalid type, got type "Object", expected "Time".
+                - Schema 3:
+                  - /: Invalid type, got type "Object", expected "array".
+                - Schema 4:
+                  - /: Invalid type, got type "Object", expected "boolean".
+                - Schema 5:
+                  - /: Invalid type, got type "Object", expected "integer".
+                - Schema 6:
+                  - /: Invalid type, got type "Object", expected "big_decimal" or "float" or "integer" or "rational".
+                - Schema 7:
+                  - /: Invalid type, got type "Object", expected "object".
+                - Schema 8:
+                  - /: Matches 0 schemas but should match exactly 1:
+                    - Schema 1:
+                      - /: Invalid type, got type "Object", expected "object".
+                    - Schema 2:
+                      - /: Invalid type, got type "Object", expected "object".
+                - Schema 9:
+                  - /: Invalid type, got type "Object", expected "string".
+                - Schema 10:
+                  - /: Invalid type, got type "Object", expected "string".
+            PLAIN
           end
         end
       end
@@ -153,7 +296,13 @@ module Schemacop
         assert_validation(foo: { baz: 'Baz' })
 
         assert_validation(foo: { xyz: 'Baz' }) do
-          error '/foo', 'Does not match any anyOf condition.'
+          error '/foo', <<~PLAIN.strip
+            Matches 0 schemas but should match at least 1:
+              - Schema 1:
+                - /: Obsolete property "xyz".
+              - Schema 2:
+                - /: Obsolete property "xyz".
+          PLAIN
         end
 
         assert_cast(
