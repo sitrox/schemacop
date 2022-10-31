@@ -28,9 +28,8 @@ module Schemacop
         klass = resolve_class(type)
         fail "Could not find node for type #{type.inspect}." unless klass
 
-        node = klass.new(**options, &block)
-
         options = Schemacop.v3_default_options.slice(*klass.allowed_options).merge(options)
+        node = klass.new(**options, &block)
 
         if options.delete(:cast_str)
           format = NodeRegistry.name(klass)

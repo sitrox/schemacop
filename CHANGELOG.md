@@ -1,5 +1,9 @@
 # Change log
 
+## 3.0.22 (2022-10-31)
+
+* Fix `v3_default_options` being not applied to nodes
+
 ## 3.0.21 (2022-10-31)
 
 * Adapt option `ignore_obsolete_properties` of `HashNode` so that it can also
