@@ -1,6 +1,6 @@
 # Change log
 
-## 3.0.20 (2022-10-31)
+## 3.0.21 (2022-10-31)
 
 * Adapt option `ignore_obsolete_properties` of `HashNode` so that it can also
   function as a parameter white-list when set to an enumerable.
