@@ -1,5 +1,10 @@
 # Change log
 
+## 3.0.20 (2022-10-31)
+
+* Adapt option `ignore_obsolete_properties` of `HashNode` so that it can also
+  function as a parameter white-list when set to an enumerable.
+
 ## 3.0.20 (2022-09-29)
 
 * Improve error messages for `all_of`, `any_of` and `one_of`

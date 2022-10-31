@@ -1074,6 +1074,43 @@ module Schemacop
         assert_cast({ foo: 1, bar: 'baz', obsolete_key: 42 }, { foo: 1, bar: 'baz' }.with_indifferent_access)
       end
 
+      def test_ignore_obsolete_properties_whitelist
+        schema :hash, ignore_obsolete_properties: %i[obsolete_key] do
+          int? :foo
+          str? :bar
+        end
+
+        # Some standard validations first
+        assert_validation({})
+        assert_validation({ foo: 1 })
+        assert_validation({ bar: 'baz' })
+        assert_validation({ foo: 1, bar: 'baz' })
+        assert_validation({ foo: 1, bar: 'baz', baz: 'foo' }) do
+          error '/', 'Obsolete property "baz".'
+        end
+
+        assert_cast({}, {}.with_indifferent_access)
+        assert_cast({ foo: 1 }, { foo: 1 }.with_indifferent_access)
+        assert_cast({ bar: 'baz' }, { bar: 'baz' }.with_indifferent_access)
+        assert_cast({ foo: 1, bar: 'baz' }, { foo: 1, bar: 'baz' }.with_indifferent_access)
+
+        # Should allow obsolete properties and remove them from the result
+        assert_validation({ obsolete_key: 42 })
+        assert_validation({ foo: 1, obsolete_key: 42 })
+        assert_validation({ bar: 'baz', obsolete_key: 42 })
+        assert_validation({ foo: 1, bar: 'baz', obsolete_key: 42 })
+
+        assert_cast({ obsolete_key: 42 }, {}.with_indifferent_access)
+        assert_cast({ foo: 1, obsolete_key: 42 }, { foo: 1 }.with_indifferent_access)
+        assert_cast({ bar: 'baz', obsolete_key: 42 }, { bar: 'baz' }.with_indifferent_access)
+        assert_cast({ foo: 1, bar: 'baz', obsolete_key: 42 }, { foo: 1, bar: 'baz' }.with_indifferent_access)
+
+        assert_cast({ obsolete_key: 42 }, {}.with_indifferent_access)
+        assert_cast({ foo: 1, obsolete_key: 42 }, { foo: 1 }.with_indifferent_access)
+        assert_cast({ bar: 'baz', obsolete_key: 42 }, { bar: 'baz' }.with_indifferent_access)
+        assert_cast({ foo: 1, bar: 'baz', obsolete_key: 42 }, { foo: 1, bar: 'baz' }.with_indifferent_access)
+      end
+
       def test_ignore_obsolete_properties_false
         schema :hash, ignore_obsolete_properties: false do
           int? :foo

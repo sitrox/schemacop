@@ -873,6 +873,9 @@ It consists of key-value-pairs that can be validated using arbitrary nodes.
   controller, as this only allows white-listed params and removes any params
   which are not whitelisted (i.e. similar to strong params from Rails).
 
+  If it is set to an enumerable (e.g. `Set` or `Array`), it functions as a
+  white-list and only the given additional properties are allowed.
+
 #### Specifying properties
 
 Hash nodes support a block in which you can specify the required hash contents.

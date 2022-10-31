@@ -141,7 +141,9 @@ module Schemacop
               result.in_path(name) do
                 property_patterns[match]._validate(additional_property, result: result)
               end
-            elsif !options[:ignore_obsolete_properties]
+            elsif (options[:ignore_obsolete_properties].is_a?(Enumerable) &&
+                   options[:ignore_obsolete_properties].exclude?(name.to_sym)) ||
+                  !options[:ignore_obsolete_properties]
               result.error "Obsolete property #{name.to_s.inspect}."
             end
           elsif options[:additional_properties].is_a?(Node)
