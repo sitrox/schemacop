@@ -2,6 +2,7 @@
 require 'ruby2_keywords'
 require 'active_support/all'
 require 'set'
+require 'uri'
 
 # Schemacop module
 module Schemacop

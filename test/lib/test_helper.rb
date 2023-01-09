@@ -1,4 +1,5 @@
 require 'simplecov'
+
 SimpleCov.start do
   add_group 'v3', 'lib/schemacop/v3'
   add_group 'v2', 'lib/schemacop/v2'
