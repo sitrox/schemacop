@@ -1,5 +1,10 @@
 # Change log
 
+## 3.0.23 (2023-05-04)
+
+* Improve formatting regular expressions for error messages and OpenAPI
+  documentation
+
 ## 3.0.22 (2022-10-31)
 
 * Fix `v3_default_options` being not applied to nodes

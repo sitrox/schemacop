@@ -8,15 +8,18 @@ module Schemacop
     def self.sanitize_exp(exp)
       return exp if exp.is_a?(String)
 
-      _start_slash, caret, exp, dollar, _end_slash, flags = exp.inspect.match(%r{^(/?)(\^)?(.*?)(\$)?(/?)([ixm]*)?$}).captures
-      flags = flags.chars
+      # Convert expression to a string
+      exp = exp.inspect
 
-      if flags.delete('i')
-        exp = "(?i)(#{exp})"
+      # If regexp has flag /x, squish it
+      if exp.match(%r{/[a-wy-z]*?x[a-wy-z]*?})
+        exp = exp.squish
       end
 
-      if flags.any?
-        fail "Flags #{flags.inspect} are not supported by Schemacop."
+      _start_slash, caret, exp, dollar, _end_slash, flags = exp.match(%r{^(/?)(\^)?(.*?)(\$)?(/?)([ixm]*)?$}).captures
+
+      unless flags.blank?
+        exp = "(?#{flags})(#{exp})"
       end
 
       return "#{caret}#{exp}#{dollar}"
