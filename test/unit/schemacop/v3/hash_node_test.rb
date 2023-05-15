@@ -1226,13 +1226,13 @@ module Schemacop
         end
 
         assert_json({
-                      properties: {
+                      properties:           {
                         foo: { type: :string, require_key: true },
-                        ok: { type: :string, require_key: true },
+                        ok:  { type: :string, require_key: true },
                         bar: { type: :integer, require_key: true }
                       },
                       additionalProperties: false,
-                      type: :object
+                      type:                 :object
                     })
       end
     end
