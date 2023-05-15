@@ -109,6 +109,16 @@ The nodes in Schemacop v3 also support generic keywords, similar to JSON schema:
   value is not in the array, the validation will fail
 * `default`: You may provide a default value for items that will be set if the
   value is not given
+* `require_key`: If set to true, validate that the key of this node is present, 
+  regardless of the value (including `nil`). This is only validated if the 
+  schema type is set to `:hash`.
+  Example:
+  ```ruby
+  Schemacop::Schema3.new(:hash) do
+    str? :foo, require_key: true
+    int? :bar, require_key: true
+  end
+  ```
 
 The three keywords `title`, `description` and `examples` aren't used for validation,
 but can be used to document the schema. They will be included in the JSON output
