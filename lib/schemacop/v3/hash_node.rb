@@ -109,6 +109,7 @@ module Schemacop
           result.in_path(node.name) do
             next if node.name.is_a?(Regexp)
 
+            result.error "Key #{node.name} must be given." if node.require_key? && !data_hash.include?(node.name)
             node._validate(data_hash[node.name], result: result)
           end
         end

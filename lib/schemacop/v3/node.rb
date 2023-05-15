@@ -8,6 +8,7 @@ module Schemacop
       attr_reader :description
       attr_reader :options
       attr_reader :parent
+      attr_reader :require_key
 
       class_attribute :_supports_children
       self._supports_children = nil
@@ -50,7 +51,7 @@ module Schemacop
       end
 
       def self.allowed_options
-        %i[name required default description examples enum parent options title as]
+        %i[name required default description examples enum parent options title as require_key]
       end
 
       def self.dsl_methods
@@ -87,6 +88,7 @@ module Schemacop
         @description = options.delete(:description)
         @examples = options.delete(:examples)
         @enum = options.delete(:enum)&.to_set
+        @require_key = !!options.delete(:require_key)
         @parent = options.delete(:parent)
         @options = options
         @schemas = {}
@@ -136,6 +138,10 @@ module Schemacop
         @required
       end
 
+      def require_key?
+        @require_key
+      end
+
       def as_json
         process_json([], {})
       end
@@ -181,6 +187,7 @@ module Schemacop
         json[:description] = @description if @description
         json[:default] = @default unless @default.nil?
         json[:enum] = @enum.to_a if @enum
+        json[:require_key] = @require_key if @require_key
 
         return json.as_json
       end
