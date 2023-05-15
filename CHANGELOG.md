@@ -1,5 +1,9 @@
 # Change log
 
+## 3.0.24 (2023-05-15)
+
+* Add `require_key` option
+
 ## 3.0.23 (2023-05-04)
 
 * Improve formatting regular expressions for error messages and OpenAPI
