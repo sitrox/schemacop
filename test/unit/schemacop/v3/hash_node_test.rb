@@ -1208,6 +1208,33 @@ module Schemacop
           error '/', 'Obsolete property "obsolete_key".'
         end
       end
+
+      def test_schema_required_key
+        @schema = Schemacop::Schema3.new(:hash) do
+          str? :foo, require_key: true
+          str? :ok, require_key: true
+          int? :bar, require_key: true
+        end
+
+        assert_validation({ ok: nil }) do
+          error '/foo', <<~PLAIN.strip
+            Key foo must be given.
+          PLAIN
+          error '/bar', <<~PLAIN.strip
+            Key bar must be given.
+          PLAIN
+        end
+
+        assert_json({
+                      properties: {
+                        foo: { type: :string, require_key: true },
+                        ok: { type: :string, require_key: true },
+                        bar: { type: :integer, require_key: true }
+                      },
+                      additionalProperties: false,
+                      type: :object
+                    })
+      end
     end
   end
 end
