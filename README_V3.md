@@ -109,8 +109,8 @@ The nodes in Schemacop v3 also support generic keywords, similar to JSON schema:
   value is not in the array, the validation will fail
 * `default`: You may provide a default value for items that will be set if the
   value is not given
-* `require_key`: If set to true, validate that the key of this node is present, 
-  regardless of the value (including `nil`). This is only validated if the 
+* `require_key`: If set to true, validate that the key of this node is present,
+  regardless of the value (including `nil`). This is only validated if the
   schema type is set to `:hash`.
   Example:
   ```ruby
@@ -673,10 +673,11 @@ how you specify your array contents.
 
 List validation validates a sequence of arbitrary length where each item matches
 the same schema. Unless you specify a `min_items` count on the array node, an
-empty array will also suffice. To specify a list validation, use the `list` DSL
-method, and specify the type you want to validate against. Here, you need to
-specify the type of the element using the long `type` name (e.g. `integer` and
-not `int`).
+empty array will also suffice. If the option `required: true` is not specified,
+a list containing only `nil` values is also valid. To specify a list validation,
+use the `list` DSL method, and specify the type you want to validate against.
+Here, you need to specify the type of the element using the long `type` name
+(e.g. `integer` and not `int`).
 
 For example, you can specify that you want an array with only integers between 1 and 5:
 

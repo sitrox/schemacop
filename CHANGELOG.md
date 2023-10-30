@@ -1,5 +1,9 @@
 # Change log
 
+## 3.0.25 (2023-10-30)
+
+* Improve documentation: list validation
+
 ## 3.0.24 (2023-05-15)
 
 * Add `require_key` option
