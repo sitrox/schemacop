@@ -1,5 +1,9 @@
 # Change log
 
+## 3.0.26 (2023-11-16)
+
+* Lock dependency `ruby2_keywords` to the more open `>= 0.0.4`
+
 ## 3.0.25 (2023-10-30)
 
 * Improve documentation: list validation
