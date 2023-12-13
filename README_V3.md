@@ -243,6 +243,11 @@ transformed into various types.
   Validates for a valid email address. There is no casting involved since email
   addresses do not have their own ruby type.
 
+* `mailbox`
+  Validates for a valid mailbox, which is defined as a valid email enclosed in
+  brackets (`< >`), with an optional name before the email address. There is no
+  casting involved.
+
 * `boolean`
   The string must be either `true`, `false`, `0` or `1`. This value will be
   casted to Ruby's `TrueClass` or `FalseClass`. Please note that the strings

@@ -191,6 +191,50 @@ module Schemacop
         assert_cast('john.doe@example.com', 'john.doe@example.com')
       end
 
+      def test_format_mailbox
+        schema :string, format: :mailbox
+
+        assert_json(type: :string, format: :mailbox)
+
+        assert_validation 'john.doe@example.com' do
+          error '/', 'String does not match format "mailbox".'
+        end
+
+        assert_validation 'john.doe+foo-bar_baz@example.com' do
+          error '/', 'String does not match format "mailbox".'
+        end
+
+        assert_validation 'JOHN.DOE+FOO-BAR_BAZ@EXAMPLE.COM' do
+          error '/', 'String does not match format "mailbox".'
+        end
+
+        assert_validation 'someemail' do
+          error '/', 'String does not match format "mailbox".'
+        end
+
+        assert_validation 'john doe@example.com' do
+          error '/', 'String does not match format "mailbox".'
+        end
+
+        assert_validation '@john@example.com' do
+          error '/', 'String does not match format "mailbox".'
+        end
+
+        assert_validation 'John Doe <john.doe@example.com>'
+        assert_validation 'John Doe <john.doe+foo-bar_baz@example.com>'
+        assert_validation 'John Doe <JOHN.DOE+FOO-BAR_BAZ@EXAMPLE.COM>'
+
+        assert_validation 'John <john.doe@example.com>'
+        assert_validation 'John Doe 123 <john.doe@example.com>'
+        assert_validation 'John_Doe <john.doe@example.com>'
+        assert_validation 'John-Doe ÖÄ <john.doe@example.com>'
+        assert_validation '"John Doe" <john.doe@example.com>'
+        assert_validation '<john.doe@example.com>'
+
+        assert_cast(nil, nil)
+        assert_cast('John Doe <john.doe@example.com>', 'John Doe <john.doe@example.com>')
+      end
+
       def test_format_boolean
         schema :string, format: :boolean
 

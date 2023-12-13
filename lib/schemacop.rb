@@ -56,6 +56,12 @@ module Schemacop
   )
 
   register_string_formatter(
+    :mailbox,
+    pattern: %r{^.*\s?<[a-zA-Z0-9.!\#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*>$},
+    handler: ->(value) { value }
+  )
+
+  register_string_formatter(
     :boolean,
     pattern: /^(true|false|0|1)$/i,
     handler: ->(value) { %w[true 1].include?(value&.downcase) }
