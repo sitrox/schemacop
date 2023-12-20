@@ -196,43 +196,87 @@ module Schemacop
 
         assert_json(type: :string, format: :mailbox)
 
+        # No angle brackets given
         assert_validation 'john.doe@example.com' do
           error '/', 'String does not match format "mailbox".'
         end
 
-        assert_validation 'john.doe+foo-bar_baz@example.com' do
+        # Only leading angle bracket given
+        assert_validation '<john.doe@example.com' do
           error '/', 'String does not match format "mailbox".'
         end
 
-        assert_validation 'JOHN.DOE+FOO-BAR_BAZ@EXAMPLE.COM' do
+        # Only trailing angle bracket given
+        assert_validation 'john.doe@example.com>' do
           error '/', 'String does not match format "mailbox".'
         end
 
-        assert_validation 'someemail' do
-          error '/', 'String does not match format "mailbox".'
-        end
-
-        assert_validation 'john doe@example.com' do
-          error '/', 'String does not match format "mailbox".'
-        end
-
-        assert_validation '@john@example.com' do
-          error '/', 'String does not match format "mailbox".'
-        end
-
-        assert_validation 'John Doe <john.doe@example.com>'
-        assert_validation 'John Doe <john.doe+foo-bar_baz@example.com>'
-        assert_validation 'John Doe <JOHN.DOE+FOO-BAR_BAZ@EXAMPLE.COM>'
-
-        assert_validation 'John <john.doe@example.com>'
-        assert_validation 'John Doe 123 <john.doe@example.com>'
-        assert_validation 'John_Doe <john.doe@example.com>'
-        assert_validation 'John-Doe ÖÄ <john.doe@example.com>'
-        assert_validation '"John Doe" <john.doe@example.com>'
+        # Both angle brackets given, OK
         assert_validation '<john.doe@example.com>'
 
+        # Both angle brackets given but leading space, not okay
+        assert_validation ' <john.doe@example.com>' do
+          error '/', 'String does not match format "mailbox".'
+        end
+
+        # Invalid email address given
+        assert_validation ' <john>' do
+          error '/', 'String does not match format "mailbox".'
+        end
+
+        # Invalid email address given
+        assert_validation ' <john@>' do
+          error '/', 'String does not match format "mailbox".'
+        end
+
+        # Invalid email address given
+        assert_validation ' <@example.com>' do
+          error '/', 'String does not match format "mailbox".'
+        end
+
+        # Name given but no quotes
+        assert_validation 'John Doe <john.doe@example.com>' do
+          error '/', 'String does not match format "mailbox".'
+        end
+
+        # Name given but only leading quote
+        assert_validation '"John Doe <john.doe@example.com>' do
+          error '/', 'String does not match format "mailbox".'
+        end
+
+        # Name given but only trailing quote
+        assert_validation 'John Doe" <john.doe@example.com>' do
+          error '/', 'String does not match format "mailbox".'
+        end
+
+        # Name given but no space between mail and name
+        assert_validation '"John Doe"<john.doe@example.com>' do
+          error '/', 'String does not match format "mailbox".'
+        end
+
+        # Too many brackets at start
+        assert_validation '"John Doe" <<john.doe@example.com>' do
+          error '/', 'String does not match format "mailbox".'
+        end
+
+        # Too many brackets at end
+        assert_validation '"John Doe" <john.doe@example.com>>' do
+          error '/', 'String does not match format "mailbox".'
+        end
+
+        # Name with quotes and space before mail, OK
+        assert_validation '"John Doe" <john.doe@example.com>'
+
+        # Name with quotes and space before mail with special characters, OK
+        assert_validation '"Jöhn Doé-Test" <john.doe@example.com>'
+
+        # Name with quotes and space before mail with angle bracket in name, OK
+        assert_validation '"John < Doe" <john.doe@example.com>'
+
         assert_cast(nil, nil)
-        assert_cast('John Doe <john.doe@example.com>', 'John Doe <john.doe@example.com>')
+        assert_cast('<john.doe@example.com>', '<john.doe@example.com>')
+        assert_cast('"John Doe" <john.doe@example.com>', '"John Doe" <john.doe@example.com>')
+        assert_cast('"Jöhn Doé-Test" <john.doe@example.com>', '"Jöhn Doé-Test" <john.doe@example.com>')
       end
 
       def test_format_boolean
