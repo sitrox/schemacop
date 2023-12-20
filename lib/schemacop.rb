@@ -55,16 +55,11 @@ module Schemacop
     handler: ->(value) { value }
   )
 
-  # rubocop: disable Layout/LineLength
-  # rubocop: disable Style/RegexpLiteral
   register_string_formatter(
     :mailbox,
-    pattern: /^("\p{Print}+"\s)?<[a-zA-Z0-9.!\#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*>$/,
+    pattern: /^("\p{Print}+"\s)?<#{URI::MailTo::EMAIL_REGEXP.source[2...-2]}>$/,
     handler: ->(value) { value }
   )
-  # rubocop: enable Style/RegexpLiteral
-  # rubocop: enable Layout/LineLength
-
   register_string_formatter(
     :boolean,
     pattern: /^(true|false|0|1)$/i,
