@@ -1,5 +1,9 @@
 # Change log
 
+## 3.0.28 (2023-12-20)
+
+* Fix `mailbox` format allowing incorrectly formatted strings
+
 ## 3.0.27 (2023-12-13)
 
 * Add format `mailbox` to `str` node for Schemacop3 schemas
