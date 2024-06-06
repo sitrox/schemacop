@@ -19,15 +19,6 @@ task :gemspec do
     # behavior of that as in version 5 of ActiveSupport.
     spec.add_dependency 'activesupport', '>= 4.0'
     spec.add_dependency 'ruby2_keywords', '>= 0.0.4'
-    spec.add_development_dependency 'bundler'
-    spec.add_development_dependency 'rake'
-    spec.add_development_dependency 'minitest'
-    spec.add_development_dependency 'minitest-reporters'
-    spec.add_development_dependency 'colorize'
-    spec.add_development_dependency 'rubocop', '1.24.1'
-    spec.add_development_dependency 'pry'
-    spec.add_development_dependency 'byebug'
-    spec.add_development_dependency 'simplecov', '0.21.2'
   end
 
   File.write('schemacop.gemspec', gemspec.to_ruby.strip)
