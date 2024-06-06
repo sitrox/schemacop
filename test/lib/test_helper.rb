@@ -130,7 +130,7 @@ class V3Test < SchemacopTest
 
               Expected
               --------
-              #{expected_error.blue}
+              #{expected_error.to_s.blue}
 
               #{'Actual'.red}
               #{'------'.red}
