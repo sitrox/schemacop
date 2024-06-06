@@ -144,11 +144,11 @@ s = Schema.new do
   req :foo, default: 42
 end
 
-collector = s.validate({}) 
+collector = s.validate({})
 collector.valid? # true
 collector.data   # => { foo: 42 }
 
-collector = s.validate({ foo: 'invalid' }) 
+collector = s.validate({ foo: 'invalid' })
 collector.valid?     # false
 collector.data       # => nil
 collector.exceptions # => Validation error
@@ -772,4 +772,4 @@ To run tests:
 
 ## Copyright
 
-Copyright (c) 2020 Sitrox. See `LICENSE` for further details.
+Copyright (c) 2024 Sitrox. See `LICENSE` for further details.
