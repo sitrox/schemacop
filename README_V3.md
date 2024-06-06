@@ -632,6 +632,14 @@ It consists of one or multiple values, which can be validated using arbitrary no
 
   This is the inverse of option `filter`.
 
+* `parse_json`
+  Specifies whether JSON is accepted instead of an array. If this is set to
+  `true` and the given value is a string, Schemacop will attempt to parse the
+  string as JSON. If the JSON yields a valid array, it will cast the JSON to a
+  array and validate it using the given schema.
+
+  Defaults to `false`.
+
 #### Contains
 
 The `array` node features the *contains* node, which you can use with the DSL
@@ -855,6 +863,21 @@ end
 schema.validate!(['foo', 42, 0]) # => Schemacop::Exceptions::ValidationError: /[0]: Invalid type, got type "String", expected "integer".
 ```
 
+##### Parsing JSON
+
+By enabling `parse_json`, the given value will be parsed as JSON if it is a
+string instead of an array:
+
+```ruby
+# This schema will accept any additional properties, but remove them from the result
+schema = Schemacop::Schema3.new :array, parse_json: true do
+  list :integer
+end
+
+schema.validate!([1, 2, 3])   # => [1, 2, 3]
+schema.validate!('[1, 2, 3]') # => [1, 2, 3]
+```
+
 ### Hash
 
 Type: `:hash`\
@@ -891,6 +914,14 @@ It consists of key-value-pairs that can be validated using arbitrary nodes.
 
   If it is set to an enumerable (e.g. `Set` or `Array`), it functions as a
   white-list and only the given additional properties are allowed.
+
+* `parse_json`
+  Specifies whether JSON is accepted instead of a hash. If this is set to
+  `true` and the given value is a string, Schemacop will attempt to parse the
+  string as JSON. If the JSON yields a valid hash, it will cast the JSON to a
+  hash and validate it using the given schema.
+
+  Defaults to `false`.
 
 #### Specifying properties
 
@@ -1114,6 +1145,27 @@ schema.validate!({}) # => {}
 schema.validate!({foo: :bar}) # => {"foo"=>:bar}
 schema.validate!({foo: :bar, baz: 42}) # => {"foo"=>:bar}
 ```
+
+##### Parsing JSON
+
+By enabling `parse_json`, the given value will be parsed as JSON if it is a
+string instead of a hash:
+
+```ruby
+# This schema will accept any additional properties, but remove them from the result
+schema = Schemacop::Schema3.new :hash, parse_json: true do
+  int! :id
+  str! :name
+end
+
+schema.validate!({
+  id: 42,
+  name: 'Jane Doe'
+}) # => { id: 42, name: 'Jane Doe' }
+schema.validate!('{ "id": 42, name: "Jane Doe" }') # => { "id" => 42, "name" => 'Jane Doe' }
+```
+
+Note that the parsed JSON will always result in string hash keys, not symbols.
 
 ##### Dependencies
 

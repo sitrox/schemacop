@@ -14,6 +14,41 @@ module Schemacop
         assert_json(type: :object, additionalProperties: false)
       end
 
+      def test_parse_json
+        schema :hash, parse_json: true do
+          int! :id
+          str! :name
+        end
+        assert_validation({ id: 42, name: 'Jane Doe' })
+        assert_validation('{"id":42,"name":"Jane Doe"}')
+        assert_cast('{"id":42,"name":"Jane Doe"}', { id: 42, name: 'Jane Doe' }.stringify_keys)
+
+        assert_validation('{"id":42,"name":42}') do
+          error '/name', 'Invalid type, got type "Integer", expected "string".'
+        end
+
+        assert_validation('[42]') do
+          error '/', 'Invalid type, got type "Array", expected "object".'
+        end
+
+        assert_validation('{42]') do
+          error '/', %(JSON parse error: "767: unexpected token at '{42]'".)
+        end
+
+        assert_validation('"foo"') do
+          error '/', 'Invalid type, got type "String", expected "object".'
+        end
+
+        schema :hash do
+          int! :id
+        end
+
+        assert_validation({ id: 42 })
+        assert_validation('{"id":42}') do
+          error '/', 'Invalid type, got type "String", expected "object".'
+        end
+      end
+
       def test_additional_properties_false_by_default
         schema
         assert_validation({})

@@ -930,6 +930,31 @@ module Schemacop
           end
         end
       end
+
+      def test_parse_json
+        schema :array, parse_json: true do
+          list :integer
+        end
+        assert_validation([1, 2, 3])
+        assert_validation('[1,2,3]')
+        assert_cast('[1,2,3]', [1, 2, 3])
+
+        assert_validation('[1,2,"3"]') do
+          error '/[2]', 'Invalid type, got type "String", expected "integer".'
+        end
+
+        assert_validation('{ "id": 42 }') do
+          error '/', 'Invalid type, got type "Hash", expected "array".'
+        end
+
+        assert_validation('{42]') do
+          error '/', %(JSON parse error: "767: unexpected token at '{42]'".)
+        end
+
+        assert_validation('"foo"') do
+          error '/', 'Invalid type, got type "String", expected "array".'
+        end
+      end
     end
   end
 end

@@ -10,7 +10,7 @@ module Schemacop
       supports_children
 
       def self.allowed_options
-        super + ATTRIBUTES + %i[additional_items reject filter]
+        super + ATTRIBUTES + %i[additional_items reject filter parse_json]
       end
 
       def self.dsl_methods
@@ -73,11 +73,19 @@ module Schemacop
       end
 
       def allowed_types
-        { Array => :array }
+        if options[:parse_json]
+          { Array => :array, String => :array }
+        else
+          { Array => :array }
+        end
       end
 
       def _validate(data, result:)
         super_data = super
+        return if super_data.nil?
+
+        # Handle JSON
+        super_data = parse_if_json(super_data, result: result, allowed_types: { Array => :array })
         return if super_data.nil?
 
         # Preprocess
@@ -142,6 +150,7 @@ module Schemacop
 
       def cast(value)
         return default unless value
+        value = parse_if_json(value, allowed_types: { Array => :array })
 
         result = []
 

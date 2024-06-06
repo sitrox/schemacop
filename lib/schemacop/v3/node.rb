@@ -192,6 +192,25 @@ module Schemacop
         return json.as_json
       end
 
+      def parse_if_json(data, result: nil, allowed_types:)
+        if data.is_a?(String)
+          data = JSON.parse(data)
+
+          if result
+            return nil unless validate_type(data, result, allowed_types: allowed_types)
+          end
+        end
+
+        return data
+      rescue JSON::ParserError => e
+        if result
+          result.error "JSON parse error: #{e.message.inspect}."
+        end
+
+        return nil
+      end
+
+
       def type_assertion_method
         :is_a?
       end
@@ -213,11 +232,7 @@ module Schemacop
         end
 
         # Validate type #
-        if allowed_types.any? && allowed_types.keys.none? { |c| data.send(type_assertion_method, c) }
-          collection = allowed_types.values.map { |t| "\"#{t}\"" }.uniq.sort.join(' or ')
-          result.error "Invalid type, got type \"#{data.class}\", expected #{collection}."
-          return nil
-        end
+        return nil unless validate_type(data, result)
 
         # Validate enums #
         if @enum && !@enum.include?(data)
@@ -225,6 +240,16 @@ module Schemacop
         end
 
         return data
+      end
+
+      def validate_type(data, result, allowed_types: self.allowed_types)
+        if allowed_types.any? && allowed_types.keys.none? { |c| data.send(type_assertion_method, c) }
+          collection = allowed_types.values.map { |t| "\"#{t}\"" }.uniq.sort.join(' or ')
+          result.error "Invalid type, got type \"#{data.class}\", expected #{collection}."
+          return false
+        end
+
+        return true
       end
 
       def validate_self; end

@@ -14,7 +14,7 @@ module Schemacop
       attr_reader :properties
 
       def self.allowed_options
-        super + ATTRIBUTES - %i[dependencies] + %i[additional_properties ignore_obsolete_properties]
+        super + ATTRIBUTES - %i[dependencies] + %i[additional_properties ignore_obsolete_properties parse_json]
       end
 
       def self.dsl_methods
@@ -78,11 +78,19 @@ module Schemacop
       end
 
       def allowed_types
-        { Hash => :object }
+        if options[:parse_json]
+          { Hash => :object, String => :string }
+        else
+          { Hash => :object }
+        end
       end
 
       def _validate(data, result: Result.new)
         super_data = super
+        return if super_data.nil?
+
+        # Handle JSON
+        super_data = parse_if_json(super_data, result: result, allowed_types: { Hash => :object })
         return if super_data.nil?
 
         original_data_hash = super_data.dup
@@ -169,6 +177,7 @@ module Schemacop
       end
 
       def cast(data)
+        data = parse_if_json(data, allowed_types: { Hash => :object })
         result = {}.with_indifferent_access
         data ||= default
         return nil if data.nil?

@@ -1,5 +1,11 @@
 # Change log
 
+## 3.0.29 (2024-06-06)
+
+* Add option `parse_json` to `hash` and `array` V3 nodes
+
+  Internal reference: `#125211`.
+
 ## 3.0.28 (2023-12-20)
 
 * Fix `mailbox` format allowing incorrectly formatted strings
