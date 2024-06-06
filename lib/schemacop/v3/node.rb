@@ -192,24 +192,20 @@ module Schemacop
         return json.as_json
       end
 
-      def parse_if_json(data, result: nil, allowed_types:)
+      def parse_if_json(data, allowed_types:, result: nil)
         if data.is_a?(String)
           data = JSON.parse(data)
 
-          if result
-            return nil unless validate_type(data, result, allowed_types: allowed_types)
+          if result && !validate_type(data, result, allowed_types: allowed_types)
+            return nil
           end
         end
 
         return data
       rescue JSON::ParserError => e
-        if result
-          result.error "JSON parse error: #{e.message.inspect}."
-        end
-
+        result&.error "JSON parse error: #{e.message.inspect}."
         return nil
       end
-
 
       def type_assertion_method
         :is_a?

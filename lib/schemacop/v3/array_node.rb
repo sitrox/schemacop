@@ -150,6 +150,7 @@ module Schemacop
 
       def cast(value)
         return default unless value
+
         value = parse_if_json(value, allowed_types: { Array => :array })
 
         result = []
