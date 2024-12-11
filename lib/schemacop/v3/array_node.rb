@@ -145,7 +145,7 @@ module Schemacop
       end
 
       def children
-        (@items + [@cont_item]).compact
+        (@items + [@cont_item, list_item]).compact
       end
 
       def cast(value)

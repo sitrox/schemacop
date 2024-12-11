@@ -39,8 +39,12 @@ module Schemacop
         return target.cast(data)
       end
 
-      def used_external_schemas
-        target_children_schema = target.used_external_schemas
+      def used_external_schemas(encountered_nodes = Set.new)
+        if encountered_nodes.include?(self)
+          return []
+        end
+
+        target_children_schema = target.used_external_schemas(encountered_nodes + [self])
 
         if schemas.include?(@path)
           return target_children_schema

@@ -1,5 +1,11 @@
 # Change log
 
+## 3.0.30 (2024-12-11)
+
+* Fix `used_external_schemas` sometimes returning an incomplete list
+
+  Internal reference: `#132006`.
+
 ## 3.0.29 (2024-06-06)
 
 * Add option `parse_json` to `hash` and `array` V3 nodes

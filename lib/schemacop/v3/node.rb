@@ -62,8 +62,10 @@ module Schemacop
         {}
       end
 
-      def used_external_schemas
-        children.map(&:used_external_schemas).flatten.uniq
+      def used_external_schemas(encountered_nodes = Set.new)
+        return [] if encountered_nodes.include?(self)
+
+        return children.map { |c| c.used_external_schemas(encountered_nodes) }.flatten.uniq
       end
 
       def children
