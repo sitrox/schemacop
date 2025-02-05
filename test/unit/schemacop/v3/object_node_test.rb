@@ -109,13 +109,25 @@ module Schemacop
 
         # These will fail, as we didn't put them into the enum list
         assert_validation(1) do
-          error '/', 'Value not included in enum [true, "foo", :baz, [], {:qux=>"123"}].'
+          if new_hash_inspect_format?
+            error '/', 'Value not included in enum [true, "foo", :baz, [], {qux: "123"}].'
+          else
+            error '/', 'Value not included in enum [true, "foo", :baz, [], {:qux=>"123"}].'
+          end
         end
         assert_validation(:bar) do
-          error '/', 'Value not included in enum [true, "foo", :baz, [], {:qux=>"123"}].'
+          if new_hash_inspect_format?
+            error '/', 'Value not included in enum [true, "foo", :baz, [], {qux: "123"}].'
+          else
+            error '/', 'Value not included in enum [true, "foo", :baz, [], {:qux=>"123"}].'
+          end
         end
         assert_validation({ qux: 42 }) do
-          error '/', 'Value not included in enum [true, "foo", :baz, [], {:qux=>"123"}].'
+          if new_hash_inspect_format?
+            error '/', 'Value not included in enum [true, "foo", :baz, [], {qux: "123"}].'
+          else
+            error '/', 'Value not included in enum [true, "foo", :baz, [], {:qux=>"123"}].'
+          end
         end
       end
 

@@ -30,16 +30,32 @@ module Schemacop
         assert_validation({ qux: 42 })
 
         assert_validation(3) do
-          error '/', 'Value not included in enum [1, 2, "foo", :bar, {:qux=>42}].'
+          if new_hash_inspect_format?
+            error '/', 'Value not included in enum [1, 2, "foo", :bar, {qux: 42}].'
+          else
+            error '/', 'Value not included in enum [1, 2, "foo", :bar, {:qux=>42}].'
+          end
         end
         assert_validation('bar') do
-          error '/', 'Value not included in enum [1, 2, "foo", :bar, {:qux=>42}].'
+          if new_hash_inspect_format?
+            error '/', 'Value not included in enum [1, 2, "foo", :bar, {qux: 42}].'
+          else
+            error '/', 'Value not included in enum [1, 2, "foo", :bar, {:qux=>42}].'
+          end
         end
         assert_validation(:foo) do
-          error '/', 'Value not included in enum [1, 2, "foo", :bar, {:qux=>42}].'
+          if new_hash_inspect_format?
+            error '/', 'Value not included in enum [1, 2, "foo", :bar, {qux: 42}].'
+          else
+            error '/', 'Value not included in enum [1, 2, "foo", :bar, {:qux=>42}].'
+          end
         end
         assert_validation({ qux: 13 }) do
-          error '/', 'Value not included in enum [1, 2, "foo", :bar, {:qux=>42}].'
+          if new_hash_inspect_format?
+            error '/', 'Value not included in enum [1, 2, "foo", :bar, {qux: 42}].'
+          else
+            error '/', 'Value not included in enum [1, 2, "foo", :bar, {:qux=>42}].'
+          end
         end
       end
 

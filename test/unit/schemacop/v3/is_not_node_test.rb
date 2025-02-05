@@ -17,7 +17,11 @@ module Schemacop
         assert_validation(:foo)
         assert_validation(4)
         assert_validation(8) do
-          error '/', 'Must not match schema: {"type"=>"integer", "minimum"=>5}.'
+          if new_hash_inspect_format?
+            error '/', 'Must not match schema: {"type" => "integer", "minimum" => 5}.'
+          else
+            error '/', 'Must not match schema: {"type"=>"integer", "minimum"=>5}.'
+          end
         end
       end
 
@@ -37,7 +41,11 @@ module Schemacop
         end
         assert_validation({})
         assert_validation(8) do
-          error '/', 'Must not match schema: {"type"=>"integer", "minimum"=>5}.'
+          if new_hash_inspect_format?
+            error '/', 'Must not match schema: {"type" => "integer", "minimum" => 5}.'
+          else
+            error '/', 'Must not match schema: {"type"=>"integer", "minimum"=>5}.'
+          end
         end
       end
 
@@ -61,11 +69,19 @@ module Schemacop
         # Needs to fail the validation, as the value is included in the enum
         # and a string (which the not turns into "failing the validation")
         assert_validation('bar') do
-          error '/', 'Must not match schema: {"type"=>"string", "enum"=>["bar", "qux", 123, "faz"]}.'
+          if new_hash_inspect_format?
+            error '/', 'Must not match schema: {"type" => "string", "enum" => ["bar", "qux", 123, "faz"]}.'
+          else
+            error '/', 'Must not match schema: {"type"=>"string", "enum"=>["bar", "qux", 123, "faz"]}.'
+          end
         end
 
         assert_validation('qux') do
-          error '/', 'Must not match schema: {"type"=>"string", "enum"=>["bar", "qux", 123, "faz"]}.'
+          if new_hash_inspect_format?
+            error '/', 'Must not match schema: {"type" => "string", "enum" => ["bar", "qux", 123, "faz"]}.'
+          else
+            error '/', 'Must not match schema: {"type"=>"string", "enum"=>["bar", "qux", 123, "faz"]}.'
+          end
         end
       end
 
@@ -89,11 +105,19 @@ module Schemacop
         # Needs to fail the validation, as the value is included in the enum
         # and a string (which the not turns into "failing the validation")
         assert_validation('bar') do
-          error '/', 'Must not match schema: {"type"=>"string", "title"=>"Short title", "examples"=>["foo"], "description"=>"Longer description", "enum"=>["bar", "qux", 123, "faz"]}.'
+          if new_hash_inspect_format?
+            error '/', 'Must not match schema: {"type" => "string", "title" => "Short title", "examples" => ["foo"], "description" => "Longer description", "enum" => ["bar", "qux", 123, "faz"]}.'
+          else
+            error '/', 'Must not match schema: {"type"=>"string", "title"=>"Short title", "examples"=>["foo"], "description"=>"Longer description", "enum"=>["bar", "qux", 123, "faz"]}.'
+          end
         end
 
         assert_validation('qux') do
-          error '/', 'Must not match schema: {"type"=>"string", "title"=>"Short title", "examples"=>["foo"], "description"=>"Longer description", "enum"=>["bar", "qux", 123, "faz"]}.'
+          if new_hash_inspect_format?
+            error '/', 'Must not match schema: {"type" => "string", "title" => "Short title", "examples" => ["foo"], "description" => "Longer description", "enum" => ["bar", "qux", 123, "faz"]}.'
+          else
+            error '/', 'Must not match schema: {"type"=>"string", "title"=>"Short title", "examples"=>["foo"], "description"=>"Longer description", "enum"=>["bar", "qux", 123, "faz"]}.'
+          end
         end
 
         # rubocop:enable Layout/LineLength
@@ -136,12 +160,20 @@ module Schemacop
 
         assert_validation(nil)
         assert_validation([]) do
-          error '/', 'Must not match schema: {"type"=>"array", "items"=>{"type"=>"integer"}}.'
+          if new_hash_inspect_format?
+            error '/', 'Must not match schema: {"type" => "array", "items" => {"type" => "integer"}}.'
+          else
+            error '/', 'Must not match schema: {"type"=>"array", "items"=>{"type"=>"integer"}}.'
+          end
         end
         assert_validation('foo')
         assert_validation(['foo'])
         assert_validation([1]) do
-          error '/', 'Must not match schema: {"type"=>"array", "items"=>{"type"=>"integer"}}.'
+          if new_hash_inspect_format?
+            error '/', 'Must not match schema: {"type" => "array", "items" => {"type" => "integer"}}.'
+          else
+            error '/', 'Must not match schema: {"type"=>"array", "items"=>{"type"=>"integer"}}.'
+          end
         end
       end
 

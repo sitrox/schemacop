@@ -499,7 +499,11 @@ module Schemacop
           error '/foo', 'Value must be given.'
         end
         assert_validation(foo: 'string') do
-          error '/foo', 'Must not match schema: {"type"=>"string"}.'
+          if new_hash_inspect_format?
+            error '/foo', 'Must not match schema: {"type" => "string"}.'
+          else
+            error '/foo', 'Must not match schema: {"type"=>"string"}.'
+          end
         end
       end
 
@@ -515,7 +519,11 @@ module Schemacop
         assert_validation(foo: { bar: :baz })
         assert_validation(foo: nil)
         assert_validation(foo: 'string') do
-          error '/foo', 'Must not match schema: {"type"=>"string"}.'
+          if new_hash_inspect_format?
+            error '/foo', 'Must not match schema: {"type" => "string"}.'
+          else
+            error '/foo', 'Must not match schema: {"type"=>"string"}.'
+          end
         end
       end
 

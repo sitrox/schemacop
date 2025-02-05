@@ -57,6 +57,11 @@ class V3Test < SchemacopTest
       @errors[path] ||= []
       @errors[path] << exp
     end
+
+    def new_hash_inspect_format?
+      # See https://bugs.ruby-lang.org/issues/20433#note-10
+      Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('3.4.0')
+    end
   end
 
   def setup

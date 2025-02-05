@@ -597,11 +597,19 @@ module Schemacop
         assert_validation(['foo'])
 
         assert_validation([]) do
-          error '/', 'At least one entry must match schema {"type"=>"string"}.'
+          if new_hash_inspect_format?
+            error '/', 'At least one entry must match schema {"type" => "string"}.'
+          else
+            error '/', 'At least one entry must match schema {"type"=>"string"}.'
+          end
         end
 
         assert_validation([234, :foo]) do
-          error '/', 'At least one entry must match schema {"type"=>"string"}.'
+          if new_hash_inspect_format?
+            error '/', 'At least one entry must match schema {"type" => "string"}.'
+          else
+            error '/', 'At least one entry must match schema {"type"=>"string"}.'
+          end
         end
       end
 
@@ -689,10 +697,18 @@ module Schemacop
 
         # These need to fail validation, as they are not in the enum list
         assert_validation([1, 2, 3]) do
-          error '/', 'Value not included in enum [1, 2, "foo", :bar, {:qux=>42}, [1, 2], ["a", "b"]].'
+          if new_hash_inspect_format?
+            error '/', 'Value not included in enum [1, 2, "foo", :bar, {qux: 42}, [1, 2], ["a", "b"]].'
+          else
+            error '/', 'Value not included in enum [1, 2, "foo", :bar, {:qux=>42}, [1, 2], ["a", "b"]].'
+          end
         end
         assert_validation([]) do
-          error '/', 'Value not included in enum [1, 2, "foo", :bar, {:qux=>42}, [1, 2], ["a", "b"]].'
+          if new_hash_inspect_format?
+            error '/', 'Value not included in enum [1, 2, "foo", :bar, {qux: 42}, [1, 2], ["a", "b"]].'
+          else
+            error '/', 'Value not included in enum [1, 2, "foo", :bar, {:qux=>42}, [1, 2], ["a", "b"]].'
+          end
         end
       end
 
@@ -832,10 +848,18 @@ module Schemacop
 
         assert_validation(nil)
         assert_validation([]) do
-          error '/', 'At least one entry must match schema {"type"=>"integer", "minimum"=>3}.'
+          if new_hash_inspect_format?
+            error '/', 'At least one entry must match schema {"type" => "integer", "minimum" => 3}.'
+          else
+            error '/', 'At least one entry must match schema {"type"=>"integer", "minimum"=>3}.'
+          end
         end
         assert_validation([1, 2]) do
-          error '/', 'At least one entry must match schema {"type"=>"integer", "minimum"=>3}.'
+          if new_hash_inspect_format?
+            error '/', 'At least one entry must match schema {"type" => "integer", "minimum" => 3}.'
+          else
+            error '/', 'At least one entry must match schema {"type"=>"integer", "minimum"=>3}.'
+          end
         end
         assert_validation([1, 2, 3])
       end
@@ -860,14 +884,26 @@ module Schemacop
 
         assert_validation(nil)
         assert_validation([]) do
-          error '/', 'At least one entry must match schema {"type"=>"integer", "minimum"=>5}.'
+          if new_hash_inspect_format?
+            error '/', 'At least one entry must match schema {"type" => "integer", "minimum" => 5}.'
+          else
+            error '/', 'At least one entry must match schema {"type"=>"integer", "minimum"=>5}.'
+          end
         end
         assert_validation([1]) do
-          error '/', 'At least one entry must match schema {"type"=>"integer", "minimum"=>5}.'
+          if new_hash_inspect_format?
+            error '/', 'At least one entry must match schema {"type" => "integer", "minimum" => 5}.'
+          else
+            error '/', 'At least one entry must match schema {"type"=>"integer", "minimum"=>5}.'
+          end
           error '/[0]', 'Value must have a minimum of 2.'
         end
         assert_validation([2]) do
-          error '/', 'At least one entry must match schema {"type"=>"integer", "minimum"=>5}.'
+          if new_hash_inspect_format?
+            error '/', 'At least one entry must match schema {"type" => "integer", "minimum" => 5}.'
+          else
+            error '/', 'At least one entry must match schema {"type"=>"integer", "minimum"=>5}.'
+          end
         end
 
         assert_validation([2, 3, 5])
@@ -914,7 +950,11 @@ module Schemacop
 
         assert_validation(nil)
         assert_validation(['foo']) do
-          error '/', 'At least one entry must match schema {"type"=>"string", "format"=>"date"}.'
+          if new_hash_inspect_format?
+            error '/', 'At least one entry must match schema {"type" => "string", "format" => "date"}.'
+          else
+            error '/', 'At least one entry must match schema {"type"=>"string", "format"=>"date"}.'
+          end
         end
         assert_validation(%w[foo 1990-01-01])
 

@@ -307,10 +307,18 @@ module Schemacop
 
         # These need to fail validation, as they are not in the enum list
         assert_validation(13) do
-          error '/', 'Value not included in enum [1, 2, "foo", :bar, {:qux=>42}].'
+          if new_hash_inspect_format?
+            error '/', 'Value not included in enum [1, 2, "foo", :bar, {qux: 42}].'
+          else
+            error '/', 'Value not included in enum [1, 2, "foo", :bar, {:qux=>42}].'
+          end
         end
         assert_validation(4) do
-          error '/', 'Value not included in enum [1, 2, "foo", :bar, {:qux=>42}].'
+          if new_hash_inspect_format?
+            error '/', 'Value not included in enum [1, 2, "foo", :bar, {qux: 42}].'
+          else
+            error '/', 'Value not included in enum [1, 2, "foo", :bar, {:qux=>42}].'
+          end
         end
       end
 
