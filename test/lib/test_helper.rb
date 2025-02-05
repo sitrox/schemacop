@@ -27,7 +27,6 @@ require 'minitest/autorun'
 require 'minitest/reporters'
 require 'schemacop'
 require 'pry'
-require 'colorize'
 
 Minitest::Reporters.use! [Minitest::Reporters::DefaultReporter.new(color: true)]
 
