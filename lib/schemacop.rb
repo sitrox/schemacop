@@ -1,5 +1,6 @@
 # External dependencies
 require 'ruby2_keywords'
+require 'logger'
 require 'active_support/all'
 require 'set'
 require 'uri'
