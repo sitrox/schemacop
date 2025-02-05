@@ -5,7 +5,6 @@ gemspec
 
 # Development dependencies
 gem 'bundler'
-gem 'colorize'
 gem 'minitest'
 gem 'minitest-reporters'
 gem 'pry'
