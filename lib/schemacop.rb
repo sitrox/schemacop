@@ -4,6 +4,7 @@ require 'logger'
 require 'active_support/all'
 require 'set'
 require 'uri'
+require 'resolv'
 
 # Schemacop module
 module Schemacop
@@ -95,6 +96,18 @@ module Schemacop
     :'integer-list',
     pattern: /^(-?[0-9]+)(,-?[0-9]+)*$/,
     handler: ->(value) { value.split(',').map { |i| Integer(i, 10) } }
+  )
+
+  register_string_formatter(
+    :ipv4,
+    pattern: Resolv::IPv4::Regex,
+    handler: ->(value) { value }
+  )
+
+  register_string_formatter(
+    :ipv6,
+    pattern: Resolv::IPv6::Regex,
+    handler: ->(value) { value }
   )
 
   def self.with_context(context)

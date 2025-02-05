@@ -357,6 +357,107 @@ module Schemacop
         assert_cast '01,032', [1, 32]
       end
 
+      def test_format_ipv4
+        schema :string, format: :ipv4
+
+        assert_json(type: :string, format: :ipv4)
+
+        assert_validation 234 do
+          error '/', StringNodeTest.invalid_type_error(Integer)
+        end
+
+        assert_validation 'sd sfdij soidf' do
+          error '/', 'String does not match format "ipv4".'
+        end
+
+        # Some valid IPv4 addresses
+        assert_validation '0.1.2.3'
+        assert_validation '110.0.217.94'
+        assert_validation '59.1.18.160'
+        assert_validation '83.212.124.74'
+        assert_validation '208.122.67.117'
+        assert_validation '175.186.176.213'
+
+        # Some invalid IPv4 addresses
+        assert_validation '256.1.4.2' do
+          error '/', 'String does not match format "ipv4".'
+        end
+        assert_validation '2.4.522.1' do
+          error '/', 'String does not match format "ipv4".'
+        end
+        assert_validation '1.1.1' do
+          error '/', 'String does not match format "ipv4".'
+        end
+        assert_validation '1' do
+          error '/', 'String does not match format "ipv4".'
+        end
+
+        # CIDR addresses are not allowed
+        assert_validation '247.182.236.127/24' do
+          error '/', 'String does not match format "ipv4".'
+        end
+
+        # And IPv6 isn't allowed as well
+        assert_validation 'd91c:af3e:72f1:f5c3::::ad81' do
+          error '/', 'String does not match format "ipv4".'
+        end
+      end
+
+      def test_format_ipv6
+        schema :string, format: :ipv6
+
+        assert_json(type: :string, format: :ipv6)
+
+        assert_validation 234 do
+          error '/', StringNodeTest.invalid_type_error(Integer)
+        end
+
+        assert_validation 'sd sfdij soidf' do
+          error '/', 'String does not match format "ipv6".'
+        end
+
+        # Some valid IPv6 addresses
+        assert_validation '2001:0db8:85a3:0000:0000:8a2e:0370:7334'
+        assert_validation '::1'
+        assert_validation '2001:db8::ff00:42:8329'
+
+        # Some invalid IPv6 addresses
+        assert_validation '2001:db8:85a3:0000:0000:8a2e:0370:7334:1234' do
+          error '/', 'String does not match format "ipv6".'
+        end
+        assert_validation '2001:db8:85a3::8a2e::7334' do
+          error '/', 'String does not match format "ipv6".'
+        end
+        assert_validation '2001:db8:85a3::g123:4567' do
+          error '/', 'String does not match format "ipv6".'
+        end
+
+        # CIDR addresses are not allowed
+        assert_validation '247.182.236.127/24' do
+          error '/', 'String does not match format "ipv6".'
+        end
+
+        # And IPv4 isn't allowed as well
+        assert_validation '0.1.2.3' do
+          error '/', 'String does not match format "ipv6".'
+        end
+        assert_validation '110.0.217.94' do
+          error '/', 'String does not match format "ipv6".'
+        end
+        assert_validation '59.1.18.160' do
+          error '/', 'String does not match format "ipv6".'
+        end
+        assert_validation '83.212.124.74' do
+          error '/', 'String does not match format "ipv6".'
+        end
+        assert_validation '208.122.67.117' do
+          error '/', 'String does not match format "ipv6".'
+        end
+        assert_validation '175.186.176.213' do
+          error '/', 'String does not match format "ipv6".'
+        end
+      end
+
       def test_format_custom
         Schemacop.register_string_formatter(
           :integer_tuple_list,
