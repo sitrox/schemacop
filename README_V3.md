@@ -270,6 +270,12 @@ transformed into various types.
 * `symbol`
   The string can be anything and will be casted to a ruby `Symbol` object.
 
+* `ipv4`
+  A valid IPv4 address without netmask. No casting is performed.
+
+* `ipv6`
+  A valid IPv6 address without netmask. No casting is performed.
+
 #### Custom Formats
 
 You can also implement your custom formats or override the behavior of the

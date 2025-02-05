@@ -1,5 +1,9 @@
 # Change log
 
+## 3.0.31 (2025-02-05)
+
+* Add format `ipv4` and `ipv6` to `str` node for Schemacop3 schemas
+
 ## 3.0.30 (2024-12-11)
 
 * Fix `used_external_schemas` sometimes returning an incomplete list
