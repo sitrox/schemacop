@@ -424,6 +424,12 @@ module Schemacop
         assert_validation '208.122.67.117/10'
         assert_validation '175.186.176.213/8'
 
+        # Validate all subnets
+        (0..32).each do |subnet|
+          assert_validation "123.4.53.12/#{subnet}"
+        end
+
+
         # Some invalid IPv4 CIDR addresses
         assert_validation '256.1.4.2/24' do
           error '/', 'String does not match format "ipv4-cidr".'

@@ -1,5 +1,9 @@
 # Change log
 
+## 3.0.33 (2025-02-11)
+
+* Fix bug marking subnet `/30` as invalid when using `ipv4-cidr` string format
+
 ## 3.0.32 (2025-02-11)
 
 * Add format `ipv4-cidr` to `str` node for Schemacop3 schemas
