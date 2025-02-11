@@ -105,6 +105,12 @@ module Schemacop
   )
 
   register_string_formatter(
+    :'ipv4-cidr',
+    pattern: Regexp.new(Resolv::IPv4::Regex.source[0..-3] + %r{/([0-9]|[1-2][0-9]|3[1-2])\z}.source),
+    handler: ->(value) { value }
+  )
+
+  register_string_formatter(
     :ipv6,
     pattern: Resolv::IPv6::Regex,
     handler: ->(value) { value }

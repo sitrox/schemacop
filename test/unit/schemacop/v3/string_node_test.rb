@@ -403,6 +403,58 @@ module Schemacop
         end
       end
 
+      def test_format_ipv4_cidr
+        schema :string, format: :'ipv4-cidr'
+
+        assert_json(type: :string, format: :'ipv4-cidr')
+
+        assert_validation 234 do
+          error '/', StringNodeTest.invalid_type_error(Integer)
+        end
+
+        assert_validation 'sd sfdij soidf' do
+          error '/', 'String does not match format "ipv4-cidr".'
+        end
+
+        # Some valid IPv4 CIDR addresses
+        assert_validation '0.1.2.3/23'
+        assert_validation '110.0.217.94/1'
+        assert_validation '59.1.18.160/32'
+        assert_validation '83.212.124.74/24'
+        assert_validation '208.122.67.117/10'
+        assert_validation '175.186.176.213/8'
+
+        # Some invalid IPv4 CIDR addresses
+        assert_validation '256.1.4.2/24' do
+          error '/', 'String does not match format "ipv4-cidr".'
+        end
+        assert_validation '2.4.522.1/32' do
+          error '/', 'String does not match format "ipv4-cidr".'
+        end
+        assert_validation '1.1.1/21' do
+          error '/', 'String does not match format "ipv4-cidr".'
+        end
+        assert_validation '1/4' do
+          error '/', 'String does not match format "ipv4-cidr".'
+        end
+        assert_validation '0.1.2.3/33' do
+          error '/', 'String does not match format "ipv4-cidr".'
+        end
+        assert_validation '0.1.2.3/123' do
+          error '/', 'String does not match format "ipv4-cidr".'
+        end
+
+        # Normal IPv4 addresses are not allowed
+        assert_validation '247.182.236.127' do
+          error '/', 'String does not match format "ipv4-cidr".'
+        end
+
+        # And IPv6 isn't allowed as well
+        assert_validation 'd91c:af3e:72f1:f5c3::::ad81' do
+          error '/', 'String does not match format "ipv4-cidr".'
+        end
+      end
+
       def test_format_ipv6
         schema :string, format: :ipv6
 

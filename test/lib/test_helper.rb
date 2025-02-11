@@ -134,11 +134,11 @@ class V3Test < SchemacopTest
 
               Expected
               --------
-              #{expected_error.to_s.blue}
+              #{expected_error}
 
-              #{'Actual'.red}
-              #{'------'.red}
-              #{result.messages_by_path[path].join("\n\n").green}
+              Actual
+              ------
+              #{result.messages_by_path[path].join("\n\n")}
             ERROR
           end
         end
