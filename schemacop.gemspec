@@ -1,9 +1,9 @@
 # -*- encoding: utf-8 -*-
-# stub: schemacop 3.0.32 ruby lib
+# stub: schemacop 3.0.33 ruby lib
 
 Gem::Specification.new do |s|
   s.name = "schemacop".freeze
-  s.version = "3.0.32"
+  s.version = "3.0.33"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0".freeze) if s.respond_to? :required_rubygems_version=
   s.require_paths = ["lib".freeze]
