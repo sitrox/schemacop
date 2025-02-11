@@ -122,4 +122,4 @@ To run tests:
 
 ## Copyright
 
-Copyright © 2016 - 2024 Sitrox. See `LICENSE` for further details.
+Copyright © 2016 - 2025 Sitrox. See `LICENSE` for further details.

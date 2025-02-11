@@ -1,5 +1,9 @@
 # Change log
 
+## 3.0.32 (2025-02-11)
+
+* Add format `ipv4-cidr` to `str` node for Schemacop3 schemas
+
 ## 3.0.31 (2025-02-05)
 
 * Add format `ipv4` and `ipv6` to `str` node for Schemacop3 schemas

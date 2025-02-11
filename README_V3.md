@@ -273,6 +273,9 @@ transformed into various types.
 * `ipv4`
   A valid IPv4 address without netmask. No casting is performed.
 
+* `ipv4-cidr`
+  A valid IPv4 CIDR address with netmask. No casting is performed.
+
 * `ipv6`
   A valid IPv6 address without netmask. No casting is performed.
 
