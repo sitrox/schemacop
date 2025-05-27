@@ -166,7 +166,7 @@ class V3Test < SchemacopTest
            "Expected any of #{array.inspect} to match #{exp}."
   end
 
-  def assert_cast(input_data, expected_data)
+  def assert_cast(input_data, expected_data, check_type: false)
     input_data_was = Marshal.load(Marshal.dump(input_data))
     result = @schema.validate(input_data)
     assert_empty result.errors
@@ -181,6 +181,10 @@ class V3Test < SchemacopTest
       assert_nil input_data_was, 'Expected input_data to stay the same.'
     else
       assert_equal input_data, input_data_was, 'Expected input_data to stay the same.'
+    end
+
+    if check_type
+      assert_equal expected_data.class, result.data.class, 'Unexpected casted type.'
     end
   end
 end

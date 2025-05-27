@@ -89,7 +89,13 @@ module Schemacop
   register_string_formatter(
     :number,
     pattern: /^-?[0-9]+(\.[0-9]+)?$/,
-    handler: ->(value) { Float(value) }
+    handler: proc do |value|
+      if value.include?('.')
+        Float(value)
+      else
+        Integer(value, 10)
+      end
+    end
   )
 
   register_string_formatter(

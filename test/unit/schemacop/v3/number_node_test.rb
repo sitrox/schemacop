@@ -313,19 +313,19 @@ module Schemacop
       def test_cast_str
         schema :number, cast_str: true, minimum: 0.0, maximum: 50r, multiple_of: BigDecimal('0.5')
 
-        assert_cast('1', 1)
-        assert_cast(1, 1)
+        assert_cast('1', 1, check_type: true)
+        assert_cast(1, 1, check_type: true)
 
-        assert_cast('08', 8)
-        assert_cast('09', 9)
-        assert_cast('050', 50)
-        assert_cast('01', 1)
+        assert_cast('08', 8, check_type: true)
+        assert_cast('09', 9, check_type: true)
+        assert_cast('050', 50, check_type: true)
+        assert_cast('01', 1, check_type: true)
 
         assert_validation(nil)
         assert_validation('')
 
-        assert_cast('1.0', 1.0)
-        assert_cast(1.0, 1.0)
+        assert_cast('1.0', 1.0, check_type: true)
+        assert_cast(1.0, 1.0, check_type: true)
 
         assert_validation('42')
         assert_validation('0.5')

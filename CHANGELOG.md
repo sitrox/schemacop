@@ -1,5 +1,12 @@
 # Change log
 
+## 3.0.34 (2025-05-27)
+
+* Adapt string format `number` to cast to `Integer` instead of to a `Float` if
+  the string does not contain a floating point number
+
+  Internal reference: `#137987`.
+
 ## 3.0.33 (2025-02-11)
 
 * Fix bug marking subnet `/30` as invalid when using `ipv4-cidr` string format
