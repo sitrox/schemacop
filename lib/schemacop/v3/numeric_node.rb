@@ -8,6 +8,7 @@ module Schemacop
         multiple_of
         exclusive_minimum
         exclusive_maximum
+        max_precision
       ].freeze
 
       def self.allowed_options
@@ -58,12 +59,39 @@ module Schemacop
         if options[:multiple_of] && !compare_float((super_data % options[:multiple_of]), 0.0)
           result.error "Value must be a multiple of #{options[:multiple_of]}."
         end
+
+        # Validate max precision #
+        if options[:max_precision] && (super_data.is_a?(Float) || super_data.is_a?(BigDecimal))
+          # Convert to string and check decimal places
+          str = super_data.to_s
+          # For BigDecimal, remove the trailing '0' from the scientific notation if present
+          str = str.sub(/\.0e[+-]?\d+\z/, '.0') if super_data.is_a?(BigDecimal)
+
+          if (match = str.match(/\.(\d+)$/))
+            # Remove trailing zeros for more accurate precision check
+            decimal_part = match[1].sub(/0+\z/, '')
+            decimal_places = decimal_part.empty? ? 0 : decimal_part.length
+            if decimal_places > options[:max_precision]
+              result.error "Value must have a maximum precision of #{options[:max_precision]} digits after the decimal point."
+            end
+          end
+        end
       end
 
       def validate_self
         # Check that the options have the correct type
         ATTRIBUTES.each do |attribute|
           next if options[attribute].nil?
+
+          # Special handling for max_precision - must be an integer
+          if attribute == :max_precision
+            unless options[attribute].is_a?(Integer) && options[attribute] >= 0
+              fail 'Option "max_precision" must be a non-negative integer.'
+            end
+
+            next
+          end
+
           next unless allowed_types.keys.none? { |c| options[attribute].send(type_assertion_method, c) }
 
           collection = allowed_types.values.map { |t| "\"#{t}\"" }.uniq.sort.join(' or ')

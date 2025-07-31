@@ -193,6 +193,75 @@ module Schemacop
         end
       end
 
+      def test_max_precision
+        schema :number, max_precision: 2
+
+        assert_json(
+          type:         :number,
+          maxPrecision: 2
+        )
+
+        # Valid cases
+        assert_validation(42)          # Integer
+        assert_validation(3.14)        # 2 decimal places
+        assert_validation(3.1)         # 1 decimal place
+        assert_validation(3.0)         # 0 decimal places
+        assert_validation(0.12)        # 2 decimal places
+        assert_validation(1r)          # Rational should not be affected
+
+        # BigDecimal valid cases
+        assert_validation(BigDecimal('3.14'))     # 2 decimal places
+        assert_validation(BigDecimal('3.1'))      # 1 decimal place
+        assert_validation(BigDecimal('3.0'))      # 0 decimal places (with trailing zero)
+        assert_validation(BigDecimal('3'))        # 0 decimal places
+        assert_validation(BigDecimal('3.00'))     # trailing zeros should be ignored
+
+        # Invalid cases - Float
+        assert_validation(3.141) do
+          error '/', 'Value must have a maximum precision of 2 digits after the decimal point.'
+        end
+
+        assert_validation(0.123) do
+          error '/', 'Value must have a maximum precision of 2 digits after the decimal point.'
+        end
+
+        assert_validation(123.456789) do
+          error '/', 'Value must have a maximum precision of 2 digits after the decimal point.'
+        end
+
+        # Invalid cases - BigDecimal
+        assert_validation(BigDecimal('3.141')) do
+          error '/', 'Value must have a maximum precision of 2 digits after the decimal point.'
+        end
+
+        assert_validation(BigDecimal('0.123')) do
+          error '/', 'Value must have a maximum precision of 2 digits after the decimal point.'
+        end
+
+        # Test with max_precision: 0
+        schema :number, max_precision: 0
+
+        assert_json(
+          type:         :number,
+          maxPrecision: 0
+        )
+
+        assert_validation(42)
+        assert_validation(3.0)
+        assert_validation(0)
+        assert_validation(BigDecimal('3'))
+        assert_validation(BigDecimal('3.0'))
+        assert_validation(BigDecimal('3.00'))
+
+        assert_validation(3.1) do
+          error '/', 'Value must have a maximum precision of 0 digits after the decimal point.'
+        end
+
+        assert_validation(BigDecimal('3.1')) do
+          error '/', 'Value must have a maximum precision of 0 digits after the decimal point.'
+        end
+      end
+
       # Helper function that checks for all the options if the option is
       # an allowed class or something else, in which case it needs to raise
       def validate_self_should_error(value_to_check)
@@ -237,6 +306,21 @@ module Schemacop
         assert_raises_with_message Exceptions::InvalidSchemaError,
                                    'Option "multiple_of" can\'t be 0.' do
           schema :number, multiple_of: 0
+        end
+
+        assert_raises_with_message Exceptions::InvalidSchemaError,
+                                   'Option "max_precision" must be a non-negative integer.' do
+          schema :number, max_precision: -1
+        end
+
+        assert_raises_with_message Exceptions::InvalidSchemaError,
+                                   'Option "max_precision" must be a non-negative integer.' do
+          schema :number, max_precision: 2.5
+        end
+
+        assert_raises_with_message Exceptions::InvalidSchemaError,
+                                   'Option "max_precision" must be a non-negative integer.' do
+          schema :number, max_precision: '2'
         end
 
         validate_self_should_error(1 + 0i) # Complex
@@ -308,6 +392,33 @@ module Schemacop
                         4.2
                       ]
                     })
+      end
+
+      def test_combined_validations_with_max_precision
+        schema :number, minimum: 0, maximum: 100, max_precision: 1
+
+        assert_json(
+          type:         :number,
+          minimum:      0,
+          maximum:      100,
+          maxPrecision: 1
+        )
+
+        assert_validation(50.5)
+        assert_validation(0.1)
+        assert_validation(100.0)
+
+        assert_validation(50.55) do
+          error '/', 'Value must have a maximum precision of 1 digits after the decimal point.'
+        end
+
+        assert_validation(-0.1) do
+          error '/', 'Value must have a minimum of 0.'
+        end
+
+        assert_validation(100.1) do
+          error '/', 'Value must have a maximum of 100.'
+        end
       end
 
       def test_cast_str

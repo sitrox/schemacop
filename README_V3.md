@@ -445,6 +445,10 @@ With the various available options, validations on the value of the number can b
 * `multiple_of`
   The received number has to be a multiple of the given number for the validation to
   pass.
+* `max_precision`
+  Defines the maximum number of digits after the decimal point for `Float` and 
+  `BigDecimal` values. Must be a non-negative integer. When `nil` (default), no
+  precision validation is performed. Trailing zeros are ignored in the validation.
 * `cast_str`
   When set to `true`, this node also accepts strings that can be casted to a number, e.g.
   the values `'0.1'` or `'3.1415'`. Please note that you can only validate numbers which
@@ -481,6 +485,21 @@ schema.validate!('1.5r')      # => Schemacop::Exceptions::ValidationError: /: Ma
 schema.validate!('(4 + 0i)')  # => Schemacop::Exceptions::ValidationError: /: Matches 0 definitions but should match exactly 1.
 schema.validate!(nil)         # => nil
 schema.validate!('')          # => nil
+```
+
+With `max_precision`:
+
+```ruby
+# Validates that the input is a number with maximum 2 decimal places
+schema = Schemacop::Schema3.new(:number, max_precision: 2)
+schema.validate!(42)                   # => 42
+schema.validate!(42.5)                 # => 42.5
+schema.validate!(42.52)                # => 42.52
+schema.validate!(42.523)               # => Schemacop::Exceptions::ValidationError: /: Value must have a maximum precision of 2 digits after the decimal point.
+schema.validate!(BigDecimal('3.14'))   # => 0.314e1
+schema.validate!(BigDecimal('3.141'))  # => Schemacop::Exceptions::ValidationError: /: Value must have a maximum precision of 2 digits after the decimal point.
+schema.validate!(BigDecimal('3.140'))  # => 0.314e1 (trailing zeros are ignored)
+schema.validate!(1r)                   # => (1/1) (rational numbers are not affected)
 ```
 
 Please note, that `nil` and blank strings are treated equally when using the `cast_str` option,

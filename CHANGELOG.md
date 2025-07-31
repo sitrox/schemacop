@@ -1,5 +1,10 @@
 # Change log
 
+## 3.0.35 (2025-07-31)
+
+* Add option `max_precision` to `number` nodes for Schemacop V3 schemas to validate
+  the maximum number of decimal places for `Float` and `BigDecimal` values
+
 ## 3.0.34 (2025-05-27)
 
 * Adapt string format `number` to cast to `Integer` instead of to a `Float` if
