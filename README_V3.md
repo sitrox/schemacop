@@ -1,4 +1,4 @@
-# Schemacop schema V3
+# Schemacop Schema V3
 
 ## Table of Contents
 
@@ -424,7 +424,7 @@ and subclasses are valid:
 * `Rational`
 * `BigDecimal`
 
-As some subclasses of `Numeric`, such as `Complex` don't support all required oeprations,
+As some subclasses of `Numeric`, such as `Complex` don't support all required operations,
 only the above list is supported. If you need support for additional number classes, please
 contact the Gem maintainers.
 
@@ -507,7 +507,7 @@ and validating a blank string will return `nil`.
 If you need a value, use the `required` option:
 
 ```ruby
-schema = Schemacop::Schema3.new(:number, cast_str: true, minimum: 0.0, maximum: (50r), multiple_of: BigDecimal('0.5'), require: true)
+schema = Schemacop::Schema3.new(:number, cast_str: true, minimum: 0.0, maximum: (50r), multiple_of: BigDecimal('0.5'), required: true)
 schema.validate!('42.5')  # => 42.5
 schema.validate!(nil)     # => Schemacop::Exceptions::ValidationError: /: Value must be given.
 schema.validate!('')      # => Schemacop::Exceptions::ValidationError: /: Value must be given.
@@ -636,7 +636,7 @@ It consists of one or multiple values, which can be validated using arbitrary no
   must contain to pass the validation.
 
 * `unique_items`
-  This option specifies wether the items in the array must all be distinct from
+  This option specifies whether the items in the array must all be distinct from
   each other, or if there may be duplicate values. By default, this is false,
   i.e. duplicate values are allowed
 
@@ -704,13 +704,13 @@ schema.validate!([1, 2, 3]) # => Schemacop::Exceptions::ValidationError: /: At l
 schema.validate!([1, 3, 5]) # => [1, 3, 5]
 ```
 
-#### Specifying properties
+#### Specifying Properties
 
 Array nodes support a block in which you can specify the required array contents.
 The array nodes support either list validation, or tuple validation, depending on
 how you specify your array contents.
 
-##### List validation
+##### List Validation
 
 List validation validates a sequence of arbitrary length where each item matches
 the same schema. Unless you specify a `min_items` count on the array node, an
@@ -759,7 +759,7 @@ end
 # => Schemacop::Exceptions::InvalidSchemaError: You can only use "list" once.
 ```
 
-##### Tuple validation
+##### Tuple Validation
 
 On the other hand, tuple validation validates a sequence of fixed length, where
 each item has its own schema that it has to match. Here, the order of the items
@@ -850,8 +850,8 @@ Using the options `filter` and `reject`, arrays can be filtered. Filtering
 happens before validation. Both options behave in the same way, with the only
 difference being that `filter` uses a inclusive approach and `reject` an
 exclusive (see [filter](https://apidock.com/ruby/Array/filter) and
-[reject](https://apidock.com/ruby/Array/reject] in the Ruby API, as they behave
-in a similar manor).
+[reject](https://apidock.com/ruby/Array/reject) in the Ruby API, as they behave
+in a similar manner).
 
 You can either pass a Symbol which specifies the name of the method that is
 called on each array item:
@@ -951,11 +951,11 @@ It consists of key-value-pairs that can be validated using arbitrary nodes.
 
   Defaults to `false`.
 
-#### Specifying properties
+#### Specifying Properties
 
 Hash nodes support a block in which you can specify the required hash contents.
 
-##### Standard properties
+##### Standard Properties
 
 It supports all type nodes, but requires the suffix `?` or `!` for each
 property, which specifies whether a property is required (`!`) or optional
@@ -1078,7 +1078,7 @@ schema.validate!({foo: 1})      # => {"foo"=>1}
 schema.validate!({foo: 'bar'})  # => {"foo"=>"bar"}
 ```
 
-##### Pattern properties
+##### Pattern Properties
 
 In addition to symbols, property keys can also be a regular expression. Here,
 you may only use the optional `?` suffix for the property. This allows any
@@ -1098,7 +1098,7 @@ schema.validate!({id_foo: 1, id_bar: 2})  # => {"id_foo"=>1, "id_bar"=>2}
 schema.validate!({foo: 3})                # => Schemacop::Exceptions::ValidationError: /: Obsolete property "foo".
 ```
 
-##### Additional properties & property names
+##### Additional Properties & Property Names
 
 In addition to standard properties, you can allow the hash to contain
 additional, unspecified properties. By default, this is turned off if you have
@@ -1158,7 +1158,7 @@ schema.validate!({foo: :bar})       # => Schemacop::Exceptions::ValidationError:
 schema.validate!({Foo: :bar})       # => Schemacop::Exceptions::ValidationError: /: Property name :Foo does not match "^[a-z]+$". /Foo: Invalid type, got type "Symbol", expected "array".
 ```
 
-##### Ignoring obsolete properties
+##### Ignoring Obsolete Properties
 
 By enabling `ignore_obsolete_properties`, you can filter out any unspecified params,
 while still passing validation:
@@ -1559,7 +1559,7 @@ to use other data in the second context than in the first.
 
 ## External schemas
 
-Finally, Schemacop features the possibility to specify schemas in seperate
+Finally, Schemacop features the possibility to specify schemas in separate
 files.  This is especially useful is you have schemas in your application which
 are used multiple times throughout the application.
 
@@ -1582,7 +1582,7 @@ Where:
 * context schemas: Defined in the current context using `context.schema`
 * global schemas: Defined in a ruby file in the load path
 
-### External schemas in Rails applications
+### External Schemas in Rails Applications
 
 In Rails applications, your schemas are automatically eager-loaded from the load
 path `'app/schemas'` when your application is started, unless your application
@@ -1633,7 +1633,7 @@ schema.validate!({usr: {first_name: 'Joe', last_name: 'Doe', groups: [{name: 'fo
   # => {"usr"=>{"first_name"=>"Joe", "last_name"=>"Doe", "groups"=>[{"name"=>"foo"}, {"name"=>"bar"}]}}
 ```
 
-### External schemas in Non-Rails applications
+### External Schemas in Non-Rails Applications
 
 Usage in non-Rails applications is the same as with usage in Rails applications,
 however you might need to eager load the schemas yourself:

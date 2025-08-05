@@ -61,7 +61,7 @@ gem 'schemacop'
 ## Basics
 
 Since there is no explicit typing in Ruby, it can be hard to make sure that a
-method is recieving exactly the right kind of data it needs. The idea of this
+method is receiving exactly the right kind of data it needs. The idea of this
 gem is to define a schema at boot time that will validate the data being passed
 around at runtime. Those two steps look as follows:
 
@@ -84,7 +84,7 @@ my_schema.validate!(
 `validate!` will fail if the data given to it does not match what was specified
 in the schema.
 
-### Type lines vs. Field lines
+### Type Lines vs. Field Lines
 
 Schemacop uses a DSL (domain-specific language) to let you describe your
 schemas. We distinguish between two kinds of identifiers:
@@ -309,7 +309,7 @@ end
 You might find the notation cumbersome, and you'd be right to say so. Luckily
 there are plenty of short forms available which we will see below.
 
-#### Handling hashes with indifferent access
+#### Handling Hashes with Indifferent Access
 
 Schemacop has special handling for objects of the class
 `ActiveSupport::HashWithIndifferentAccess`: You may specify the keys as symbols
@@ -403,12 +403,12 @@ The following types are supported by Schemacop by default:
 All types support the options `if` and `check` (see the section about Type Lines
 above).
 
-## Short forms
+## Short Forms
 
 For convenience, the following short forms may be used (and combined if
 possible).
 
-### Passing a type to a Field Line or schema
+### Passing a Type to a Field Line or Schema
 
 Instead of adding a Type Line in the block of a Field Line, you can omit `do
 type ... end` and directly write the type after the key of the field.
@@ -444,7 +444,7 @@ Schema.new(:string, min: 2, max: 5)
 This means that the data given to the schema must be a String that is between 2
 and 5 characters long.
 
-### Passing multiple types at once
+### Passing Multiple Types at Once
 
 You can specify several types at once by putting them in an array.
 
@@ -522,7 +522,7 @@ Note that this does not allow you to specify any options for the hash itself.
 You still need to specify `:hash` as a type if you want to pass any options to
 the hash (i.e. a `default`).
 
-### Shortform for subtypes
+### Shortform for Subtypes
 
 In case of nested arrays, you can group all Type Lines to a single one.
 
@@ -638,14 +638,14 @@ Schema.new do
 end
 ```
 
-### Required data points
+### Required Data Points
 
 Note that any *required* validation is done before applying the defaults. If you
 specify a `req` field, it must always be given, no matter if you have specified
 a default or not. Therefore, specifying `req` fields do not make sense in
 conjunction with defaults, as the default is always ignored.
 
-## Type casting
+## Type Casting
 
 Starting from version 2.4.0, Schemacop allows you to specify type castings that
 can alter the validated data. Consider the following:
@@ -663,7 +663,7 @@ Note that Schemacop never modifies the data you pass to it. If you want to
 benefit from Schemacop-applied castings, you need to access the cloned, modified
 data returned by `validate` or `validate!`.
 
-### Specifying type castings
+### Specifying Type Castings
 
 Type castings can be specified using two forms: Either as a hash or as an array.
 While using an array only allows you to specify the supported source types to be
@@ -689,7 +689,7 @@ Schema.new do
 end
 ```
 
-### Built-in casters
+### Built-in Casters
 
 Schemacop comes with the following casters:
 
@@ -702,7 +702,7 @@ an error if casted to an Integer. When casting float values and strings
 containing float values to integers, the decimal places will be discarded
 however.
 
-### Execution order
+### Execution Order
 
 The casting is done *before* the options `if` and `check` are evaluated.
 Example:
@@ -748,7 +748,7 @@ Schemacop will throw one of the following checked exceptions:
   This exception is thrown when the given data does not comply with the given
   schema definition.
 
-## Known limitations
+## Known Limitations
 
 * Schemacop does not yet allow cyclic structures with infinite depth.
 
