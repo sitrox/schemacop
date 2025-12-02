@@ -1,6 +1,6 @@
 module Schemacop
   class Railtie < Rails::Railtie
-    initializer 'schemacop' do
+    initializer 'schemacop', after: :load_config_initializers do
       # Load global schemas
       unless Rails.env.development?
         V3::GlobalContext.eager_load!

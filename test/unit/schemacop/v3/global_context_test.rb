@@ -161,6 +161,105 @@ module Schemacop
           GlobalContext.instance.schema_for('user')
         end
       end
+
+      def test_v3_default_options_with_lazy_load
+        dir = Dir.mktmpdir
+        Schemacop.load_paths << dir
+        File.write(File.join(dir, 'test_schema.rb'), %(schema :integer))
+
+        Schemacop.v3_default_options = { cast_str: true }.freeze
+
+        schema = GlobalContext.instance.schema_for('test_schema')
+        result = schema.validate('42')
+
+        assert result.valid?, "Expected string '42' to be cast to integer 42, but got errors: #{result.errors}"
+        assert_equal 42, result.data
+      ensure
+        Schemacop.v3_default_options = {}
+      end
+
+      def test_v3_default_options_with_eager_load
+        dir = Dir.mktmpdir
+        Schemacop.load_paths << dir
+        File.write(File.join(dir, 'test_schema.rb'), %(schema :integer))
+
+        Schemacop.v3_default_options = { cast_str: true }.freeze
+
+        GlobalContext.instance.eager_load!
+        schema = GlobalContext.instance.schema_for('test_schema')
+        result = schema.validate('42')
+
+        assert result.valid?, "Expected string '42' to be cast to integer 42, but got errors: #{result.errors}"
+        assert_equal 42, result.data
+      ensure
+        Schemacop.v3_default_options = {}
+      end
+
+      def test_v3_default_options_with_nested_schema
+        dir = Dir.mktmpdir
+        Schemacop.load_paths << dir
+        File.write(File.join(dir, 'form_schema.rb'), <<~SCHEMA)
+          schema do
+            int! :age
+            str! :name
+          end
+        SCHEMA
+
+        Schemacop.v3_default_options = { cast_str: true }.freeze
+
+        schema = GlobalContext.instance.schema_for('form_schema')
+        result = schema.validate({ age: '25', name: 'John' })
+
+        assert result.valid?, "Expected string '25' to be cast to integer 25, but got errors: #{result.errors}"
+        assert_equal 25, result.data[:age]
+        assert_equal 'John', result.data[:name]
+      ensure
+        Schemacop.v3_default_options = {}
+      end
+
+      def test_v3_default_options_set_before_eager_load
+        dir = Dir.mktmpdir
+        Schemacop.load_paths << dir
+        File.write(File.join(dir, 'test_schema.rb'), %(schema :integer))
+
+        # Set default options BEFORE eager loading (simulates production mode)
+        Schemacop.v3_default_options = { cast_str: true }.freeze
+
+        GlobalContext.instance.eager_load!
+        schema = GlobalContext.instance.schema_for('test_schema')
+        result = schema.validate('42')
+
+        assert result.valid?, "Expected string '42' to be cast to integer 42, but got errors: #{result.errors}"
+        assert_equal 42, result.data
+      ensure
+        Schemacop.v3_default_options = {}
+      end
+
+      def test_v3_default_options_set_after_eager_load
+        dir = Dir.mktmpdir
+        Schemacop.load_paths << dir
+        File.write(File.join(dir, 'test_schema.rb'), %(schema :integer))
+
+        # Eager load schemas BEFORE setting default options
+        GlobalContext.instance.eager_load!
+
+        Schemacop.v3_default_options = { cast_str: true }.freeze
+
+        schema = GlobalContext.instance.schema_for('test_schema')
+        result = schema.validate('42')
+
+        # NOTE: Setting v3_default_options AFTER eager loading does not work
+        # because schemas are already cached. In Rails applications, the
+        # Railtie initializer now runs after config/initializers (via
+        # 'after: :load_config_initializers'), ensuring options are set
+        # before eager loading occurs.
+        #
+        # This test verifies that the options don't retroactively apply.
+        refute result.valid?, 'Options set after eager_load! should not affect already-loaded schemas'
+        assert_equal({ [] => ['Invalid type, got type "String", expected "integer".'] }, result.errors)
+      ensure
+        Schemacop.v3_default_options = {}
+      end
     end
   end
 end

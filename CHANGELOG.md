@@ -1,5 +1,14 @@
 # Change log
 
+## Unreleased
+
+* Fix Railtie initialization order to ensure `v3_default_options` set in
+  `config/initializers` are applied before schemas are eager loaded in
+  production mode. The Railtie initializer now runs after application
+  initializers using `after: :load_config_initializers`.
+
+  Internal reference: `#144209`.
+
 ## 3.0.35 (2025-07-31)
 
 * Add option `max_precision` to `number` nodes for Schemacop V3 schemas to validate
