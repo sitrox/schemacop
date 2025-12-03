@@ -15,6 +15,9 @@
 
   Internal reference: `#144209`.
 
+* Fix test compatibility with Ruby 3.2+ by updating JSON parse error regex
+  patterns to match the new error message format introduced in Ruby 3.2.
+
 ## 3.0.35 (2025-07-31)
 
 * Add option `max_precision` to `number` nodes for Schemacop V3 schemas to validate

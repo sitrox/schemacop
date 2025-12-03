@@ -988,7 +988,7 @@ module Schemacop
         end
 
         assert_validation('{42]') do
-          error '/', /JSON parse error: "(\d+: )?unexpected token at '{42]'"\./
+          error '/', /JSON parse error: "((\d+: )?unexpected token at '{42]'|expected object key, got '42]' at line \d+ column \d+)"\./
         end
 
         assert_validation('"foo"') do
