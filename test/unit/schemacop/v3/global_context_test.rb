@@ -250,9 +250,8 @@ module Schemacop
 
         # NOTE: Setting v3_default_options AFTER eager loading does not work
         # because schemas are already cached. In Rails applications, the
-        # Railtie initializer now runs after config/initializers (via
-        # 'after: :load_config_initializers'), ensuring options are set
-        # before eager loading occurs.
+        # Railtie explicitly loads 'config/schemacop.rb' before eager loading,
+        # ensuring options are set before schemas are loaded.
         #
         # This test verifies that the options don't retroactively apply.
         refute result.valid?, 'Options set after eager_load! should not affect already-loaded schemas'

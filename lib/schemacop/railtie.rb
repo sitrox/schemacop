@@ -1,6 +1,13 @@
 module Schemacop
   class Railtie < Rails::Railtie
-    initializer 'schemacop', after: :load_config_initializers do
+    initializer 'schemacop' do
+      # Load configuration
+      config_path = Rails.root.join('config', 'schemacop.rb')
+
+      if config_path.exist?
+        load config_path
+      end
+
       # Load global schemas
       unless Rails.env.development?
         V3::GlobalContext.eager_load!

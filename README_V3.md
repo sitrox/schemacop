@@ -282,11 +282,11 @@ transformed into various types.
 #### Custom Formats
 
 You can also implement your custom formats or override the behavior of the
-standard formats. This can be done in the initializer configuration (in case of
-a Rails appliation):
+standard formats. For Rails applications, this can be done in
+`config/schemacop.rb`:
 
 ```ruby
-# config/initializers/schemacop.rb
+# config/schemacop.rb
 Schemacop.register_string_formatter(
   :character_array,                        # Formatter name
   pattern: /^[a-zA-Z](,[a-zA-Z])*/,        # Regex pattern for validation
@@ -1651,11 +1651,24 @@ to eager-load them on start of your application / script.
 Using the setting `Schemacop.v3_default_options`, you can specify a hash
 containing default options that will be used for every schemacop node (options
 not supported by a particular node are automatically ignored). Options passed
-directly to a node still take precedence. The setting can be set in an
-initializer:
+directly to a node still take precedence.
+
+### Rails applications
+
+For Rails applications, configure default options in `config/schemacop.rb`
+(note: not in the `initializers/` subdirectory). This ensures that options are
+applied before schemas are eager loaded in production mode:
 
 ```ruby
-# config/initializers/schemacop.rb
+# config/schemacop.rb
+Schemacop.v3_default_options = { cast_str: true }.freeze
+```
+
+### Non-Rails applications
+
+For non-Rails applications, set the options before loading any schemas:
+
+```ruby
 Schemacop.v3_default_options = { cast_str: true }.freeze
 
 # Example schema: As cast_str is enabled in the default options, strings will

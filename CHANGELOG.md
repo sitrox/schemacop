@@ -1,11 +1,17 @@
 # Change log
 
-## Unreleased
+## 3.0.36 (2025-12-03)
 
-* Fix Railtie initialization order to ensure `v3_default_options` set in
-  `config/initializers` are applied before schemas are eager loaded in
-  production mode. The Railtie initializer now runs after application
-  initializers using `after: :load_config_initializers`.
+* Fix `v3_default_options` not being applied when schemas are eager loaded in
+  production mode. The Railtie now explicitly loads `config/schemacop.rb`
+  during initialization, before eager loading schemas. This ensures that
+  default options like `cast_str` are applied to all schemas.
+
+  For Rails applications, place your Schemacop configuration in
+  `config/schemacop.rb` (not in the `initializers/` subdirectory) to benefit
+  from this fix. Configuration in `config/initializers/schemacop.rb` will
+  continue to work in development mode but will not be applied to eager-loaded
+  schemas in production mode (same behavior as in 3.0.35 and earlier).
 
   Internal reference: `#144209`.
 
