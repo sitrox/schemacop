@@ -1,6 +1,6 @@
 # Change log
 
-## 3.0.36 (2025-12-03)
+## 3.0.36 (2026-01-05)
 
 * Fix `v3_default_options` not being applied when schemas are eager loaded in
   production mode. The Railtie now explicitly loads `config/schemacop.rb`
