@@ -750,6 +750,74 @@ module Schemacop
         assert_cast("\t", "\t")
       end
 
+      def test_encoding_single
+        schema :string, encoding: 'UTF-8'
+
+        assert_validation 'Hello World'
+        assert_validation ''
+
+        assert_validation 'Hello World'.encode('ASCII') do
+          error '/', 'String has encoding "US-ASCII" but must be "UTF-8".'
+        end
+      end
+
+      def test_encoding_multiple
+        schema :string, encoding: %w[UTF-8 US-ASCII]
+
+        assert_validation 'Hello World'
+        assert_validation 'Hello World'.encode('ASCII')
+
+        assert_validation 'Hello World'.encode('ISO-8859-1') do
+          error '/', 'String has encoding "ISO-8859-1" but must be "UTF-8" or "US-ASCII".'
+        end
+      end
+
+      def test_encoding_with_nil
+        schema :string, encoding: 'UTF-8'
+
+        assert_validation nil
+      end
+
+      def test_encoding_invalid_bytes
+        schema :string, encoding: 'UTF-8'
+
+        invalid_string = "abc\x80def".force_encoding('UTF-8')
+        assert_validation invalid_string do
+          error '/', 'String has invalid "UTF-8" encoding.'
+        end
+      end
+
+      def test_encoding_invalid_bytes_without_specific_encoding
+        schema :string
+
+        invalid_string = "abc\x80def".force_encoding('UTF-8')
+        assert_validation invalid_string do
+          error '/', 'String has invalid "UTF-8" encoding.'
+        end
+      end
+
+      def test_encoding_validate_self
+        assert_raises_with_message Exceptions::InvalidSchemaError,
+                                   'Option "encoding" must be a string or an array of strings.' do
+          schema :string, encoding: 123
+        end
+
+        assert_raises_with_message Exceptions::InvalidSchemaError,
+                                   'Option "encoding" must be a string or an array of strings.' do
+          schema :string, encoding: [123]
+        end
+
+        assert_raises_with_message Exceptions::InvalidSchemaError,
+                                   'Option "encoding" contains unknown encoding "UNKNOWN-FOO".' do
+          schema :string, encoding: 'UNKNOWN-FOO'
+        end
+
+        assert_raises_with_message Exceptions::InvalidSchemaError,
+                                   'Option "encoding" contains unknown encoding "UNKNOWN-FOO".' do
+          schema :string, encoding: ['UTF-8', 'UNKNOWN-FOO']
+        end
+      end
+
       def test_empty_or_whitespace_string_blank_not_allowed
         schema :string, allow_blank: false
 
