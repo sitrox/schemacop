@@ -7,7 +7,7 @@ module Schemacop
       option :max
 
       def initialize(options = {})
-        super(options)
+        super
 
         validate_options!
       end

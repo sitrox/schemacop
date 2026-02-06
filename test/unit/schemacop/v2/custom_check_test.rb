@@ -4,7 +4,7 @@ module Schemacop
   module V2
     class CustomCheckTest < V2Test
       def test_integer_check_short_form
-        s = Schema.new :integer, check: proc { |i| i.even? }
+        s = Schema.new :integer, check: proc(&:even?)
         assert_nothing_raised { s.validate!(2) }
         assert_nothing_raised { s.validate!(-8) }
         assert_nothing_raised { s.validate!(0) }
@@ -22,7 +22,7 @@ module Schemacop
 
       def test_integer_check_with_lambda
         s = Schema.new do
-          type :integer, check: ->(i) { i.even? }
+          type :integer, check: lambda(&:even?)
         end
 
         assert_nothing_raised { s.validate!(2) }

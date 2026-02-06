@@ -256,7 +256,7 @@ module Schemacop
         end
 
         assert_raises_with_message Exceptions::InvalidSchemaError,
-                                   'Option "exclusive_minimum" can\'t be '\
+                                   'Option "exclusive_minimum" can\'t be ' \
                                    'greater than "exclusive_maximum".' do
           schema :integer, exclusive_minimum: 5, exclusive_maximum: 4
         end

@@ -653,7 +653,7 @@ module Schemacop
         end
 
         assert_raises_with_message Exceptions::InvalidSchemaError,
-                                   'Option "pattern" can\'t be parsed: end pattern '\
+                                   'Option "pattern" can\'t be parsed: end pattern ' \
                                    'with unmatched parenthesis: /(abcde/.' do
           schema :string, pattern: '(abcde'
         end

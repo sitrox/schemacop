@@ -5,7 +5,7 @@ module Schemacop
     class CustomIfTest < V2Test
       def test_allowed_subset_only
         s = Schema.new do
-          type :integer, if: proc { |data| data.odd? }
+          type :integer, if: proc(&:odd?)
         end
 
         assert_nothing_raised { s.validate! 5 }
@@ -15,7 +15,7 @@ module Schemacop
 
       def test_if_with_multiple_types
         s = Schema.new do
-          type :integer, if: proc { |data| data.odd? }
+          type :integer, if: proc(&:odd?)
           type :string
         end
 

@@ -77,7 +77,7 @@ module Schemacop
   register_string_formatter(
     :symbol,
     pattern: nil,
-    handler: ->(value) { value.to_sym }
+    handler: lambda(&:to_sym)
   )
 
   register_string_formatter(
