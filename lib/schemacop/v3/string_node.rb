@@ -128,11 +128,9 @@ module Schemacop
           end
 
           Array(options[:encoding]).each do |encoding|
-            begin
-              Encoding.find(encoding)
-            rescue ArgumentError
-              fail "Option \"encoding\" contains unknown encoding #{encoding.inspect}."
-            end
+            Encoding.find(encoding)
+          rescue ArgumentError
+            fail "Option \"encoding\" contains unknown encoding #{encoding.inspect}."
           end
         end
 

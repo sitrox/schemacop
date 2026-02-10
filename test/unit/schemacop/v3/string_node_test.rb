@@ -814,7 +814,7 @@ module Schemacop
 
         assert_raises_with_message Exceptions::InvalidSchemaError,
                                    'Option "encoding" contains unknown encoding "UNKNOWN-FOO".' do
-          schema :string, encoding: ['UTF-8', 'UNKNOWN-FOO']
+          schema :string, encoding: %w[UTF-8 UNKNOWN-FOO]
         end
       end
 
