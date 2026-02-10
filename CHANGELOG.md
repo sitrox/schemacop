@@ -1,6 +1,6 @@
 # Change log
 
-## 3.1.0 (2026-02-06)
+## 3.1.0 (2026-02-10)
 
 * Add option `encoding` to `str` node for Schemacop V3 schemas to validate that
   a string has one of the specified encodings. Accepts a single encoding name or
@@ -16,6 +16,8 @@
   Internal reference: `#143271`.
 
 * Update RuboCop from 1.24.1 to 1.69.2.
+
+* Drop support for all EOL Rubies (2.6.2, 2.7.1, 3.0.1, 3.1.0)
 
 ## 3.0.36 (2026-01-05)
 
