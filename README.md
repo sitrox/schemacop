@@ -12,13 +12,14 @@ use in conjunction with [OpenAPI](https://swagger.io/specification/).
 
 Schemacop is tested with the following ruby versions:
 
-* 2.6.2
-* 2.7.1
-* 3.0.1
-* 3.1.0
-* 3.2.0
-* 3.3.0
-* 3.4.0
+| Schemacop | Ruby                                            |
+|:----------|:------------------------------------------------|
+| >= 3.1.0  | 3.2.0, 3.3.0, 3.4.0, 4.0.0                      |
+| >= 3.0.31 | 2.6.2, 2.7.1, 3.0.1, 3.1.0, 3.2.0, 3.3.0, 3.4.0 |
+| >= 3.0.29 | 2.6.2, 2.7.1, 3.0.1, 3.1.0, 3.2.0, 3.3.0        |
+| >= 3.0.23 | 2.6.2, 2.7.1, 3.0.1, 3.1.0, 3.2.0               |
+| >= 3.0.17 | 2.6.2, 2.7.1, 3.0.1, 3.1.0                      |
+| <= 3.0.16 | 2.6.2, 2.7.1, 3.0.1                             |
 
 Other ruby versions might work but are not covered by our automated tests.
 

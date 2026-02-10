@@ -8,7 +8,7 @@ module Schemacop
       ].freeze
 
       def self.allowed_options
-        super + ATTRIBUTES + %i[format_options pattern allow_blank]
+        super + ATTRIBUTES + %i[format_options pattern allow_blank encoding]
       end
 
       def allowed_types
@@ -53,6 +53,19 @@ module Schemacop
           unless super_data.match?(pattern)
             result.error "String does not match pattern #{V3.sanitize_exp(pattern).inspect}."
           end
+        end
+
+        # Validate encoding matches #
+        if options[:encoding]
+          allowed_encodings = Array(options[:encoding])
+          unless allowed_encodings.include?(super_data.encoding.name)
+            result.error "String has encoding #{super_data.encoding.name.inspect} but must be #{allowed_encodings.map(&:inspect).join(' or ')}."
+          end
+        end
+
+        # Validate encoding #
+        unless super_data.valid_encoding?
+          result.error "String has invalid #{super_data.encoding.name.inspect} encoding."
         end
 
         # Validate format #
@@ -107,6 +120,18 @@ module Schemacop
 
         if options[:min_length] && options[:max_length] && options[:min_length] > options[:max_length]
           fail 'Option "min_length" can\'t be greater than "max_length".'
+        end
+
+        if options[:encoding]
+          unless options[:encoding].is_a?(String) || (options[:encoding].is_a?(Array) && options[:encoding].all? { |e| e.is_a?(String) })
+            fail 'Option "encoding" must be a string or an array of strings.'
+          end
+
+          Array(options[:encoding]).each do |encoding|
+            Encoding.find(encoding)
+          rescue ArgumentError
+            fail "Option \"encoding\" contains unknown encoding #{encoding.inspect}."
+          end
         end
 
         if options[:pattern]

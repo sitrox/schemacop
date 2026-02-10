@@ -1,5 +1,24 @@
 # Change log
 
+## 3.1.0 (2026-02-10)
+
+* Add option `encoding` to `str` node for Schemacop V3 schemas to validate that
+  a string has one of the specified encodings. Accepts a single encoding name or
+  an array of encoding names (e.g. `encoding: 'UTF-8'` or
+  `encoding: %w[UTF-8 US-ASCII]`).
+
+  Internal reference: `#143271`.
+
+* All strings are now validated for valid encoding (via `valid_encoding?`),
+  regardless of whether the `encoding` option is set. Strings with invalid byte
+  sequences for their declared encoding will now produce a validation error.
+
+  Internal reference: `#143271`.
+
+* Update RuboCop from 1.24.1 to 1.69.2.
+
+* Drop support for all EOL Rubies (2.6.2, 2.7.1, 3.0.1, 3.1.0)
+
 ## 3.0.36 (2026-01-05)
 
 * Fix `v3_default_options` not being applied when schemas are eager loaded in

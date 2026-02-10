@@ -28,7 +28,7 @@ module Schemacop
           data = nil
         end
 
-        super_data = super(data, result: result)
+        super_data = super
         return if super_data.nil?
 
         matches = matches(super_data)

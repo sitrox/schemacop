@@ -55,8 +55,8 @@ module Schemacop
         end
 
         json = {}
-        json[:properties] = properties.values.map { |p| [p.name, p.as_json] }.to_h if properties.any?
-        json[:patternProperties] = pattern_properties.values.map { |p| [V3.sanitize_exp(p.name), p.as_json] }.to_h if pattern_properties.any?
+        json[:properties] = properties.values.to_h { |p| [p.name, p.as_json] } if properties.any?
+        json[:patternProperties] = pattern_properties.values.to_h { |p| [V3.sanitize_exp(p.name), p.as_json] } if pattern_properties.any?
 
         # In schemacop, by default, additional properties are not allowed,
         # the users explicitly need to enable additional properties

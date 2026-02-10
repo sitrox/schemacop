@@ -97,7 +97,7 @@ module Schemacop
           fail "Schema #{path.inspect} does not define any schema."
         when 1
           if @schemas.include?(virtual_path)
-            fail "Schema #{virtual_path.to_s.inspect} is defined in both load paths "\
+            fail "Schema #{virtual_path.to_s.inspect} is defined in both load paths " \
                  "#{@load_paths_by_schemas[virtual_path].inspect} and #{load_path.inspect}."
           end
 

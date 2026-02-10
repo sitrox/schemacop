@@ -223,6 +223,15 @@ transformed into various types.
   By default, blank strings are allowed and left as they are when casted (e.g.
   the string `''` is valid). If you want to disallow blank strings, set this
   option to `false`.
+* `encoding`
+  Validates the encoding of the string. Accepts a single encoding name or an
+  array of encoding names (e.g. `encoding: 'UTF-8'` or
+  `encoding: %w[UTF-8 US-ASCII]`). See `Encoding.name_list` for all available
+  encoding names.
+
+Note that regardless of the `encoding` option, all strings are validated for
+valid encoding using `valid_encoding?`. Strings with invalid byte sequences for
+their declared encoding will always produce a validation error.
 
 #### Formats
 

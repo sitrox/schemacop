@@ -88,7 +88,7 @@ module Schemacop
 
         if option?(:cast) && self.class.klasses.size > 1
           fail Exceptions::InvalidSchemaError,
-               "Casting is only allowed for single-value datatypes, but type #{self.class.inspect} has classes "\
+               "Casting is only allowed for single-value datatypes, but type #{self.class.inspect} has classes " \
                "#{self.class.klasses.map(&:inspect)}."
         end
       end
