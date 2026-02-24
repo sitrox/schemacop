@@ -714,7 +714,7 @@ module Schemacop
           end
 
           ref! nil, :BasicInfo
-          int! :name  # Direct property takes precedence
+          int! :name # Direct property takes precedence
         end
 
         # Direct property (int!) takes precedence — string should fail
@@ -735,11 +735,11 @@ module Schemacop
           end
 
           scm :ExtraInfo do
-            int! :name  # Clashes with BasicInfo's :name
+            int! :name # Clashes with BasicInfo's :name
             str! :extra
           end
 
-          ref! nil, :BasicInfo  # First inline ref wins for :name
+          ref! nil, :BasicInfo # First inline ref wins for :name
           ref! nil, :ExtraInfo
         end
 
