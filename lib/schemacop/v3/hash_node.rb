@@ -12,6 +12,7 @@ module Schemacop
       supports_children(name: true)
 
       attr_reader :properties
+      attr_reader :inline_refs
 
       def self.allowed_options
         super + ATTRIBUTES - %i[dependencies] + %i[additional_properties ignore_obsolete_properties parse_json]
@@ -22,8 +23,13 @@ module Schemacop
       end
 
       def add_child(node)
-        unless node.name
-          fail Exceptions::InvalidSchemaError, 'Child nodes must have a name.'
+        if node.name.nil?
+          if node.is_a?(ReferenceNode)
+            @inline_refs << node
+            return
+          else
+            fail Exceptions::InvalidSchemaError, 'Child nodes must have a name.'
+          end
         end
 
         @properties[node.name] = node
@@ -52,6 +58,10 @@ module Schemacop
           else
             properties[name] = property
           end
+        end
+
+        if @inline_refs.any?
+          return as_json_with_inline_refs(properties, pattern_properties)
         end
 
         json = {}
@@ -122,8 +132,29 @@ module Schemacop
           end
         end
 
+        # Validate inline ref properties #
+        inline_ref_property_names = Set.new
+
+        @inline_refs.each do |inline_ref|
+          target = inline_ref.target
+          next unless target
+
+          target.properties.each_value do |prop|
+            next if prop.name.is_a?(Regexp)
+            next if @properties.key?(prop.name)
+            next if inline_ref_property_names.include?(prop.name)
+
+            inline_ref_property_names << prop.name
+
+            result.in_path(prop.name) do
+              result.error "Key #{prop.name} must be given." if prop.require_key? && !data_hash.include?(prop.name)
+              prop._validate(data_hash[prop.name], result: result)
+            end
+          end
+        end
+
         # Validate additional properties #
-        specified_properties = @properties.keys.to_set
+        specified_properties = @properties.keys.to_set + inline_ref_property_names
         additional_properties = data_hash.reject { |k, _v| specified_properties.include?(k.to_s) }
 
         property_patterns = {}
@@ -173,7 +204,7 @@ module Schemacop
       end
 
       def children
-        @properties.values
+        @properties.values + @inline_refs
       end
 
       def cast(data)
@@ -208,8 +239,36 @@ module Schemacop
           end
         end
 
+        # Cast inline ref properties
+        inline_ref_property_names = Set.new
+
+        @inline_refs.each do |inline_ref|
+          target = inline_ref.target
+          next unless target
+
+          target.properties.each_value do |prop|
+            next if prop.name.is_a?(Regexp)
+            next if @properties.key?(prop.name)
+            next if inline_ref_property_names.include?(prop.name)
+
+            inline_ref_property_names << prop.name
+
+            prop_name = prop.as&.to_s || prop.name
+
+            casted_data = prop.cast(data_hash[prop.name])
+
+            if !casted_data.nil? || data_hash.include?(prop.name)
+              result[prop_name] = casted_data
+            end
+
+            if result[prop_name].nil? && !data_hash.include?(prop.name)
+              result.delete(prop_name)
+            end
+          end
+        end
+
         # Handle regex properties
-        specified_properties = @properties.keys.to_set
+        specified_properties = @properties.keys.to_set + inline_ref_property_names
         additional_properties = data_hash.reject { |k, _v| specified_properties.include?(k.to_s.to_sym) }
 
         if additional_properties.any? && property_patterns.any?
@@ -224,8 +283,8 @@ module Schemacop
         if options[:additional_properties].is_a?(TrueClass)
           result = data_hash.merge(result)
         elsif options[:additional_properties].is_a?(Node)
-          specified_properties = @properties.keys.to_set
-          additional_properties = data_hash.reject { |k, _v| specified_properties.include?(k.to_s.to_sym) }
+          add_prop_specified = @properties.keys.to_set + inline_ref_property_names
+          additional_properties = data_hash.reject { |k, _v| add_prop_specified.include?(k.to_s.to_sym) }
           if additional_properties.any?
             additional_properties_result = {}
             additional_properties.each do |key, value|
@@ -240,8 +299,42 @@ module Schemacop
 
       protected
 
+      def as_json_with_inline_refs(properties, pattern_properties)
+        all_of = []
+
+        # Add each inline ref
+        @inline_refs.each do |inline_ref|
+          all_of << inline_ref.as_json
+        end
+
+        # Add own properties schema if any direct properties exist
+        if properties.any? || pattern_properties.any?
+          own_schema = {}
+          own_schema[:type] = :object
+          own_schema[:properties] = properties.values.map { |p| [p.name, p.as_json] }.to_h if properties.any?
+          own_schema[:patternProperties] = pattern_properties.values.map { |p| [V3.sanitize_exp(p.name), p.as_json] }.to_h if pattern_properties.any?
+
+          if options[:additional_properties].is_a?(TrueClass)
+            own_schema[:additionalProperties] = true
+          elsif options[:additional_properties].is_a?(Node)
+            own_schema[:additionalProperties] = options[:additional_properties].as_json
+          else
+            own_schema[:additionalProperties] = false
+          end
+
+          required_properties = @properties.values.select(&:required?).map(&:name)
+          own_schema[:required] = required_properties if required_properties.any?
+
+          all_of << own_schema
+        end
+
+        json = { allOf: all_of }
+        return process_json(ATTRIBUTES, json)
+      end
+
       def init
         @properties = {}
+        @inline_refs = []
         @options[:type] = :object
         unless @options[:additional_properties].nil? || @options[:additional_properties].is_a?(TrueClass) || @options[:additional_properties].is_a?(FalseClass)
           fail Schemacop::Exceptions::InvalidSchemaError, 'Option "additional_properties" must be a boolean value'

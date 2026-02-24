@@ -362,6 +362,404 @@ module Schemacop
 
         assert_cast({ person: { born_at: '1990-01-13' } }, { person: { born_at: Date.new(1990, 1, 13) } }.with_indifferent_access)
       end
+
+      # --- Inline ref tests ---
+
+      def test_inline_ref_schema_builds_without_error
+        schema do
+          scm :BasicInfo do
+            int! :id
+            str! :name
+          end
+
+          ref! nil, :BasicInfo
+        end
+
+        assert_equal [], @schema.root.properties.keys
+        assert_equal 1, @schema.root.inline_refs.size
+      end
+
+      def test_inline_ref_validation
+        schema do
+          scm :BasicInfo do
+            int! :id
+            str! :name
+          end
+
+          ref! nil, :BasicInfo
+          str! :extra
+        end
+
+        assert_validation(id: 1, name: 'John', extra: 'info')
+      end
+
+      def test_inline_ref_validation_errors
+        schema do
+          scm :BasicInfo do
+            int! :id
+            str! :name
+          end
+
+          ref! nil, :BasicInfo
+          str! :extra
+        end
+
+        assert_validation(extra: 'info') do
+          error '/id', 'Value must be given.'
+          error '/name', 'Value must be given.'
+        end
+      end
+
+      def test_inline_ref_validation_type_errors
+        schema do
+          scm :BasicInfo do
+            int! :id
+            str! :name
+          end
+
+          ref! nil, :BasicInfo
+        end
+
+        assert_validation(id: 'not_an_int', name: 42) do
+          error '/id', 'Invalid type, got type "String", expected "integer".'
+          error '/name', 'Invalid type, got type "Integer", expected "string".'
+        end
+      end
+
+      def test_inline_ref_validation_obsolete_properties
+        schema do
+          scm :BasicInfo do
+            int! :id
+            str! :name
+          end
+
+          ref! nil, :BasicInfo
+        end
+
+        # Properties from inline ref are accepted
+        assert_validation(id: 1, name: 'John')
+
+        # Unknown properties are still rejected
+        assert_validation(id: 1, name: 'John', unknown: 'value') do
+          error '/', 'Obsolete property "unknown".'
+        end
+      end
+
+      def test_inline_ref_cast
+        schema do
+          scm :BasicInfo do
+            str! :born_at, format: :date
+            str! :name
+          end
+
+          ref! nil, :BasicInfo
+          str! :extra
+        end
+
+        assert_cast(
+          { born_at: '1990-01-13', name: 'John', extra: 'info' },
+          { born_at: Date.new(1990, 1, 13), name: 'John', extra: 'info' }.with_indifferent_access
+        )
+      end
+
+      def test_inline_ref_with_defaults
+        schema do
+          scm :BasicInfo do
+            str? :name, default: 'Anonymous'
+          end
+
+          ref! nil, :BasicInfo
+        end
+
+        assert_cast({}, { name: 'Anonymous' }.with_indifferent_access)
+      end
+
+      def test_inline_ref_with_optional_properties
+        schema do
+          scm :BasicInfo do
+            int! :id
+            str? :nickname
+          end
+
+          ref! nil, :BasicInfo
+        end
+
+        assert_validation(id: 1)
+        assert_validation(id: 1, nickname: 'Johnny')
+      end
+
+      def test_inline_ref_as_json
+        schema do
+          scm :BasicInfo do
+            int! :id
+            str! :name
+          end
+
+          ref! nil, :BasicInfo
+          str! :extra
+        end
+
+        assert_json({
+                      definitions: {
+                        BasicInfo: {
+                          properties:           {
+                            id:   { type: :integer },
+                            name: { type: :string }
+                          },
+                          additionalProperties: false,
+                          required:             %w[id name],
+                          type:                 :object
+                        }
+                      },
+                      type:        :object,
+                      allOf:       [
+                        { '$ref' => '#/definitions/BasicInfo' },
+                        {
+                          type:                 :object,
+                          properties:           {
+                            extra: { type: :string }
+                          },
+                          additionalProperties: false,
+                          required:             %w[extra]
+                        }
+                      ]
+                    })
+      end
+
+      def test_inline_ref_as_json_no_own_properties
+        schema do
+          scm :BasicInfo do
+            int! :id
+            str! :name
+          end
+
+          ref! nil, :BasicInfo
+        end
+
+        assert_json({
+                      definitions: {
+                        BasicInfo: {
+                          properties:           {
+                            id:   { type: :integer },
+                            name: { type: :string }
+                          },
+                          additionalProperties: false,
+                          required:             %w[id name],
+                          type:                 :object
+                        }
+                      },
+                      type:        :object,
+                      allOf:       [
+                        { '$ref' => '#/definitions/BasicInfo' }
+                      ]
+                    })
+      end
+
+      def test_inline_ref_swagger_json
+        schema do
+          scm :BasicInfo do
+            int! :id
+            str! :name
+          end
+
+          ref! nil, :BasicInfo
+          str! :extra
+        end
+
+        assert_swagger_json({
+                              type:  :object,
+                              allOf: [
+                                { '$ref' => '#/components/schemas/BasicInfo' },
+                                {
+                                  type:                 :object,
+                                  properties:           {
+                                    extra: { type: :string }
+                                  },
+                                  additionalProperties: false,
+                                  required:             %w[extra]
+                                }
+                              ]
+                            })
+      end
+
+      def test_inline_ref_multiple
+        schema do
+          scm :BasicInfo do
+            int! :id
+            str! :name
+          end
+
+          scm :Timestamps do
+            str! :created_at, format: :date
+          end
+
+          ref! nil, :BasicInfo
+          ref! nil, :Timestamps
+          str! :extra
+        end
+
+        # Validation
+        assert_validation(id: 1, name: 'John', created_at: '2024-01-01', extra: 'info')
+        assert_validation(extra: 'info') do
+          error '/id', 'Value must be given.'
+          error '/name', 'Value must be given.'
+          error '/created_at', 'Value must be given.'
+        end
+
+        # Casting
+        assert_cast(
+          { id: 1, name: 'John', created_at: '2024-01-01', extra: 'info' },
+          { id: 1, name: 'John', created_at: Date.new(2024, 1, 1), extra: 'info' }.with_indifferent_access
+        )
+
+        # JSON
+        assert_json({
+                      definitions: {
+                        BasicInfo:  {
+                          properties:           {
+                            id:   { type: :integer },
+                            name: { type: :string }
+                          },
+                          additionalProperties: false,
+                          required:             %w[id name],
+                          type:                 :object
+                        },
+                        Timestamps: {
+                          properties:           {
+                            created_at: { type: :string, format: :date }
+                          },
+                          additionalProperties: false,
+                          required:             %w[created_at],
+                          type:                 :object
+                        }
+                      },
+                      type:        :object,
+                      allOf:       [
+                        { '$ref' => '#/definitions/BasicInfo' },
+                        { '$ref' => '#/definitions/Timestamps' },
+                        {
+                          type:                 :object,
+                          properties:           {
+                            extra: { type: :string }
+                          },
+                          additionalProperties: false,
+                          required:             %w[extra]
+                        }
+                      ]
+                    })
+      end
+
+      def test_inline_ref_with_external_schema
+        context = Context.new
+
+        context.schema :BasicInfo do
+          int! :id
+          str! :name
+        end
+
+        with_context context do
+          schema do
+            ref! nil, :BasicInfo
+            str! :extra
+          end
+
+          assert_validation(id: 1, name: 'John', extra: 'info')
+          assert_validation(extra: 'info') do
+            error '/id', 'Value must be given.'
+            error '/name', 'Value must be given.'
+          end
+        end
+      end
+
+      def test_inline_ref_used_external_schemas
+        context = Context.new
+
+        context.schema :BasicInfo do
+          int! :id
+          str! :name
+        end
+
+        with_context context do
+          schema do
+            ref! nil, :BasicInfo
+            str! :extra
+          end
+
+          assert_equal %i[BasicInfo], @schema.root.used_external_schemas
+        end
+      end
+
+      def test_inline_ref_with_additional_properties_true
+        schema do
+          scm :BasicInfo do
+            int! :id
+            str! :name
+          end
+
+          ref! nil, :BasicInfo
+          str! :extra
+        end
+
+        # Without additional_properties: true, unknown props are rejected
+        assert_validation(id: 1, name: 'John', extra: 'info', unknown: 'value') do
+          error '/', 'Obsolete property "unknown".'
+        end
+      end
+
+      def test_inline_ref_property_name_collision
+        schema do
+          scm :BasicInfo do
+            str! :name
+            str? :description
+          end
+
+          ref! nil, :BasicInfo
+          int! :name  # Direct property takes precedence
+        end
+
+        # Direct property (int!) takes precedence — string should fail
+        assert_validation(name: 42)
+        assert_validation(name: 'John') do
+          error '/name', 'Invalid type, got type "String", expected "integer".'
+        end
+
+        # Optional description from inline ref still works
+        assert_validation(name: 42, description: 'A description')
+      end
+
+      def test_inline_ref_collision_between_inline_refs
+        schema do
+          scm :BasicInfo do
+            str! :name
+            str? :description
+          end
+
+          scm :ExtraInfo do
+            int! :name  # Clashes with BasicInfo's :name
+            str! :extra
+          end
+
+          ref! nil, :BasicInfo  # First inline ref wins for :name
+          ref! nil, :ExtraInfo
+        end
+
+        # First inline ref wins: :name is validated as str! (from BasicInfo)
+        assert_validation(name: 'John', extra: 'info')
+        assert_validation(name: 42, extra: 'info') do
+          error '/name', 'Invalid type, got type "Integer", expected "string".'
+        end
+
+        # Properties unique to second inline ref still work
+        assert_validation(name: 'John') do
+          error '/extra', 'Value must be given.'
+        end
+
+        # Casting uses first inline ref's definition for :name
+        assert_cast(
+          { name: 'John', description: 'A desc', extra: 'info' },
+          { name: 'John', description: 'A desc', extra: 'info' }.with_indifferent_access
+        )
+      end
     end
   end
 end

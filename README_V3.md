@@ -1494,6 +1494,131 @@ schema.validate!([{first_name: 'Joe', last_name: 'Doe'}]) # => [{"first_name"=>"
 schema.validate!([id: 42, first_name: 'Joe'])             # => Schemacop::Exceptions::ValidationError: /[0]/last_name: Value must be given. /[0]: Obsolete property "id".
 ```
 
+#### Inline References
+
+By passing `nil` as the name, you can "inline" a referenced schema into the
+parent hash. Instead of nesting the referenced properties under a key, they are
+unpacked directly into the parent:
+
+```ruby
+schema = Schemacop::Schema3.new :hash do
+  scm :BasicInfo do
+    int! :id
+    str! :name
+  end
+
+  ref! nil, :BasicInfo
+  str! :extra
+end
+
+# Properties from the referenced schema are validated at the top level
+schema.validate!({id: 1, name: 'John', extra: 'info'})
+# => {"id"=>1, "name"=>"John", "extra"=>"info"}
+
+# Required properties from the ref are enforced
+schema.validate!({extra: 'info'})
+# => Schemacop::Exceptions::ValidationError: /id: Value must be given. /name: Value must be given.
+
+# Unknown properties are still rejected
+schema.validate!({id: 1, name: 'John', extra: 'info', unknown: 'value'})
+# => Schemacop::Exceptions::ValidationError: /: Obsolete property "unknown".
+```
+
+Casting works as expected — values from the inline ref are cast according to the
+referenced schema's types:
+
+```ruby
+schema = Schemacop::Schema3.new :hash do
+  scm :BasicInfo do
+    str! :born_at, format: :date
+    str! :name
+  end
+
+  ref! nil, :BasicInfo
+  str! :extra
+end
+
+result = schema.validate!({born_at: '1990-01-13', name: 'John', extra: 'info'})
+result[:born_at] # => Date<"Sat, 13 Jan 1990">
+```
+
+You can also use multiple inline refs in the same hash:
+
+```ruby
+schema = Schemacop::Schema3.new :hash do
+  scm :BasicInfo do
+    int! :id
+    str! :name
+  end
+
+  scm :Timestamps do
+    str! :created_at, format: :date
+  end
+
+  ref! nil, :BasicInfo
+  ref! nil, :Timestamps
+  str! :extra
+end
+
+schema.validate!({id: 1, name: 'John', created_at: '2024-01-01', extra: 'info'})
+# => {"id"=>1, "name"=>"John", "created_at"=>Mon, 01 Jan 2024, "extra"=>"info"}
+```
+
+If a direct property has the same name as one from the inline ref, the direct
+property takes precedence:
+
+```ruby
+schema = Schemacop::Schema3.new :hash do
+  scm :BasicInfo do
+    str! :name
+  end
+
+  ref! nil, :BasicInfo
+  int! :name  # Direct property takes precedence
+end
+
+schema.validate!({name: 42})      # => {"name"=>42}
+schema.validate!({name: 'John'})
+# => Schemacop::Exceptions::ValidationError: /name: Invalid type, got type "String", expected "integer".
+```
+
+In the JSON / Swagger output, inline refs produce an `allOf` array containing
+the `$ref` entries alongside the hash's own properties:
+
+```ruby
+schema = Schemacop::Schema3.new :hash do
+  scm :BasicInfo do
+    int! :id
+    str! :name
+  end
+
+  ref! nil, :BasicInfo
+  str! :extra
+end
+
+schema.as_json
+# => {
+#   "allOf" => [
+#     { "$ref" => "#/definitions/BasicInfo" },
+#     {
+#       "type" => "object",
+#       "properties" => { "extra" => { "type" => "string" } },
+#       "additionalProperties" => false,
+#       "required" => ["extra"]
+#     }
+#   ],
+#   "definitions" => {
+#     "BasicInfo" => {
+#       "properties" => { "id" => { "type" => "integer" }, "name" => { "type" => "string" } },
+#       "additionalProperties" => false,
+#       "required" => ["id", "name"],
+#       "type" => "object"
+#     }
+#   },
+#   "type" => "object"
+# }
+```
+
 ## Context
 
 Schemacop also features the concept of a `Context`. You can define schemas in a

@@ -1,5 +1,14 @@
 # Change log
 
+## 3.0.37 (2026-02-24)
+
+* Add inline ref support for hash nodes via `ref! nil, :SchemaName`. This
+  unpacks the referenced schema's properties directly into the parent hash
+  instead of nesting them under a key. Produces `allOf` with `$ref` in the
+  JSON/Swagger output.
+
+  Internal reference: `#146962`.
+
 ## 3.0.36 (2026-01-05)
 
 * Fix `v3_default_options` not being applied when schemas are eager loaded in
