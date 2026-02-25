@@ -22,7 +22,7 @@ module Schemacop
           # Plain JSON Schema: use RFC 6901 JSON Pointer escaping in $ref.
           # gsub with a hash is a single-pass substitution, so the RFC 6901
           # order-of-escaping concern (~ before /) does not apply here.
-          escaped = @path.to_s.gsub(/[~\/]/, RFC6901_ESCAPE)
+          escaped = @path.to_s.gsub(%r{[~/]}, RFC6901_ESCAPE)
           process_json([], '$ref': "#/definitions/#{escaped}")
         end
       end
