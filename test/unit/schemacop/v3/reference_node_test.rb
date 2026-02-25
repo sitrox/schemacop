@@ -706,6 +706,104 @@ module Schemacop
         end
       end
 
+      def test_namespaced_schema_reference
+        context = Context.new
+
+        context.schema :'namespaced/user' do
+          str! :name
+        end
+
+        Schemacop.with_context context do
+          schema do
+            ref! :user, :'namespaced/user'
+          end
+
+          assert_json({
+                        properties:           {
+                          user: {
+                            '$ref' => '#/definitions/namespaced~1user'
+                          }
+                        },
+                        additionalProperties: false,
+                        required:             %w[user],
+                        type:                 :object
+                      })
+
+          assert_swagger_json({
+                                properties:           {
+                                  user: {
+                                    '$ref' => '#/components/schemas/namespaced.user'
+                                  }
+                                },
+                                additionalProperties: false,
+                                required:             %w[user],
+                                type:                 :object
+                              })
+
+          assert_validation(user: { name: 'John' })
+          assert_validation(user: { name: 42 }) do
+            error '/user/name', 'Invalid type, got type "Integer", expected "string".'
+          end
+        end
+      end
+
+      def test_namespaced_schema_reference_with_tilde
+        context = Context.new
+
+        context.schema :'config~item/sub' do
+          str! :value
+        end
+
+        Schemacop.with_context context do
+          schema do
+            ref! :item, :'config~item/sub'
+          end
+
+          assert_json({
+                        properties:           {
+                          item: {
+                            '$ref' => '#/definitions/config~0item~1sub'
+                          }
+                        },
+                        additionalProperties: false,
+                        required:             %w[item],
+                        type:                 :object
+                      })
+
+          assert_swagger_json({
+                                properties:           {
+                                  item: {
+                                    '$ref' => '#/components/schemas/config.item.sub'
+                                  }
+                                },
+                                additionalProperties: false,
+                                required:             %w[item],
+                                type:                 :object
+                              })
+
+          assert_validation(item: { value: 'hello' })
+        end
+      end
+
+      def test_ref_inside_one_of_used_external_schemas
+        context = Context.new
+
+        context.schema :Nested do
+          str! :value
+        end
+
+        Schemacop.with_context context do
+          schema do
+            one_of! :item do
+              ref :Nested
+              str
+            end
+          end
+
+          assert_includes @schema.root.used_external_schemas, :Nested
+        end
+      end
+
       def test_inline_ref_property_name_collision
         schema do
           scm :BasicInfo do

@@ -1,6 +1,8 @@
 module Schemacop
   module V3
     class ReferenceNode < Node
+      RFC6901_ESCAPE = { '~' => '~0', '/' => '~1' }.freeze
+
       def self.allowed_options
         super + %i[path]
       end
@@ -12,9 +14,16 @@ module Schemacop
 
       def as_json
         if context.swagger_json?
-          process_json([], '$ref': "#/components/schemas/#{@path}")
+          # OpenAPI schema names must match ^[a-zA-Z0-9._-]+$, so we replace
+          # all non-conforming characters: `/` and `~` become `.`.
+          sanitized = @path.to_s.gsub(%r{[~/]}, '.')
+          process_json([], '$ref': "#/components/schemas/#{sanitized}")
         else
-          process_json([], '$ref': "#/definitions/#{@path}")
+          # Plain JSON Schema: use RFC 6901 JSON Pointer escaping in $ref.
+          # gsub with a hash is a single-pass substitution, so the RFC 6901
+          # order-of-escaping concern (~ before /) does not apply here.
+          escaped = @path.to_s.gsub(/[~\/]/, RFC6901_ESCAPE)
+          process_json([], '$ref': "#/definitions/#{escaped}")
         end
       end
 
@@ -56,7 +65,7 @@ module Schemacop
       protected
 
       def init
-        @path = options.delete(:path)
+        @path = options.delete(:path)&.to_sym
       end
     end
   end

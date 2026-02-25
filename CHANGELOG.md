@@ -1,5 +1,26 @@
 # Change log
 
+## 3.0.38 (2026-02-25)
+
+* Fix namespaced schema `$ref` paths in generated JSON. For OpenAPI (swagger)
+  output, `/` and `~` in schema paths are replaced with `.` (e.g.
+  `namespaced/user` becomes `namespaced.user`) to comply with the OpenAPI schema
+  name format. For plain JSON Schema output, paths are escaped per RFC 6901
+  (`~0` for `~`, `~1` for `/`).
+
+  Internal reference: `#146922`.
+
+* Fix `CombinationNode` (`one_of`, `any_of`, `all_of`) not exposing its items
+  via `children`. This caused `used_external_schemas` to miss any `ref` nodes
+  nested inside combination nodes, leading to missing entries in
+  `components.schemas` in OpenAPI output.
+
+* Normalize `ReferenceNode` path to symbol. When a schema reference is created
+  with a string path (e.g. `ref 'foo'`), the path is now converted to a symbol
+  to match the keys used by `GlobalContext`.
+
+  Internal reference: `#146922`.
+
 ## 3.0.37 (2026-02-24)
 
 * Add inline ref support for hash nodes via `ref! nil, :SchemaName`. This
