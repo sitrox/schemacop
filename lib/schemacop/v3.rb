@@ -39,6 +39,7 @@ require 'schemacop/v3/numeric_node'
 require 'schemacop/v3/all_of_node'
 require 'schemacop/v3/any_of_node'
 require 'schemacop/v3/array_node'
+require 'schemacop/v3/binary_node'
 require 'schemacop/v3/boolean_node'
 require 'schemacop/v3/hash_node'
 require 'schemacop/v3/integer_node'
@@ -54,6 +55,7 @@ require 'schemacop/v3/symbol_node'
 Schemacop::V3.register :all_of,    :all_of, Schemacop::V3::AllOfNode
 Schemacop::V3.register :any_of,    :any_of, Schemacop::V3::AnyOfNode
 Schemacop::V3.register :array,     :ary,    Schemacop::V3::ArrayNode
+Schemacop::V3.register :binary,    :bin,    Schemacop::V3::BinaryNode
 Schemacop::V3.register :boolean,   :boo,    Schemacop::V3::BooleanNode
 Schemacop::V3.register :integer,   :int,    Schemacop::V3::IntegerNode
 Schemacop::V3.register :is_not,    :is_not, Schemacop::V3::IsNotNode

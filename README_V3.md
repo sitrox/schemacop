@@ -14,11 +14,12 @@
     6. [Array](#array)
     7. [Hash](#hash)
     8. [Object](#object)
-    9. [AllOf](#allOf)
-    10. [AnyOf](#anyOf)
-    11. [OneOf](#oneOf)
-    12. [IsNot](#isNot)
-    13. [Reference](#reference)
+    9. [Binary](#binary)
+    10. [AllOf](#allOf)
+    11. [AnyOf](#anyOf)
+    12. [OneOf](#oneOf)
+    13. [IsNot](#isNot)
+    14. [Reference](#reference)
 5. [Context](#context)
 6. [External schemas](#external-schemas)
 7. [Default options](#default-options)
@@ -1289,6 +1290,45 @@ schema.validate!('foo'.html_safe) # => "foo"
 
 If you set the `strict` option to `false`, the check is done using `is_a?` instead of
 `instance_of?`, which also allows subclasses
+
+### Binary
+
+Type: `:binary`\
+DSL: `bin`
+
+The binary type represents binary data fields such as file uploads. It is
+represented as `{ type: 'string', format: 'binary' }` in JSON Schema / OpenAPI
+output. At runtime, it validates that the value is an instance of one of the
+configured classes (using `is_a?`, so subclasses are accepted).
+
+By default, the node accepts instances of `ActionDispatch::Http::UploadedFile`,
+`Rack::Multipart::UploadedFile`, `Tempfile`, and `String`. Missing classes (e.g.
+when not running within Rails) are silently skipped.
+
+```ruby
+schema = Schemacop::Schema3.new :binary, classes: [Tempfile, String]
+
+schema.validate!(nil)                # => nil
+schema.validate!(Tempfile.new('f'))  # => #<Tempfile:...>
+schema.validate!('binary data')      # => "binary data"
+schema.validate!(42)                 # => Schemacop::Exceptions::ValidationError: /: Invalid type, got type "Integer", expected "String" or "Tempfile".
+```
+
+If you want to limit the accepted classes, use the `classes` option:
+
+```ruby
+schema = Schemacop::Schema3.new :binary, classes: [Tempfile]
+
+schema.validate!(nil)                 # => nil
+schema.validate!(Tempfile.new('f'))   # => #<Tempfile:...>
+schema.validate!('foo')              # => Schemacop::Exceptions::ValidationError: /: Invalid type, got type "String", expected "Tempfile".
+```
+
+#### Options
+
+* `classes`
+  An array of `Class` objects that should be accepted. Must not be empty. If not
+  given, the default classes listed above are used.
 
 ### AllOf
 

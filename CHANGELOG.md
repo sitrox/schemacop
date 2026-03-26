@@ -1,5 +1,13 @@
 # Change log
 
+## 3.0.39 (2026-03-26)
+
+* Add `BinaryNode` for validating binary data fields such as file uploads.
+  Represented as `{ type: 'string', format: 'binary' }` in JSON Schema / OpenAPI
+  output. By default accepts `ActionDispatch::Http::UploadedFile`,
+  `Rack::Multipart::UploadedFile`, `Tempfile`, and `String`. Custom classes can
+  be specified via the `classes` option. DSL: `bin` / `bin!` / `bin?`.
+
 ## 3.0.38 (2026-02-25)
 
 * Fix namespaced schema `$ref` paths in generated JSON. For OpenAPI (swagger)
