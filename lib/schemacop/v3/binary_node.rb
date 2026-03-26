@@ -68,7 +68,7 @@ module Schemacop
       private
 
       def resolved_classes
-        @resolved_classes ||= @classes || (OPTIONAL_CLASS_NAMES.filter_map(&:safe_constantize) + DEFAULT_CLASSES)
+        @resolved_classes ||= @classes || (OPTIONAL_CLASS_NAMES.map(&:safe_constantize).compact + DEFAULT_CLASSES)
       end
     end
   end
