@@ -300,19 +300,15 @@ module Schemacop
       protected
 
       def as_json_with_inline_refs(properties, pattern_properties)
-        all_of = []
-
         # Add each inline ref
-        @inline_refs.each do |inline_ref|
-          all_of << inline_ref.as_json
-        end
+        all_of = @inline_refs.map(&:as_json)
 
         # Add own properties schema if any direct properties exist
         if properties.any? || pattern_properties.any?
           own_schema = {}
           own_schema[:type] = :object
-          own_schema[:properties] = properties.values.map { |p| [p.name, p.as_json] }.to_h if properties.any?
-          own_schema[:patternProperties] = pattern_properties.values.map { |p| [V3.sanitize_exp(p.name), p.as_json] }.to_h if pattern_properties.any?
+          own_schema[:properties] = properties.values.to_h { |p| [p.name, p.as_json] } if properties.any?
+          own_schema[:patternProperties] = pattern_properties.values.to_h { |p| [V3.sanitize_exp(p.name), p.as_json] } if pattern_properties.any?
 
           if options[:additional_properties].is_a?(TrueClass)
             own_schema[:additionalProperties] = true
