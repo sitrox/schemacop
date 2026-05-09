@@ -1,6 +1,6 @@
 # Change log
 
-## 3.1.0 (2026-02-10)
+## 3.1.0 (2026-05-09)
 
 * Add option `encoding` to `str` node for Schemacop V3 schemas to validate that
   a string has one of the specified encodings. Accepts a single encoding name or
