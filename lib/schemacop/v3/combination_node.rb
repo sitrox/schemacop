@@ -23,6 +23,10 @@ module Schemacop
         return item.cast(value)
       end
 
+      def children
+        @items
+      end
+
       def add_child(node)
         @items << node
       end

@@ -27,6 +27,44 @@
 
   Internal reference: `#149255`.
 
+## 3.0.39 (2026-03-26)
+
+* Add `BinaryNode` for validating binary data fields such as file uploads.
+  Represented as `{ type: 'string', format: 'binary' }` in JSON Schema / OpenAPI
+  output. By default accepts `ActionDispatch::Http::UploadedFile`,
+  `Rack::Multipart::UploadedFile`, `Tempfile`, and `String`. Custom classes can
+  be specified via the `classes` option. DSL: `bin` / `bin!` / `bin?`.
+
+## 3.0.38 (2026-02-25)
+
+* Fix namespaced schema `$ref` paths in generated JSON. For OpenAPI (swagger)
+  output, `/` and `~` in schema paths are replaced with `.` (e.g.
+  `namespaced/user` becomes `namespaced.user`) to comply with the OpenAPI schema
+  name format. For plain JSON Schema output, paths are escaped per RFC 6901
+  (`~0` for `~`, `~1` for `/`).
+
+  Internal reference: `#146922`.
+
+* Fix `CombinationNode` (`one_of`, `any_of`, `all_of`) not exposing its items
+  via `children`. This caused `used_external_schemas` to miss any `ref` nodes
+  nested inside combination nodes, leading to missing entries in
+  `components.schemas` in OpenAPI output.
+
+* Normalize `ReferenceNode` path to symbol. When a schema reference is created
+  with a string path (e.g. `ref 'foo'`), the path is now converted to a symbol
+  to match the keys used by `GlobalContext`.
+
+  Internal reference: `#146922`.
+
+## 3.0.37 (2026-02-24)
+
+* Add inline ref support for hash nodes via `ref! nil, :SchemaName`. This
+  unpacks the referenced schema's properties directly into the parent hash
+  instead of nesting them under a key. Produces `allOf` with `$ref` in the
+  JSON/Swagger output.
+
+  Internal reference: `#146962`.
+
 ## 3.0.36 (2026-01-05)
 
 * Fix `v3_default_options` not being applied when schemas are eager loaded in

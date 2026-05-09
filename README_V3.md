@@ -14,11 +14,12 @@
     6. [Array](#array)
     7. [Hash](#hash)
     8. [Object](#object)
-    9. [AllOf](#allOf)
-    10. [AnyOf](#anyOf)
-    11. [OneOf](#oneOf)
-    12. [IsNot](#isNot)
-    13. [Reference](#reference)
+    9. [Binary](#binary)
+    10. [AllOf](#allOf)
+    11. [AnyOf](#anyOf)
+    12. [OneOf](#oneOf)
+    13. [IsNot](#isNot)
+    14. [Reference](#reference)
 5. [Context](#context)
 6. [External schemas](#external-schemas)
 7. [Default options](#default-options)
@@ -1299,6 +1300,45 @@ schema.validate!('foo'.html_safe) # => "foo"
 If you set the `strict` option to `false`, the check is done using `is_a?` instead of
 `instance_of?`, which also allows subclasses
 
+### Binary
+
+Type: `:binary`\
+DSL: `bin`
+
+The binary type represents binary data fields such as file uploads. It is
+represented as `{ type: 'string', format: 'binary' }` in JSON Schema / OpenAPI
+output. At runtime, it validates that the value is an instance of one of the
+configured classes (using `is_a?`, so subclasses are accepted).
+
+By default, the node accepts instances of `ActionDispatch::Http::UploadedFile`,
+`Rack::Multipart::UploadedFile`, `Tempfile`, and `String`. Missing classes (e.g.
+when not running within Rails) are silently skipped.
+
+```ruby
+schema = Schemacop::Schema3.new :binary, classes: [Tempfile, String]
+
+schema.validate!(nil)                # => nil
+schema.validate!(Tempfile.new('f'))  # => #<Tempfile:...>
+schema.validate!('binary data')      # => "binary data"
+schema.validate!(42)                 # => Schemacop::Exceptions::ValidationError: /: Invalid type, got type "Integer", expected "String" or "Tempfile".
+```
+
+If you want to limit the accepted classes, use the `classes` option:
+
+```ruby
+schema = Schemacop::Schema3.new :binary, classes: [Tempfile]
+
+schema.validate!(nil)                 # => nil
+schema.validate!(Tempfile.new('f'))   # => #<Tempfile:...>
+schema.validate!('foo')              # => Schemacop::Exceptions::ValidationError: /: Invalid type, got type "String", expected "Tempfile".
+```
+
+#### Options
+
+* `classes`
+  An array of `Class` objects that should be accepted. Must not be empty. If not
+  given, the default classes listed above are used.
+
 ### AllOf
 
 Type: `:all_of`\
@@ -1501,6 +1541,131 @@ end
 schema.validate!([])                                      # => []
 schema.validate!([{first_name: 'Joe', last_name: 'Doe'}]) # => [{"first_name"=>"Joe", "last_name"=>"Doe"}]
 schema.validate!([id: 42, first_name: 'Joe'])             # => Schemacop::Exceptions::ValidationError: /[0]/last_name: Value must be given. /[0]: Obsolete property "id".
+```
+
+#### Inline References
+
+By passing `nil` as the name, you can "inline" a referenced schema into the
+parent hash. Instead of nesting the referenced properties under a key, they are
+unpacked directly into the parent:
+
+```ruby
+schema = Schemacop::Schema3.new :hash do
+  scm :BasicInfo do
+    int! :id
+    str! :name
+  end
+
+  ref! nil, :BasicInfo
+  str! :extra
+end
+
+# Properties from the referenced schema are validated at the top level
+schema.validate!({id: 1, name: 'John', extra: 'info'})
+# => {"id"=>1, "name"=>"John", "extra"=>"info"}
+
+# Required properties from the ref are enforced
+schema.validate!({extra: 'info'})
+# => Schemacop::Exceptions::ValidationError: /id: Value must be given. /name: Value must be given.
+
+# Unknown properties are still rejected
+schema.validate!({id: 1, name: 'John', extra: 'info', unknown: 'value'})
+# => Schemacop::Exceptions::ValidationError: /: Obsolete property "unknown".
+```
+
+Casting works as expected — values from the inline ref are cast according to the
+referenced schema's types:
+
+```ruby
+schema = Schemacop::Schema3.new :hash do
+  scm :BasicInfo do
+    str! :born_at, format: :date
+    str! :name
+  end
+
+  ref! nil, :BasicInfo
+  str! :extra
+end
+
+result = schema.validate!({born_at: '1990-01-13', name: 'John', extra: 'info'})
+result[:born_at] # => Date<"Sat, 13 Jan 1990">
+```
+
+You can also use multiple inline refs in the same hash:
+
+```ruby
+schema = Schemacop::Schema3.new :hash do
+  scm :BasicInfo do
+    int! :id
+    str! :name
+  end
+
+  scm :Timestamps do
+    str! :created_at, format: :date
+  end
+
+  ref! nil, :BasicInfo
+  ref! nil, :Timestamps
+  str! :extra
+end
+
+schema.validate!({id: 1, name: 'John', created_at: '2024-01-01', extra: 'info'})
+# => {"id"=>1, "name"=>"John", "created_at"=>Mon, 01 Jan 2024, "extra"=>"info"}
+```
+
+If a direct property has the same name as one from the inline ref, the direct
+property takes precedence:
+
+```ruby
+schema = Schemacop::Schema3.new :hash do
+  scm :BasicInfo do
+    str! :name
+  end
+
+  ref! nil, :BasicInfo
+  int! :name  # Direct property takes precedence
+end
+
+schema.validate!({name: 42})      # => {"name"=>42}
+schema.validate!({name: 'John'})
+# => Schemacop::Exceptions::ValidationError: /name: Invalid type, got type "String", expected "integer".
+```
+
+In the JSON / Swagger output, inline refs produce an `allOf` array containing
+the `$ref` entries alongside the hash's own properties:
+
+```ruby
+schema = Schemacop::Schema3.new :hash do
+  scm :BasicInfo do
+    int! :id
+    str! :name
+  end
+
+  ref! nil, :BasicInfo
+  str! :extra
+end
+
+schema.as_json
+# => {
+#   "allOf" => [
+#     { "$ref" => "#/definitions/BasicInfo" },
+#     {
+#       "type" => "object",
+#       "properties" => { "extra" => { "type" => "string" } },
+#       "additionalProperties" => false,
+#       "required" => ["extra"]
+#     }
+#   ],
+#   "definitions" => {
+#     "BasicInfo" => {
+#       "properties" => { "id" => { "type" => "integer" }, "name" => { "type" => "string" } },
+#       "additionalProperties" => false,
+#       "required" => ["id", "name"],
+#       "type" => "object"
+#     }
+#   },
+#   "type" => "object"
+# }
 ```
 
 ## Context
