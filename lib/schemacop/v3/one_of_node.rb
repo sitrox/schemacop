@@ -23,6 +23,19 @@ module Schemacop
         return item.cast(value)
       end
 
+      protected
+
+      def matches(data)
+        all_matches = super
+        if all_matches.size > 1
+          non_wrappers = all_matches.reject(&:cast_str_wrapper?)
+          return non_wrappers if non_wrappers.any?
+        end
+        all_matches
+      end
+
+      public
+
       def _validate(data, result:)
         if options[:treat_blank_as_nil] && data.blank? && !data.is_a?(FalseClass)
           data = nil

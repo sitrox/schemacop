@@ -19,6 +19,14 @@
 
 * Drop support for all EOL Rubies (2.6.2, 2.7.1, 3.0.1, 3.1.0)
 
+* Fix `cast_str` default option causing incorrect casting and validation errors
+  when used with combination nodes and array tuples. Numeric-looking strings
+  (e.g. `"1"`) were incorrectly cast to integers in schemas where a string type
+  was also valid. With this fix, `cast_str` only activates when the value cannot
+  be matched natively by another sibling schema.
+
+  Internal reference: `#149255`.
+
 ## 3.0.36 (2026-01-05)
 
 * Fix `v3_default_options` not being applied when schemas are eager loaded in

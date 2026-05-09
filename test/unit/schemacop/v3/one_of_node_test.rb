@@ -259,6 +259,29 @@ module Schemacop
         assert_validation('true')
         assert_validation(true)
       end
+
+      # With cast_str as default option, int gets wrapped in a OneOfNode containing
+      # [IntegerNode, StringNode(format: :integer)]. When combined with a sibling str
+      # node in one_of, numeric-looking strings like "1" match both the wrapped int
+      # (via StringNode(format: :integer)) and the plain str, causing a "matches 2"
+      # validation error.
+      def test_default_cast_str_with_int_and_str
+        Schemacop.v3_default_options = { cast_str: true }.freeze
+
+        schema :one_of do
+          int
+          str
+        end
+
+        assert_validation(42)
+        assert_validation('hello')
+        assert_validation('1')
+        assert_cast(42, 42)
+        assert_cast('hello', 'hello')
+        assert_cast('1', '1')
+      ensure
+        Schemacop.v3_default_options = {}
+      end
     end
   end
 end

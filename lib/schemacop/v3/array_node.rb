@@ -156,7 +156,7 @@ module Schemacop
         result = []
 
         value.each_with_index do |value_item, index|
-          if cont_item.present? && item_matches?(cont_item, value_item)
+          if cont_item.present? && !cont_item.cast_str_wrapper? && item_matches?(cont_item, value_item)
             result << cont_item.cast(value_item)
           elsif list?
             result << list_item.cast(value_item)
@@ -168,8 +168,7 @@ module Schemacop
                 result << value_item
               end
             else
-              item = item_for_data(value_item)
-              result << item.cast(value_item)
+              result << items[index].cast(value_item)
             end
           else
             result << value_item
