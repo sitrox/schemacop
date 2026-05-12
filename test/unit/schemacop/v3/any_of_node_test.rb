@@ -362,6 +362,30 @@ module Schemacop
           schema :any_of
         end
       end
+
+      # With cast_str as default option, int gets wrapped in a OneOfNode containing
+      # [IntegerNode, StringNode(format: :integer)]. In any_of, the first matching
+      # schema is used for casting. Since the wrapped int node matches numeric-looking
+      # strings (via StringNode(format: :integer)), a string like "1" gets cast to
+      # integer 1, even though the plain str branch also matches and the value is
+      # already a valid string.
+      def test_default_cast_str_with_int_and_str
+        Schemacop.v3_default_options = { cast_str: true }.freeze
+
+        schema :any_of do
+          int
+          str
+        end
+
+        assert_validation(42)
+        assert_validation('hello')
+        assert_validation('1')
+        assert_cast(42, 42)
+        assert_cast('hello', 'hello')
+        assert_cast('1', '1')
+      ensure
+        Schemacop.v3_default_options = {}
+      end
     end
   end
 end

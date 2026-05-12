@@ -45,6 +45,7 @@ module Schemacop
             self.node node
             str format: format, format_options: options
           end
+          node.instance_variable_set(:@cast_str_wrapper, true)
         end
 
         return node
@@ -134,6 +135,10 @@ module Schemacop
 
       def schemas
         (parent&.schemas || {}).merge(@schemas)
+      end
+
+      def cast_str_wrapper?
+        !!@cast_str_wrapper
       end
 
       def required?

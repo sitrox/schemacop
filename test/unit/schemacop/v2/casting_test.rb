@@ -75,7 +75,7 @@ module Schemacop
           end
         end
 
-        assert_equal 'Casting is only allowed for single-value datatypes, '\
+        assert_equal 'Casting is only allowed for single-value datatypes, ' \
                      'but type Schemacop::V2::NumberValidator has classes ["Integer", "Float"].',
                      e.message
       end

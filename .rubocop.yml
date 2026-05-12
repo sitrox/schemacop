@@ -10,7 +10,7 @@ AllCops:
     - 'locale/translations.rb'
     - 'lib/scratch.rb'
     - 'schemacop.gemspec'
-
+  SuggestExtensions: false
   DisplayCopNames: true
 
 Style/SignalException:
@@ -108,4 +108,7 @@ Style/CaseLikeIf:
   Enabled: false
 
 Lint/EmptyClass:
+  Enabled: false
+
+Lint/RedundantRequireStatement:
   Enabled: false

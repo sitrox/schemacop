@@ -30,7 +30,7 @@ module Schemacop
           attrs -= %i[exclusive_minimum exclusive_maximum]
         end
 
-        super attrs, json
+        super
       end
 
       def _validate(data, result:)
@@ -102,7 +102,7 @@ module Schemacop
           fail 'Option "minimum" can\'t be greater than "maximum".'
         end
 
-        if options[:exclusive_minimum] && options[:exclusive_maximum]\
+        if options[:exclusive_minimum] && options[:exclusive_maximum] \
            && options[:exclusive_minimum] > options[:exclusive_maximum]
           fail 'Option "exclusive_minimum" can\'t be greater than "exclusive_maximum".'
         end

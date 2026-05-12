@@ -1,5 +1,32 @@
 # Change log
 
+## 3.1.0 (2026-05-09)
+
+* Add option `encoding` to `str` node for Schemacop V3 schemas to validate that
+  a string has one of the specified encodings. Accepts a single encoding name or
+  an array of encoding names (e.g. `encoding: 'UTF-8'` or
+  `encoding: %w[UTF-8 US-ASCII]`).
+
+  Internal reference: `#143271`.
+
+* All strings are now validated for valid encoding (via `valid_encoding?`),
+  regardless of whether the `encoding` option is set. Strings with invalid byte
+  sequences for their declared encoding will now produce a validation error.
+
+  Internal reference: `#143271`.
+
+* Update RuboCop from 1.24.1 to 1.69.2.
+
+* Drop support for all EOL Rubies (2.6.2, 2.7.1, 3.0.1, 3.1.0)
+
+* Fix `cast_str` default option causing incorrect casting and validation errors
+  when used with combination nodes and array tuples. Numeric-looking strings
+  (e.g. `"1"`) were incorrectly cast to integers in schemas where a string type
+  was also valid. With this fix, `cast_str` only activates when the value cannot
+  be matched natively by another sibling schema.
+
+  Internal reference: `#149255`.
+
 ## 3.0.39 (2026-03-26)
 
 * Add `BinaryNode` for validating binary data fields such as file uploads.

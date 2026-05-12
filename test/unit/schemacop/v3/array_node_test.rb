@@ -988,12 +988,51 @@ module Schemacop
         end
 
         assert_validation('{42]') do
-          error '/', /JSON parse error: "((\d+: )?unexpected token at '{42]'|expected object key, got '42]' at line \d+ column \d+)"\./
+          error '/', /JSON parse error: "((\d+: )?unexpected token at '{42\]'|expected object key, got '42\]' at line \d+ column \d+)"\./
         end
 
         assert_validation('"foo"') do
           error '/', 'Invalid type, got type "String", expected "array".'
         end
+      end
+
+      def test_tuple_cast_with_default_cast_str
+        Schemacop.v3_default_options = { cast_str: true }.freeze
+
+        schema :array do
+          list :array do
+            int
+            str
+          end
+        end
+
+        # String "1" at position 1 (str) must not be cast to integer
+        assert_validation([[1, '1']])
+        assert_cast([[1, '1']], [[1, '1']])
+
+        # String "1" at position 0 (int with cast_str) should be cast to integer
+        assert_validation([%w[1 foo]])
+        assert_cast([%w[1 foo]], [[1, 'foo']])
+      ensure
+        Schemacop.v3_default_options = {}
+      end
+
+      # With cast_str as default option, cont :integer creates a OneOfNode containing
+      # [IntegerNode, StringNode(format: :integer)]. The cont_item takes priority in
+      # casting over the list_item, so numeric-looking strings that match the cont
+      # schema get cast to integers even though the list schema says they are strings.
+      def test_cont_cast_with_default_cast_str
+        Schemacop.v3_default_options = { cast_str: true }.freeze
+
+        schema :array do
+          list :string
+          cont :integer
+        end
+
+        assert_validation(%w[hello 42 world])
+        assert_cast(%w[hello 42 world], %w[hello 42 world])
+      ensure
+        Schemacop.v3_default_options = {}
       end
     end
   end
