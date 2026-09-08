@@ -232,7 +232,15 @@ transformed into various types.
 
 Note that regardless of the `encoding` option, all strings are validated for
 valid encoding using `valid_encoding?`. Strings with invalid byte sequences for
-their declared encoding will always produce a validation error.
+their declared encoding will always produce a validation error. The `pattern`
+and `format` of such a string are not checked, as matching a pattern requires
+decoding it; the checks that do not decode the string (`min_length`,
+`max_length`, `encoding` and `enum`) are still reported.
+
+A string whose encoding is valid but cannot be compared with the `pattern` or
+with the pattern of the given `format` (e.g. a UTF-16 string) is reported as not
+matching it, rather than raising an error. Note that `min_length` and
+`max_length` count bytes for such an encoding, as it has no characters.
 
 #### Formats
 

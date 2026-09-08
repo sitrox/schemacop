@@ -172,6 +172,26 @@ module Schemacop
         end
       end
 
+      def test_items_with_invalid_encoding
+        schema :array do
+          list :string
+        end
+
+        assert_validation ['foo', invalid_string, 'bar'] do
+          error '/[1]', 'String has invalid "UTF-8" encoding.'
+        end
+
+        schema :array, unique_items: true do
+          list :string
+        end
+
+        assert_validation [invalid_string, invalid_string] do
+          error '/', 'Array has duplicate items.'
+          error '/[0]', 'String has invalid "UTF-8" encoding.'
+          error '/[1]', 'String has invalid "UTF-8" encoding.'
+        end
+      end
+
       def test_single_item_tuple
         schema :array do
           str

@@ -781,7 +781,6 @@ module Schemacop
       def test_encoding_invalid_bytes
         schema :string, encoding: 'UTF-8'
 
-        invalid_string = "abc\x80def".force_encoding('UTF-8')
         assert_validation invalid_string do
           error '/', 'String has invalid "UTF-8" encoding.'
         end
@@ -790,8 +789,136 @@ module Schemacop
       def test_encoding_invalid_bytes_without_specific_encoding
         schema :string
 
-        invalid_string = "abc\x80def".force_encoding('UTF-8')
         assert_validation invalid_string do
+          error '/', 'String has invalid "UTF-8" encoding.'
+        end
+      end
+
+      def test_encoding_invalid_bytes_us_ascii
+        schema :string
+
+        assert_validation invalid_string('US-ASCII') do
+          error '/', 'String has invalid "US-ASCII" encoding.'
+        end
+      end
+
+      def test_encoding_invalid_bytes_and_encoding_mismatch
+        schema :string, encoding: 'UTF-8'
+
+        assert_validation invalid_string('US-ASCII') do
+          error '/', 'String has encoding "US-ASCII" but must be "UTF-8".'
+          error '/', 'String has invalid "US-ASCII" encoding.'
+        end
+      end
+
+      def test_encoding_invalid_bytes_with_format
+        schema :string, format: :integer
+
+        assert_validation invalid_string do
+          error '/', 'String has invalid "UTF-8" encoding.'
+        end
+      end
+
+      def test_encoding_invalid_bytes_with_format_options
+        schema :string, format: :integer, format_options: { minimum: 5 }
+
+        assert_validation invalid_string do
+          error '/', 'String has invalid "UTF-8" encoding.'
+        end
+      end
+
+      def test_encoding_invalid_bytes_with_format_without_pattern
+        schema :string, format: :symbol
+
+        assert_validation :foo.to_s
+
+        # The symbol formatter has no pattern to fail on, and its handler calls
+        # "to_sym", which raises on an invalid byte sequence.
+        assert_validation invalid_string do
+          error '/', 'String has invalid "UTF-8" encoding.'
+        end
+      end
+
+      def test_encoding_incompatible_with_pattern
+        schema :string, pattern: /^ü+$/
+
+        assert_validation 'üü'
+        assert_validation 'üü'.encode('ISO-8859-1') do
+          error '/', 'String does not match pattern "^ü+$".'
+        end
+      end
+
+      def test_encoding_incompatible_with_format
+        schema :string, format: :integer
+
+        assert_validation '42'
+
+        # UTF-16 is a dummy encoding and cannot be matched against a pattern in
+        # any other encoding, so the string does not match, valid as it looks.
+        assert_validation '42'.encode('UTF-16') do
+          error '/', 'String does not match format "integer".'
+        end
+      end
+
+      def test_encoding_invalid_bytes_with_pattern
+        schema :string, pattern: /\Aabc.*\z/
+
+        assert_validation invalid_string do
+          error '/', 'String has invalid "UTF-8" encoding.'
+        end
+      end
+
+      def test_encoding_invalid_bytes_with_allow_blank_false
+        schema :string, allow_blank: false
+
+        assert_validation invalid_string do
+          error '/', 'String has invalid "UTF-8" encoding.'
+        end
+      end
+
+      def test_encoding_incompatible_with_allow_blank_false
+        schema :string, allow_blank: false
+
+        assert_validation '42'.encode('UTF-16')
+        assert_validation ''.encode('UTF-16') do
+          error '/', 'String is blank but must not be blank!'
+        end
+      end
+
+      def test_encoding_binary_has_no_invalid_bytes
+        schema :string
+
+        # Every byte sequence is valid in ASCII-8BIT.
+        assert_validation invalid_string('ASCII-8BIT')
+      end
+
+      def test_encoding_invalid_bytes_with_length
+        schema :string, min_length: 20, max_length: 30
+
+        # The length checks do not decode the string, so they are still
+        # reported.
+        assert_validation invalid_string do
+          error '/', 'String is 7 characters long but must be at least 20.'
+          error '/', 'String has invalid "UTF-8" encoding.'
+        end
+      end
+
+      def test_encoding_incompatible_with_length
+        schema :string, max_length: 2
+
+        assert_validation '42'
+
+        # A dummy encoding has no characters, so "size" counts bytes.
+        assert_validation '42'.encode('UTF-16') do
+          error '/', 'String is 6 characters long but must be at most 2.'
+        end
+      end
+
+      def test_encoding_invalid_bytes_with_enum
+        schema :string, enum: ['foo']
+
+        assert_validation invalid_string do
+          error '/', 'Value not included in enum ["foo"].'
           error '/', 'String has invalid "UTF-8" encoding.'
         end
       end

@@ -168,21 +168,26 @@ module Schemacop
         property_names = options[:property_names]
         property_names = Regexp.compile(property_names) if property_names
 
+        # `name.to_sym` raises an EncodingError on a key with an invalid byte
+        # sequence, so the allow list is compared as strings.
+        if options[:ignore_obsolete_properties].is_a?(Enumerable)
+          obsolete_allow_list = options[:ignore_obsolete_properties].to_set(&:to_s)
+        end
+
         additional_properties.each do |name, additional_property|
-          if property_names && !property_names.match?(name)
+          if property_names && !V3.match?(property_names, name.to_s)
             result.error "Property name #{name.inspect} does not match #{options[:property_names].inspect}."
           end
 
           if options[:additional_properties].is_a?(TrueClass)
             next
           elsif options[:additional_properties].is_a?(FalseClass) || options[:additional_properties].blank?
-            match = property_patterns.keys.find { |p| p.match?(name.to_s) }
+            match = property_patterns.keys.find { |p| V3.match?(p, name.to_s) }
             if match
               result.in_path(name) do
                 property_patterns[match]._validate(additional_property, result: result)
               end
-            elsif (options[:ignore_obsolete_properties].is_a?(Enumerable) &&
-                   options[:ignore_obsolete_properties].exclude?(name.to_sym)) ||
+            elsif obsolete_allow_list&.exclude?(name.to_s) ||
                   !options[:ignore_obsolete_properties]
               result.error "Obsolete property #{name.to_s.inspect}."
             end
@@ -196,7 +201,7 @@ module Schemacop
         # Validate dependencies #
         options[:dependencies]&.each do |source, targets|
           targets.each do |target|
-            if data_hash[source].present? && data_hash[target].blank?
+            if !V3.blank?(data_hash[source]) && V3.blank?(data_hash[target])
               result.error "Missing property #{target.to_s.inspect} because #{source.to_s.inspect} is given."
             end
           end
@@ -268,23 +273,24 @@ module Schemacop
         end
 
         # Handle regex properties
+        # Property names are strings, see Node#init.
         specified_properties = @properties.keys.to_set + inline_ref_property_names
-        additional_properties = data_hash.reject { |k, _v| specified_properties.include?(k.to_s.to_sym) }
+        additional_properties = data_hash.reject { |k, _v| specified_properties.include?(k.to_s) }
 
         if additional_properties.any? && property_patterns.any?
           additional_properties.each do |name, additional_property|
-            match_key = property_patterns.keys.find { |p| p.match?(name.to_s) }
-            match = property_patterns[match_key]
-            result[name] = match.cast(additional_property)
+            match_key = property_patterns.keys.find { |p| V3.match?(p, name.to_s) }
+            next unless match_key
+
+            result[name] = property_patterns[match_key].cast(additional_property)
           end
         end
 
         # Handle additional properties
         if options[:additional_properties].is_a?(TrueClass)
-          result = data_hash.merge(result)
+          result = data_hash.reject { |k, _v| specified_properties.include?(k.to_s) }.merge(result)
         elsif options[:additional_properties].is_a?(Node)
-          add_prop_specified = @properties.keys.to_set + inline_ref_property_names
-          additional_properties = data_hash.reject { |k, _v| add_prop_specified.include?(k.to_s.to_sym) }
+          additional_properties = data_hash.reject { |k, _v| specified_properties.include?(k.to_s) }
           if additional_properties.any?
             additional_properties_result = {}
             additional_properties.each do |key, value|

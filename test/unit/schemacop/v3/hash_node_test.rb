@@ -49,6 +49,29 @@ module Schemacop
         end
       end
 
+      def test_parse_json_with_invalid_encoding
+        schema :hash, parse_json: true do
+          str! :name
+        end
+
+        assert_validation(%({"name":"foo"}))
+
+        # The invalid bytes survive parsing and are reported by the string node.
+        assert_validation(%({"name":"#{invalid_string}"})) do
+          error '/name', 'String has invalid "UTF-8" encoding.'
+        end
+      end
+
+      def test_property_value_with_invalid_encoding
+        schema do
+          str! :foo, format: :integer
+        end
+
+        assert_validation(foo: invalid_string) do
+          error '/foo', 'String has invalid "UTF-8" encoding.'
+        end
+      end
+
       def test_additional_properties_false_by_default
         schema
         assert_validation({})
@@ -348,6 +371,98 @@ module Schemacop
         assert_cast({ id_foo: 1 }, { id_foo: 1 }.with_indifferent_access)
         assert_cast({ id_foo: 1, id_bar: 2 }, { id_foo: 1, id_bar: 2 }.with_indifferent_access)
         assert_cast({ id_foo: 1, id_bar: 2, value: 4 }, { id_foo: 1, id_bar: 2, value: 4 }.with_indifferent_access)
+      end
+
+      def test_encoding_invalid_bytes_property_name
+        schema :hash, additional_properties: true, property_names: '^[a-z]+$'
+
+        assert_validation(invalid_string => 'bar') do
+          error '/', 'Property name "abc\x80def" does not match "^[a-z]+$".'
+        end
+      end
+
+      def test_encoding_invalid_bytes_pattern_property_name
+        schema additional_properties: false do
+          str?(/^foo_.*$/)
+        end
+
+        assert_validation(invalid_string => 'bar') do
+          error '/', 'Obsolete property "abc\x80def".'
+        end
+      end
+
+      def test_encoding_invalid_bytes_pattern_property_casting
+        schema ignore_obsolete_properties: true do
+          str?(/^foo_.*$/)
+        end
+
+        assert_validation(foo_bar: 'baz', invalid_string => 'bar')
+        assert_cast({ :foo_bar => 'baz', invalid_string => 'bar' }, { foo_bar: 'baz' }.with_indifferent_access)
+      end
+
+      def test_encoding_invalid_bytes_property_name_with_obsolete_allow_list
+        schema :hash, ignore_obsolete_properties: %i[obsolete_key] do
+          str? :foo
+        end
+
+        assert_validation(:foo => 'bar', :obsolete_key => 'baz', invalid_string => 'qux') do
+          error '/', 'Obsolete property "abc\x80def".'
+        end
+
+        schema :hash, ignore_obsolete_properties: [invalid_string] do
+          str? :foo
+        end
+
+        assert_validation(:foo => 'bar', invalid_string => 'qux')
+      end
+
+      def test_encoding_invalid_bytes_in_error_path
+        schema :hash do
+          add :string
+        end
+
+        assert_validation(invalid_string => invalid_string) do
+          error '/abc�def', 'String has invalid "UTF-8" encoding.'
+        end
+
+        # The message is composed of the path and the error, so the path must
+        # not carry bytes the composition cannot handle.
+        assert_raises_with_message Exceptions::ValidationError,
+                                   '/abc�def: String has invalid "UTF-8" encoding.' do
+          @schema.validate!(invalid_string => invalid_string)
+        end
+      end
+
+      def test_encoding_invalid_bytes_dependency
+        schema :hash do
+          str? :credit_card
+          str? :billing_address
+
+          dep :credit_card, :billing_address
+        end
+
+        assert_validation(credit_card: invalid_string) do
+          error '/credit_card', 'String has invalid "UTF-8" encoding.'
+          error '/', 'Missing property "billing_address" because "credit_card" is given.'
+        end
+
+        # A target with an invalid byte sequence is given, not blank.
+        assert_validation(credit_card: 'foo', billing_address: invalid_string) do
+          error '/billing_address', 'String has invalid "UTF-8" encoding.'
+        end
+      end
+
+      def test_encoding_incompatible_dependency
+        schema :hash do
+          str? :credit_card
+          str? :billing_address
+
+          dep :credit_card, :billing_address
+        end
+
+        assert_validation(credit_card: 'foo'.encode('UTF-16')) do
+          error '/', 'Missing property "billing_address" because "credit_card" is given.'
+        end
       end
 
       def test_defaults
@@ -1003,6 +1118,33 @@ module Schemacop
 
         assert_cast(nil, nil)
         assert_cast({ foo: 42 }, { bar: 42 }.with_indifferent_access)
+      end
+
+      def test_as_option_with_additional_properties
+        schema do
+          str? :foo, as: :bar
+          add :string
+        end
+
+        assert_cast({ foo: 'baz' }, { bar: 'baz' }.with_indifferent_access)
+        assert_cast({ foo: 'baz', other: 'qux' }, { bar: 'baz', other: 'qux' }.with_indifferent_access)
+
+        schema :hash, additional_properties: true do
+          str? :foo, as: :bar
+        end
+
+        assert_cast({ foo: 'baz' }, { bar: 'baz' }.with_indifferent_access)
+        assert_cast({ foo: 'baz', other: 42 }, { bar: 'baz', other: 42 }.with_indifferent_access)
+      end
+
+      def test_as_option_with_pattern_property
+        schema do
+          str? :foo_bar, as: :bar, format: :integer
+          str?(/^foo_.*$/)
+        end
+
+        assert_cast({ foo_bar: '42' }, { bar: 42 }.with_indifferent_access)
+        assert_cast({ foo_bar: '42', foo_qux: 'x' }, { bar: 42, foo_qux: 'x' }.with_indifferent_access)
       end
 
       def test_as_option_overriding

@@ -96,6 +96,13 @@ class V3Test < SchemacopTest
     @schema = Schemacop::Schema3.new(type, **options, &block)
   end
 
+  # `\x80` is a UTF-8 continuation byte and invalid on its own, as it is in
+  # US-ASCII. Operations that decode the string (`blank?`, `match?`, `to_sym`)
+  # raise on it.
+  def invalid_string(encoding = 'UTF-8')
+    "abc\x80def".dup.force_encoding(encoding)
+  end
+
   def with_context(context, &block)
     Schemacop.with_context(context, &block)
   end

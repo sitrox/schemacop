@@ -55,10 +55,23 @@ module Schemacop
 
     def in_path(segment)
       prev_path = @current_path
-      @current_path += [segment]
+      @current_path += [sanitize_segment(segment)]
       yield
     ensure
       @current_path = prev_path
+    end
+
+    private
+
+    # A path segment can be a key of the validated data and therefore carry any
+    # encoding. Joining or splitting a message built from a string with an
+    # invalid byte sequence, or from one that is incompatible with the other
+    # messages, raises.
+    def sanitize_segment(segment)
+      return segment unless segment.is_a?(String)
+      return segment if segment.valid_encoding? && Encoding.compatible?(Encoding::UTF_8, segment)
+
+      return segment.scrub.encode(Encoding::UTF_8, invalid: :replace, undef: :replace)
     end
   end
 end

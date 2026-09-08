@@ -13,7 +13,7 @@ module Schemacop
         item = match(value)
 
         unless item
-          if options[:treat_blank_as_nil] && value.blank? && !value.is_a?(FalseClass)
+          if options[:treat_blank_as_nil] && V3.blank?(value) && !value.is_a?(FalseClass)
             return nil
           else
             return value
@@ -37,7 +37,7 @@ module Schemacop
       public
 
       def _validate(data, result:)
-        if options[:treat_blank_as_nil] && data.blank? && !data.is_a?(FalseClass)
+        if options[:treat_blank_as_nil] && V3.blank?(data) && !data.is_a?(FalseClass)
           data = nil
         end
 

@@ -1,5 +1,50 @@
 # Change log
 
+## 3.1.1 (2026-09-08)
+
+* Fix crashes when validating strings whose encoding does not fit their
+  contents or the schema:
+
+  * A string with an invalid byte sequence is reported as such and no longer
+    handed to `allow_blank`, `pattern` and `format`, which decode it and
+    therefore raised an `ArgumentError`. The checks that do not decode the
+    string (`min_length`, `max_length`, `encoding` and `enum`) are still
+    reported.
+
+  * A string that cannot be compared with the `pattern` or with the pattern of
+    the given `format` because their encodings are incompatible (e.g. a UTF-16
+    string) is reported as not matching it, rather than raising an
+    `Encoding::CompatibilityError` or a `RegexpError`. The same holds for
+    `allow_blank`, `dep` dependencies and `treat_blank_as_nil`, which treat
+    such a string as blank only if it is empty.
+
+  * Hash keys and values with an invalid byte sequence no longer raise an
+    `ArgumentError` or an `EncodingError` when used together with
+    `property_names`, pattern properties, `ignore_obsolete_properties` or `dep`
+    dependencies. Such a key matches none of the patterns.
+
+  * A key with an invalid byte sequence in the path of a validation error no
+    longer makes `Result#messages`, `Result#exception_message` and `validate!`
+    raise an `ArgumentError`. The invalid bytes are replaced in the path of the
+    message.
+
+  * The `encoding` error of a string is now reported before its `pattern` and
+    `format` errors, rather than after them.
+
+  Internal reference: `#153682`.
+
+* Fix `ignore_obsolete_properties` ignoring an allow list given as strings
+  (e.g. `ignore_obsolete_properties: %w[foo]`), which reported the listed
+  properties as obsolete. Strings and symbols are now treated alike.
+
+* Fix a `NoMethodError` when casting a hash that declares pattern properties
+  and contains a key matching none of them.
+
+* Fix casting of hash properties that are specified in the schema: in a hash
+  that also declares pattern properties or additional properties, they were
+  casted a second time as such, which could cast them with the wrong node and
+  added the original key to the result next to the one given via `as`.
+
 ## 3.1.0 (2026-05-09)
 
 * Add option `encoding` to `str` node for Schemacop V3 schemas to validate that

@@ -260,6 +260,44 @@ module Schemacop
         assert_validation(true)
       end
 
+      def test_treat_blank_as_nil_with_invalid_encoding
+        schema :one_of, treat_blank_as_nil: true do
+          str
+          int
+        end
+
+        # A string with an invalid byte sequence is not blank, so it is matched
+        # against the items rather than treated as nil.
+        assert_validation invalid_string do
+          error '/', <<~PLAIN.strip
+            Matches 0 schemas but should match exactly 1:
+              - Schema 1:
+                - /: String has invalid "UTF-8" encoding.
+              - Schema 2:
+                - /: Invalid type, got type "String", expected "integer".
+          PLAIN
+        end
+      end
+
+      def test_treat_blank_as_nil_with_incompatible_encoding
+        schema :one_of, treat_blank_as_nil: true do
+          boo
+          str format: :boolean
+        end
+
+        assert_validation ''.encode('UTF-16')
+
+        assert_validation 'true'.encode('UTF-16') do
+          error '/', <<~PLAIN.strip
+            Matches 0 schemas but should match exactly 1:
+              - Schema 1:
+                - /: Invalid type, got type "String", expected "boolean".
+              - Schema 2:
+                - /: String does not match format "boolean".
+          PLAIN
+        end
+      end
+
       # With cast_str as default option, int gets wrapped in a OneOfNode containing
       # [IntegerNode, StringNode(format: :integer)]. When combined with a sibling str
       # node in one_of, numeric-looking strings like "1" match both the wrapped int

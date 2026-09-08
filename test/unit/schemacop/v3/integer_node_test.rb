@@ -366,6 +366,20 @@ module Schemacop
         end
       end
 
+      def test_cast_str_with_invalid_encoding
+        schema :integer, cast_str: true
+
+        assert_validation(invalid_string) do
+          error '/', <<~PLAIN.strip
+            Matches 0 schemas but should match exactly 1:
+              - Schema 1:
+                - /: Invalid type, got type "String", expected "integer".
+              - Schema 2:
+                - /: String has invalid "UTF-8" encoding.
+          PLAIN
+        end
+      end
+
       def test_cast_str_required
         schema :integer, cast_str: true, required: true
 

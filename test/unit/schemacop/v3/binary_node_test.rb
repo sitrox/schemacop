@@ -13,6 +13,14 @@ module Schemacop
         assert_json(type: :string, format: :binary)
       end
 
+      def test_invalid_encoding
+        schema :binary
+
+        # Binary data is not decoded, so any byte sequence is accepted.
+        assert_validation invalid_string
+        assert_cast invalid_string, invalid_string
+      end
+
       def test_required
         schema :binary, required: true
 

@@ -27,7 +27,7 @@ module Schemacop
         super_data = super
 
         # Validate blank #
-        if options[:allow_blank].is_a?(FalseClass) && super_data.blank?
+        if options[:allow_blank].is_a?(FalseClass) && V3.blank?(super_data)
           result.error 'String is blank but must not be blank!'
         end
 
@@ -44,17 +44,6 @@ module Schemacop
           result.error "String is #{length} characters long but must be at most #{options[:max_length]}."
         end
 
-        # Validate pattern #
-        if (pattern = options[:pattern])
-          unless options[:pattern].is_a?(Regexp)
-            pattern = Regexp.compile(pattern)
-          end
-
-          unless super_data.match?(pattern)
-            result.error "String does not match pattern #{V3.sanitize_exp(pattern).inspect}."
-          end
-        end
-
         # Validate encoding matches #
         if options[:encoding]
           allowed_encodings = Array(options[:encoding])
@@ -63,16 +52,30 @@ module Schemacop
           end
         end
 
-        # Validate encoding #
+        # Validate byte sequence #
+        # `match?` raises an ArgumentError on an invalid byte sequence, so no
+        # check below may see such a string.
         unless super_data.valid_encoding?
           result.error "String has invalid #{super_data.encoding.name.inspect} encoding."
+          return
+        end
+
+        # Validate pattern #
+        if (pattern = options[:pattern])
+          unless options[:pattern].is_a?(Regexp)
+            pattern = Regexp.compile(pattern)
+          end
+
+          unless V3.match?(pattern, super_data)
+            result.error "String does not match pattern #{V3.sanitize_exp(pattern).inspect}."
+          end
         end
 
         # Validate format #
         if options[:format] && Schemacop.string_formatters.include?(options[:format])
           pattern = Schemacop.string_formatters[options[:format]][:pattern]
 
-          if pattern && !super_data.match?(pattern)
+          if pattern && !V3.match?(pattern, super_data)
             result.error "String does not match format #{options[:format].to_s.inspect}."
           elsif options[:format_options] && Node.resolve_class(options[:format])
             node = create(options[:format], **options[:format_options])

@@ -15,6 +15,14 @@ module Schemacop
         assert_json({})
       end
 
+      def test_invalid_encoding
+        schema :object, classes: [String]
+
+        # An object is only checked for its class, never decoded.
+        assert_validation invalid_string
+        assert_cast invalid_string, invalid_string
+      end
+
       def test_required_with_no_types
         schema :object, required: true
 

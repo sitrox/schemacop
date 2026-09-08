@@ -4,6 +4,38 @@ module Schemacop
       NodeRegistry.register(*args)
     end
 
+    # `String#blank?` matches a regular expression and therefore raises on a
+    # string it cannot compare: an `ArgumentError` on an invalid byte sequence,
+    # a `RegexpError` on a dummy encoding such as UTF-16. Neither kind of
+    # string is blank unless it is empty.
+    # @private
+    def self.blank?(value)
+      return false if invalid_encoding?(value)
+
+      return value.blank?
+    rescue Encoding::CompatibilityError, RegexpError
+      return value.empty?
+    end
+
+    # `Regexp#match?` raises on a string it cannot compare: an `ArgumentError`
+    # on an invalid byte sequence, an `Encoding::CompatibilityError` on an
+    # encoding incompatible with the pattern's. Neither kind of string matches.
+    # @private
+    def self.match?(pattern, value)
+      return false if invalid_encoding?(value)
+
+      begin
+        return pattern.match?(value)
+      rescue Encoding::CompatibilityError
+        return false
+      end
+    end
+
+    # @private
+    def self.invalid_encoding?(value)
+      return value.is_a?(String) && !value.valid_encoding?
+    end
+
     # @private
     def self.sanitize_exp(exp)
       return exp if exp.is_a?(String)

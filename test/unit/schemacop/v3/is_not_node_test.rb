@@ -25,6 +25,18 @@ module Schemacop
         end
       end
 
+      def test_invalid_encoding
+        schema :is_not do
+          str pattern: /\Aabc/
+        end
+
+        assert_validation('def')
+
+        # A string with an invalid byte sequence matches no pattern, so it does
+        # not match the inner schema either.
+        assert_validation(invalid_string)
+      end
+
       def test_required
         schema :is_not, required: true do
           int minimum: 5
