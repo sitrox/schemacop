@@ -33,6 +33,9 @@
 
   Internal reference: `#153682`.
 
+* Require `tempfile`, which the `bin` node needs. Requiring the gem outside of
+  Rails failed with a `NameError` for `Tempfile`.
+
 * Fix `ignore_obsolete_properties` ignoring an allow list given as strings
   (e.g. `ignore_obsolete_properties: %w[foo]`), which reported the listed
   properties as obsolete. Strings and symbols are now treated alike.

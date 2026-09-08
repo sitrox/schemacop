@@ -5,6 +5,7 @@ require 'active_support/all'
 require 'set'
 require 'uri'
 require 'resolv'
+require 'tempfile'
 
 # Schemacop module
 module Schemacop
