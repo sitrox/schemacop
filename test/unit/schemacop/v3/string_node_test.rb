@@ -323,6 +323,10 @@ module Schemacop
           error '/', 'String does not match format "integer".'
         end
 
+        assert_validation "32\ntest" do
+          error '/', 'String does not match format "integer".'
+        end
+
         assert_cast(nil, nil)
         assert_cast('2234', 2234)
         assert_cast('-1', -1)
@@ -516,9 +520,11 @@ module Schemacop
       end
 
       def test_format_custom
+        formatters_was = Schemacop.string_formatters.dup
+
         Schemacop.register_string_formatter(
           :integer_tuple_list,
-          pattern: /^(-?[0-9]+):(-?[0-9]+)(,(-?[0-9]+):(-?[0-9]+))*$/,
+          pattern: /\A(-?[0-9]+):(-?[0-9]+)(,(-?[0-9]+):(-?[0-9]+))*\z/,
           handler: proc do |value|
             value.split(',').map { |t| t.split(':').map(&:to_i) }
           end
@@ -539,8 +545,55 @@ module Schemacop
           error '/', 'String does not match format "integer-tuple-list".'
         end
 
+        assert_validation "1:5\nsd sfdij soidf" do
+          error '/', 'String does not match format "integer-tuple-list".'
+        end
+
         assert_cast nil, nil
         assert_cast '1:2,3:4,5:-6', [[1, 2], [3, 4], [5, -6]]
+      ensure
+        Schemacop.string_formatters = formatters_was
+      end
+
+      # A format pattern must be anchored with \A and \z: ^ and $ match the
+      # start and the end of any line, so a multi-line string would pass the
+      # validation and be handed to the cast handler.
+      def test_format_multiline
+        values = {
+          date:         '2020-01-13',
+          date_time:    '2018-11-13T20:20:39Z',
+          time:         '20:30:39Z',
+          email:        'support@example.com',
+          mailbox:      '<support@example.com>',
+          boolean:      'true',
+          integer:      '23425',
+          number:       '2.34',
+          integer_list: '1,2,3',
+          ipv4:         '192.168.0.1',
+          ipv4_cidr:    '192.168.0.1/24',
+          ipv6:         '2001:db8::1'
+        }
+
+        assert_equal Schemacop.string_formatters.reject { |_, f| f[:pattern].nil? }.keys.sort,
+                     values.keys.map { |format| format.to_s.dasherize.to_sym }.sort,
+                     'Every format with a pattern must be covered here'
+
+        values.each do |format, value|
+          name = format.to_s.dasherize.to_sym
+
+          schema :string, format: format
+
+          assert_validation value
+
+          ["#{value}\nfoo", "foo\n#{value}", "#{value}\n"].each do |multiline|
+            refute Schemacop.string_formatters[name][:pattern].match?(multiline),
+                   "Format #{name} matches the multi-line value #{multiline.inspect}"
+
+            assert_validation multiline do
+              error '/', "String does not match format #{name.to_s.inspect}."
+            end
+          end
+        end
       end
 
       def test_enum

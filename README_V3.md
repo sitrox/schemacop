@@ -213,8 +213,17 @@ transformed into various types.
 * `pattern`
   Defines a (ruby) regex pattern the value will be matched against. Must be either
   a string which should not be enclosed in `/` characters, or a Ruby Regexp.
-  The pattern should generally start with `^` and end with `$` so as to evaluate
-  the entire string.
+  The pattern should generally be anchored so as to evaluate the entire string.
+  In Ruby, `^` and `$` match at the start and the end of every *line*, so
+  `/^[0-9]+$/` accepts `"32\nfoo"`; `\A` and `\z` match only at the start and
+  the end of the string.
+
+  Patterns are exported to the JSON schema verbatim, and JSON Schema uses the
+  ECMA-262 dialect, which knows no `\A` and `\z` (it reads them as the literal
+  characters `A` and `z`) and where `^` and `$` already match the whole string
+  only. A pattern can therefore be correct on one side or the other, but not on
+  both: use `\A` and `\z` for schemas that are validated in Ruby, and `^` and
+  `$` for schemas that are exported and validated elsewhere.
 * `format`
   The `format` option allows for basic semantic validation on certain kinds of
   string values that are commonly used. See section *formats* for more
@@ -303,12 +312,16 @@ You can also implement your custom formats or override the behavior of the
 standard formats. For Rails applications, this can be done in
 `config/schemacop.rb`:
 
+Anchor the pattern with `\A` and `\z`. In Ruby, `^` and `$` match at the start
+and the end of every line, so a multi-line value would pass the validation and
+reach your handler.
+
 ```ruby
 # config/schemacop.rb
 Schemacop.register_string_formatter(
-  :character_array,                        # Formatter name
-  pattern: /^[a-zA-Z](,[a-zA-Z])*/,        # Regex pattern for validation
-  handler: ->(value) { value.split(',') }  # Casting callback
+  :character_array,                          # Formatter name
+  pattern: /\A[a-zA-Z](,[a-zA-Z])*\z/,       # Regex pattern for validation
+  handler: ->(value) { value.split(',') }    # Casting callback
 )
 
 # In your schema
@@ -944,6 +957,9 @@ It consists of key-value-pairs that can be validated using arbitrary nodes.
   This option allows to specify a regexp pattern (as string) which validates the
   keys of any properties that are not specified in the hash. This option only
   makes sense if `additional_properties` is enabled. See below for more information.
+  The pattern is anchored the same way as the `pattern` option of the string
+  node, i.e. a pattern using `^` and `$` accepts a key that matches on any of
+  its lines.
 
 * `min_properties`
   Specifies the (inclusive) minimum number of properties a hash must contain.

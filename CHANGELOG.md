@@ -33,6 +33,18 @@
 
   Internal reference: `#153682`.
 
+* Anchor the patterns of the built-in string formats with `\A` and `\z` instead
+  of `^` and `$`, which match at the start and the end of every line in Ruby. A
+  multi-line string passed the validation as soon as one of its lines matched
+  and was then handed to the cast handler: `"32\ntest"` passed the `integer`
+  format and raised an `ArgumentError`, `"true\n"` passed the `boolean` format
+  and was cast to `false`. A value with a trailing newline is rejected as well
+  now, where it used to pass and be cast. Affects the formats `date`,
+  `date-time`, `time`, `mailbox`, `boolean`, `integer`, `number` and
+  `integer-list`.
+
+  Internal reference: `#153681`.
+
 * Require `tempfile`, which the `bin` node needs. Requiring the gem outside of
   Rails failed with a `NameError` for `Tempfile`.
 

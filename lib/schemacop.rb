@@ -23,6 +23,8 @@ module Schemacop
   mattr_accessor :v3_default_options
   self.v3_default_options = {}
 
+  # The pattern must be anchored with \A and \z: ^ and $ match at the start and
+  # the end of every line, so a multi-line value would reach the handler.
   def self.register_string_formatter(name, pattern:, handler:)
     name = name.to_s.dasherize.to_sym
 
@@ -34,21 +36,21 @@ module Schemacop
 
   register_string_formatter(
     :date,
-    pattern: /^([0-9]{4})-?(1[0-2]|0[1-9])-?(3[01]|0[1-9]|[12][0-9])$/,
+    pattern: /\A([0-9]{4})-?(1[0-2]|0[1-9])-?(3[01]|0[1-9]|[12][0-9])\z/,
     handler: ->(value) { Date.parse(value) }
   )
 
   # rubocop: disable Layout/LineLength
   register_string_formatter(
     :'date-time',
-    pattern: /^(-?(?:[1-9][0-9]*)?[0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])T(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(\.[0-9]+)?(Z|[+-](?:2[0-3]|[01][0-9]):[0-5][0-9])?$/,
+    pattern: /\A(-?(?:[1-9][0-9]*)?[0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])T(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(\.[0-9]+)?(Z|[+-](?:2[0-3]|[01][0-9]):[0-5][0-9])?\z/,
     handler: ->(value) { DateTime.parse(value) }
   )
   # rubocop: enable Layout/LineLength
 
   register_string_formatter(
     :time,
-    pattern: /^(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(\.[0-9]+)?(Z|[+-](?:2[0-3]|[01][0-9]):[0-5][0-9])?$/,
+    pattern: /\A(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(\.[0-9]+)?(Z|[+-](?:2[0-3]|[01][0-9]):[0-5][0-9])?\z/,
     handler: ->(value) { Time.parse(value) }
   )
 
@@ -60,12 +62,12 @@ module Schemacop
 
   register_string_formatter(
     :mailbox,
-    pattern: /^("\p{Print}+"\s)?<#{URI::MailTo::EMAIL_REGEXP.source[2...-2]}>$/,
+    pattern: /\A("\p{Print}+"\s)?<#{URI::MailTo::EMAIL_REGEXP.source[2...-2]}>\z/,
     handler: ->(value) { value }
   )
   register_string_formatter(
     :boolean,
-    pattern: /^(true|false|0|1)$/i,
+    pattern: /\A(true|false|0|1)\z/i,
     handler: ->(value) { %w[true 1].include?(value&.downcase) }
   )
 
@@ -83,13 +85,13 @@ module Schemacop
 
   register_string_formatter(
     :integer,
-    pattern: /^-?[0-9]+$/,
+    pattern: /\A-?[0-9]+\z/,
     handler: ->(value) { Integer(value, 10) }
   )
 
   register_string_formatter(
     :number,
-    pattern: /^-?[0-9]+(\.[0-9]+)?$/,
+    pattern: /\A-?[0-9]+(\.[0-9]+)?\z/,
     handler: proc do |value|
       if value.include?('.')
         Float(value)
@@ -101,7 +103,7 @@ module Schemacop
 
   register_string_formatter(
     :'integer-list',
-    pattern: /^(-?[0-9]+)(,-?[0-9]+)*$/,
+    pattern: /\A(-?[0-9]+)(,-?[0-9]+)*\z/,
     handler: ->(value) { value.split(',').map { |i| Integer(i, 10) } }
   )
 
